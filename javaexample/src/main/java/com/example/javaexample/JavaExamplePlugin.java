@@ -8,14 +8,12 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.PluginType;
 import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
 	name = "Java example",
-	description = "Java example",
-	type = PluginType.MISCELLANEOUS
+	description = "Java example"
 )
 @Slf4j
 public class JavaExamplePlugin extends Plugin

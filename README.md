@@ -2,6 +2,8 @@
 
 You can use this repository as base for your external plugins, and host it on GitHub to make your external plugins available for everybody through the external manager plugin panel in the OpenOSRS client.
 
+This has been updated for the new OPRS client version 4.0+.
+
 First of all you need to build the client (refer to the steps in this [guide][1])
 After building you need to upload all the artifacts to your local maven repository.
 You can do this within intellij by going to the gradle panel at the right hand side and click on OpenOSRS -> Tasks -> publishing -> publishToMavenLocal
@@ -17,7 +19,7 @@ Before you start you need to make a couple changes:
 The file "{project}/{projectname}.gradle.kts" (for example "javaexample/javaexample.gradle.kts") has two values you'll need to change "project.extra["PluginName"]" and "project.extra["PluginDescription"]"
 
 After building your project you can find the plugin jar in the build/libs folder of that project.
-This jar can be used directly by copying it into the "externalmanager" folder in the ".runelite" directory.
+This jar can be used directly by copying it into the "plugins" folder in the ".openosrs" directory: `USER/.openosrs/plugins`.
 
 If you want to bootstrap your plugins to make them available on GitHub you can just easily run the following task from the gradle panel in intellij Tasks -> other -> bootstrapPlugin
 This will copy your plugin to the release folder in the main directory and fill the plugins.json file with the needed information.
