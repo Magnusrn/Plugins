@@ -6,15 +6,13 @@ import net.runelite.client.config.ConfigManager
 import net.runelite.client.eventbus.Subscribe
 import net.runelite.client.plugins.Plugin
 import net.runelite.client.plugins.PluginDescriptor
-import net.runelite.client.plugins.PluginType
 import org.pf4j.Extension
 import javax.inject.Inject
 
 @Extension
 @PluginDescriptor(
         name = "Kotlin example",
-        description = "Kotlin example",
-        type = PluginType.MISCELLANEOUS
+        description = "Kotlin example"
 )
 class KotlinExamplePlugin : Plugin() {
 
