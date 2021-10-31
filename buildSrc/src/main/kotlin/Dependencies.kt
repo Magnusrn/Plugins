@@ -24,20 +24,20 @@
  */
 
 object ProjectVersions {
-    const val openosrsVersion = "4.0.0"
+    const val openosrsVersion = "4.14.0"
     const val apiVersion = "^1.0.0"
 }
 
 object Libraries {
     private object Versions {
-        const val guice = "4.2.2"
+        const val guice = "5.0.1"
         const val javax = "1.3.2"
-        const val lombok = "1.18.10"
-        const val pf4j = "3.2.0"
-        const val slf4j = "1.7.30"
+        const val lombok = "1.18.20"
+        const val pf4j = "3.6.0"
+        const val slf4j = "1.7.32"
     }
 
-    const val guice = "com.google.inject:guice:${Versions.guice}:no_aop"
+    const val guice = "com.google.inject:guice:${Versions.guice}"
     const val javax = "javax.annotation:javax.annotation-api:${Versions.javax}"
     const val lombok = "org.projectlombok:lombok:${Versions.lombok}"
     const val pf4j = "org.pf4j:pf4j:${Versions.pf4j}"
