@@ -26,7 +26,6 @@
 rootProject.name = "external plugins example"
 
 include(":birdhouseinfobox")
-include(":coxraidscouter")
 include(":objecthider")
 include(":oneclickbloods")
 include(":oneclickchins")
@@ -35,7 +34,6 @@ include(":oneclickglassblowing")
 include(":oneclickkarambwans")
 include(":oneclickminnows")
 include(":oneclicksandstone")
-include(":oneclickshades")
 include(":oneclickswordfish")
 include(":oneclicktelegrab")
 include(":oneclicktenchfishing")
