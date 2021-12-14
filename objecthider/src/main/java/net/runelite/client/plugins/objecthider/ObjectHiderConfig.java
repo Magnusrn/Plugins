@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Owain van Brakel <https:github.com/Owain94>
+ * Copyright (c) 2018, Tomas Slusny <slusnucky@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,34 +22,46 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.plugins.objecthider;
 
-rootProject.name = "external plugins example"
+import net.runelite.client.config.Config;
+import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigItem;
 
-include(":birdhouseinfobox")
-include(":coxraidscouter")
-include(":objecthider")
-include(":oneclickbloods")
-include(":oneclickchins")
-include(":oneclickcustom")
-include(":oneclickglassblowing")
-include(":oneclickkarambwans")
-include(":oneclickminnows")
-include(":oneclicksandstone")
-include(":oneclickshades")
-include(":oneclickswordfish")
-include(":oneclicktelegrab")
-include(":oneclicktenchfishing")
-include(":oneclickzmi")
-include(":tabswitcher")
-
-
-
-for (project in rootProject.children) {
-    project.apply {
-        projectDir = file(name)
-        buildFileName = "$name.gradle.kts"
-
-        require(projectDir.isDirectory) { "Project '${project.path} must have a $projectDir directory" }
-        require(buildFile.isFile) { "Project '${project.path} must have a $buildFile build script" }
+@ConfigGroup("objecthider")
+public interface ObjectHiderConfig extends Config
+{
+    @ConfigItem(
+            keyName = "ObjectConfigData",
+            name = "Object ID's",
+            description = "List Desired object ID'S to be hidden, separated by a comma. **If you wish to unhide an object you must restart the plugin**",
+            position = 1
+    )
+    default String objectIdsSet()
+    {
+        return "";
     }
+
+    @ConfigItem(
+            position = 2,
+            keyName = "FossilIsland",
+            name = "Fossil Island",
+            description = "Hides various game objects whilst on Fossil Island"
+    )
+    default boolean FossilIsland()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+            position = 3,
+            keyName ="ZeahRunecrafting" ,
+            name = "Zeah Runecrafting",
+            description = "Hides various game objects whilst Zeah Runecrafting"
+    )
+    default boolean ZeahRunecrafting()
+    {
+        return false;
+    }
+
 }
