@@ -27,7 +27,7 @@ import java.util.*;
 @Extension
 @PluginDescriptor(
         name = "One Click Custom",
-        description = "Sets the Menu entry for left click anywhere",
+        description = "Sets test testthe Menu entry for left click anywhere",
         tags = {"one click","custom"},
         enabledByDefault = false
 )
