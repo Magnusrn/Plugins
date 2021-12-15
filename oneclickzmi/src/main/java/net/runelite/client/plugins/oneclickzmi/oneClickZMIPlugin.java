@@ -369,7 +369,7 @@ public class oneClickZMIPlugin extends Plugin {
         return new MenuEntry(
                 "Bank",
                 "<col=ffff00>Eniola",
-                3349,
+                12610,
                 MenuAction.NPC_FIRST_OPTION.getId(),
                 0,
                 0,
