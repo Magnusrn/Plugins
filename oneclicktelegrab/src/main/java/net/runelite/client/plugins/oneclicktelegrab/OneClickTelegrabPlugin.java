@@ -96,11 +96,9 @@ public class OneClickTelegrabPlugin extends Plugin {
     private MenuEntry telegrabMES() {
         if (!GroundItems.isEmpty()) {
             TileItem tileItem = getNearestTileItem(GroundItems);
-            return new MenuEntry(
-                    "Cast",
-                    "<col=00ff00>Telekinetic Grab</col><col=ffffff> -> <col=ff9040>Wine of zamorak",
+            return createMenuEntry(
                     getWineID(),
-                    MenuAction.SPELL_CAST_ON_GROUND_ITEM.getId(),
+                    MenuAction.SPELL_CAST_ON_GROUND_ITEM,
                     tileItem.getTile().getSceneLocation().getX(),
                     tileItem.getTile().getSceneLocation().getY(),
                     false);
@@ -176,5 +174,10 @@ public class OneClickTelegrabPlugin extends Plugin {
             return WINE_OF_ZAMORAK_WILDERNESS_ID;
         }
         return WINE_OF_ZAMORAK_FALADOR_ID;
+    }
+
+    public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
+        return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
+                .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
     }
 }

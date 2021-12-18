@@ -112,18 +112,6 @@ public class OneClickSandstonePlugin extends Plugin {
         }
     }
 
-    private MenuEntry mineSandStone() {
-        GameObject customGameObject = checkforGameObject();
-        return client.createMenuEntry(-1)
-                .setOption("option")
-                .setTarget("target")
-                .setIdentifier(11386)
-                .setType(MenuAction.GAME_OBJECT_FIRST_OPTION)
-                .setParam0(getLocation(customGameObject).getX())
-                .setParam1(getLocation(customGameObject).getY())
-                .setForceLeftClick(true);
-    }
-
     private Point getLocation(TileObject tileObject) {
         if (tileObject instanceof GameObject)
             return ((GameObject)tileObject).getSceneMinLocation();
@@ -188,28 +176,31 @@ public class OneClickSandstonePlugin extends Plugin {
         return count;
     }
 
-    private MenuEntry createHumidifyMenuEntry()
-    {
-        return client.createMenuEntry(-1)
-                .setOption("Cast")
-                .setTarget("Humidify")
-                .setIdentifier(1)
-                .setType(MenuAction.CC_OP)
-                .setParam0(-1)
-                .setParam1(14286954)
-                .setForceLeftClick(true);
+    private MenuEntry mineSandStone() {
+        GameObject customGameObject = checkforGameObject();
+        return createMenuEntry(
+                11386,
+                MenuAction.GAME_OBJECT_FIRST_OPTION,
+                getLocation(customGameObject).getX(),
+                getLocation(customGameObject).getY(),
+                true);
     }
 
-    private MenuEntry depositGrinderMenuEntry()
-    {
-        return client.createMenuEntry(-1)
-                .setOption("Deposit")
-                .setTarget("Grinder")
-                .setIdentifier(26199)
-                .setType(MenuAction.GAME_OBJECT_FIRST_OPTION)
-                .setParam0(getLocation(checkForDepositGrinder()).getX())
-                .setParam1(getLocation(checkForDepositGrinder()).getY())
-                .setForceLeftClick(true);
+    private MenuEntry createHumidifyMenuEntry() {
+        return createMenuEntry(
+                1,
+                MenuAction.CC_OP,
+                -1,
+                14286954,
+                true);
+    }
+
+    private MenuEntry depositGrinderMenuEntry() {
+        return createMenuEntry(
+                26199,
+                MenuAction.GAME_OBJECT_FIRST_OPTION,
+                getLocation(checkForDepositGrinder()).getX(),
+                getLocation(checkForDepositGrinder()).getY(),true);
     }
 
     private boolean shouldCastHumidify(Collection<Integer> ids) {
@@ -223,5 +214,10 @@ public class OneClickSandstonePlugin extends Plugin {
             }
         }
         return true;
+    }
+
+    public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
+        return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
+                .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
     }
 }

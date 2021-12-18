@@ -355,22 +355,18 @@ public class oneClickZMIPlugin extends Plugin {
 
 
     private MenuEntry depositAll(){
-        return new MenuEntry(
-                "Deposit inventory",
-                "",
+        return createMenuEntry(
                 1,
-                MenuAction.CC_OP.getId(),
+                MenuAction.CC_OP,
                 -1,
                 786474,
                 true);
     }
 
     private MenuEntry getBankMES(){
-        return new MenuEntry(
-                "Bank",
-                "<col=ffff00>Eniola",
+        return createMenuEntry(
                 12610,
-                MenuAction.NPC_FIRST_OPTION.getId(),
+                MenuAction.NPC_FIRST_OPTION,
                 0,
                 0,
                 false);
@@ -385,54 +381,45 @@ public class oneClickZMIPlugin extends Plugin {
         {
             ESSENCE = 7936;
         }
-        return new MenuEntry(
-                "Withdraw-All",
-                "<col=ff9040>Pure essence</col>",
+        return createMenuEntry(
                 7,
-                MenuAction.CC_OP_LOW_PRIORITY.getId(),
+                MenuAction.CC_OP_LOW_PRIORITY,
                 getBankIndex(ESSENCE),
                 786445,
                 false);
     }
 
     private MenuEntry drinkStamina(){
-        return new MenuEntry(
-                "Drink",
-                "<col=ff9040>Stamina potion(1)</col>",
+        return createMenuEntry(
                 9,
-                MenuAction.CC_OP_LOW_PRIORITY.getId(),
+                MenuAction.CC_OP_LOW_PRIORITY,
                 getInventoryItem(STAMINA_DOSE).getIndex(),
                 983043,
                 false);
     }
 
     private MenuEntry withdrawStamina(){
-        return new MenuEntry("Withdraw-1",
-                "<col=ff9040>Stamina potion(1)</col>",
+        return createMenuEntry(
                 1,
-                MenuAction.CC_OP.getId(),
+                MenuAction.CC_OP,
                 getBankIndex(STAMINA_DOSE),
                 786445,
                 false);
     }
 
     private MenuEntry withdrawFood(){
-        return new MenuEntry(
-                "Withdraw-1",
-                "Withdraw-1",
+        return createMenuEntry(
                 1,
-                MenuAction.CC_OP.getId(),
+                MenuAction.CC_OP,
                 getBankIndex(config.foodID()),
                 786445,
                 false);
     }
 
     private MenuEntry eatFood(){
-        return new MenuEntry(
-                "Eat",
-                "<col=ff9040>Anglerfish</col>",
+        return createMenuEntry(
                 9,
-                MenuAction.CC_OP_LOW_PRIORITY.getId(),
+                MenuAction.CC_OP_LOW_PRIORITY,
                 getInventoryItem(config.foodID()).getIndex(),
                 983043,
                 false);
@@ -448,65 +435,54 @@ public class oneClickZMIPlugin extends Plugin {
     }
 
     private MenuEntry fillMediumPouch(){
-        return new MenuEntry(
-                "Fill",
-                "Fill",
+        return createMenuEntry(
                 9,
-                MenuAction.CC_OP.getId(),
+                MenuAction.CC_OP,
                 getInventoryItem(MEDIUM_POUCH).getIndex(),
                 983043,
                 true);
     }
 
     private MenuEntry fillLargePouch(){
-        return new MenuEntry(
-                "Fill",
-                "Fill",
+        return createMenuEntry(
                 9,
-                MenuAction.CC_OP.getId(),
+                MenuAction.CC_OP,
                 getInventoryItem(LARGE_POUCH).getIndex(),
                 983043,
                 true);
     }
 
     private MenuEntry fillGiantPouch(){
-        return new MenuEntry(
-                "Fill",
-                "<col=ff9040>Giant pouch</col>",
+        return createMenuEntry(
                 9,
-                MenuAction.CC_OP_LOW_PRIORITY.getId(),
+                MenuAction.CC_OP_LOW_PRIORITY,
                 getInventoryItem(GIANT_POUCH).getIndex(),
                 983043,
                 false);
     }
 
     private MenuEntry emptyMedPouch(){
-        return new MenuEntry(
-                "Empty",
-                "<col=ff9040>Medium pouch",
+        return createMenuEntry(
                 5510,
-                MenuAction.ITEM_SECOND_OPTION.getId(),
+                MenuAction.ITEM_SECOND_OPTION,
                 getInventoryItem(MEDIUM_POUCH).getIndex(),
                 9764864,
                 true);
     }
 
     private MenuEntry emptyLargePouch(){
-        return new MenuEntry(
-                "Empty",
-                "<col=ff9040>Large pouch",
+        return createMenuEntry(
                 5512,
-                MenuAction.ITEM_SECOND_OPTION.getId(),
+                MenuAction.ITEM_SECOND_OPTION,
                 getInventoryItem(LARGE_POUCH).getIndex(),
                 9764864,
                 true);
     }
 
     private MenuEntry emptyGiantPouch(){
-        return new MenuEntry("Empty",
-                "<col=ff9040>Giant pouch",
+        return createMenuEntry(
                 5514,
-                MenuAction.ITEM_SECOND_OPTION.getId(),
+                MenuAction.ITEM_SECOND_OPTION,
                 getInventoryItem(GIANT_POUCH).getIndex(),
                 9764864,
                 false);
@@ -521,22 +497,18 @@ public class oneClickZMIPlugin extends Plugin {
     }
     private MenuEntry getAltarMES(){
         GameObject alter = getNearestAltar();
-        return new MenuEntry(
-                "Craft-rune",
-                "<col=ffff>Runecrafting altar",
+        return createMenuEntry(
                 29631,
-                MenuAction.GAME_OBJECT_FIRST_OPTION.getId(),
+                MenuAction.GAME_OBJECT_FIRST_OPTION,
                 getLocation(alter).getX(),
                 getLocation(alter).getY(),
                 true);
     }
 
     private MenuEntry castTeleport(){
-        return new MenuEntry(
-                "Cast",
-                "<col=00ff00>Ourania Teleport</col>",
+        return createMenuEntry(
                 1,
-                MenuAction.CC_OP.getId(),
+                MenuAction.CC_OP,
                 -1,
                 14286991,
                 true);
@@ -550,11 +522,9 @@ public class oneClickZMIPlugin extends Plugin {
 
     private MenuEntry clickLadder(){
         GameObject ladder = findLadder();
-        return new MenuEntry(
-                "Climb",
-                "<col=ffff>Ladder",
+        return createMenuEntry(
                 29635,
-                MenuAction.GAME_OBJECT_FIRST_OPTION.getId(),
+                MenuAction.GAME_OBJECT_FIRST_OPTION,
                 getLocation(ladder).getX(),
                 getLocation(ladder).getY(),
                 true);
@@ -569,32 +539,26 @@ public class oneClickZMIPlugin extends Plugin {
     }
 
     private MenuEntry castNpcContact(){
-        return new MenuEntry(
-                "Dark Mage",
-                "<col=00ff00>NPC Contact</col",
+        return createMenuEntry(
                 2,
-                MenuAction.CC_OP.getId(),
+                MenuAction.CC_OP,
                 -1,
                 14286952,
                 true);
     }
     private MenuEntry continueChat1(){
-        return new MenuEntry(
-                "Continue",
-                "",
+        return createMenuEntry(
                 0,
-                MenuAction.WIDGET_TYPE_6.getId(),
+                MenuAction.WIDGET_TYPE_6,
                 -1,
                 15138820,
                 true);
     }
 
     private MenuEntry continueChat2(){
-        return new MenuEntry(
-                "Continue",
-                "",
+        return createMenuEntry(
                 0,
-                MenuAction.WIDGET_TYPE_6.getId(),
+                MenuAction.WIDGET_TYPE_6,
                 -1,
                 14221316,
                 false);
@@ -629,6 +593,11 @@ public class oneClickZMIPlugin extends Plugin {
         } else {
             return -1;
         }
+    }
+
+    public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
+        return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
+                .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
     }
 }
 

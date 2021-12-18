@@ -173,10 +173,9 @@ public class oneClickCustomPlugin extends Plugin{
         {
             if (!GroundItems.isEmpty()) {
                 TileItem tileItem = getNearestTileItemByPath(GroundItems);
-                return new MenuEntry("Take",
-                        "Ground Item",
+                return createMenuEntry(
                         config.ID(),
-                        MenuAction.GROUND_ITEM_THIRD_OPTION.getId(),
+                        MenuAction.GROUND_ITEM_THIRD_OPTION,
                         tileItem.getTile().getSceneLocation().getX(),
                         tileItem.getTile().getSceneLocation().getY(),
                         true);
@@ -189,11 +188,9 @@ public class oneClickCustomPlugin extends Plugin{
             //System.out.println("Should be returning Gather MES");
             GameObject customGameObject = getNearestGameObjectByPath();
 
-            return new MenuEntry(
-                    "option",
-                    "target",
+            return createMenuEntry(
                     customGameObject.getId(),
-                    MenuAction.GAME_OBJECT_FIRST_OPTION.getId(),
+                    MenuAction.GAME_OBJECT_FIRST_OPTION,
                     getLocation(customGameObject).getX(),
                     getLocation(customGameObject).getY(),
                     true);
@@ -204,11 +201,9 @@ public class oneClickCustomPlugin extends Plugin{
         if(config.oneClickType()==oneClickCustomTypes.Fish)
         {
             //System.out.println("Should be returning Fish MES");
-            return new MenuEntry(
-                    "option",
-                    "target",
+            return createMenuEntry(
                     customNPCObject.getIndex(),
-                    MenuAction.NPC_FIRST_OPTION.getId(),
+                    MenuAction.NPC_FIRST_OPTION,
                     getNPCLocation(customNPCObject).getX(),
                     getNPCLocation(customNPCObject).getY(),
                     true);
@@ -217,11 +212,9 @@ public class oneClickCustomPlugin extends Plugin{
         if (config.oneClickType()==oneClickCustomTypes.Attack)
         {
             //System.out.println("Should be returning Attack MES");
-            return new MenuEntry(
-                    "option",
-                    "target",
+            return createMenuEntry(
                     customNPCObject.getIndex(),
-                    MenuAction.NPC_SECOND_OPTION.getId(),
+                    MenuAction.NPC_SECOND_OPTION,
                     getNPCLocation(customNPCObject).getX(),
                     getNPCLocation(customNPCObject).getY(),
                     true);
@@ -231,11 +224,9 @@ public class oneClickCustomPlugin extends Plugin{
         if(config.oneClickType()==oneClickCustomTypes.Pickpocket)
         {
             //System.out.println("Should be returning Pickpocket MES");
-            return new MenuEntry(
-                    "option",
-                    "target",
+            return createMenuEntry(
                     customNPCObject.getIndex(),
-                    MenuAction.NPC_THIRD_OPTION.getId(),
+                    MenuAction.NPC_THIRD_OPTION,
                     getNPCLocation(customNPCObject).getX(),
                     getNPCLocation(customNPCObject).getY(),
                     true);
@@ -423,6 +414,11 @@ public class oneClickCustomPlugin extends Plugin{
             previousY = worldPoint.getY();
         }
         return pathLength;
+    }
+
+    public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
+        return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
+                .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
     }
 
 }

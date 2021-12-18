@@ -106,11 +106,9 @@ public class OneClickMinnowsPlugin extends Plugin {
     }
 
     private MenuEntry fishingSpotMES(int id) {
-        return new MenuEntry(
-                "Small Net",
-                "<col=ffff00>Fishing spot",
+        return createMenuEntry(
                 getFishingSpot(id).getIndex(),
-                MenuAction.NPC_FIRST_OPTION.getId(),
+                MenuAction.NPC_FIRST_OPTION,
                 getFishingSpotLocation(getFishingSpot(id)).getX(),
                 getFishingSpotLocation(getFishingSpot(id)).getY(),
                 false);
@@ -125,5 +123,10 @@ public class OneClickMinnowsPlugin extends Plugin {
                 .idEquals(id)
                 .result(client)
                 .nearestTo(client.getLocalPlayer());
+    }
+
+    public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
+        return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
+                .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
     }
 }

@@ -145,71 +145,63 @@ public class oneClickKarambwansPlugin extends Plugin {
     }
 
     private MenuEntry fishingSpotMES() {
-        return new MenuEntry("Fish",
-                "<col=ffff00>Fishing spot",
+        return createMenuEntry(
                 getFishingSpot().getIndex(),
-                MenuAction.NPC_FIRST_OPTION.getId(),
+                MenuAction.NPC_FIRST_OPTION,
                 getNPCLocation(getFishingSpot()).getX(),
                 getNPCLocation(getFishingSpot()).getY(),
                 false);
     }
 
     private MenuEntry toZanarisMES() {
-        return new MenuEntry("Zanaris",
-                "<col=ffff>Fairy ring",
+        return createMenuEntry(
                 29495,
-                MenuAction.GAME_OBJECT_FIRST_OPTION.getId(),
+                MenuAction.GAME_OBJECT_FIRST_OPTION,
                 getLocation(getGameObject(FAIRY_RING_KARAMJA_ID)).getX(),
                 getLocation(getGameObject(FAIRY_RING_KARAMJA_ID)).getY(),
                 false);
     }
 
     private MenuEntry bankMES() {
-        return new MenuEntry("Use",
-                "<col=ffff>Bank chest",
+        return createMenuEntry(
                 26711,
-                MenuAction.GAME_OBJECT_FIRST_OPTION.getId(),
+                MenuAction.GAME_OBJECT_FIRST_OPTION,
                 getLocation(getGameObject(BANK_ID)).getX(),
                 getLocation(getGameObject(BANK_ID)).getY(),
                 false);
     }
 
     private MenuEntry toKaramjaMES() {
-        return new MenuEntry("Last-destination (DKP)",
-                "<col=ffff>Fairy ring",
+        return createMenuEntry(
                 29560,
-                MenuAction.GAME_OBJECT_THIRD_OPTION.getId(),
+                MenuAction.GAME_OBJECT_THIRD_OPTION,
                 getLocation(getGameObject(FAIRY_RING_ZANARIS_ID)).getX(),
                 getLocation(getGameObject(FAIRY_RING_ZANARIS_ID)).getY(),
                 false);
     }
 
     private MenuEntry depositKarambwansMES() {
-        return new MenuEntry("Deposit-All",
-                "<col=ff9040>Raw karambwan</col>",
+        return createMenuEntry(
                 8,
-                MenuAction.CC_OP_LOW_PRIORITY.getId(),
+                MenuAction.CC_OP_LOW_PRIORITY,
                 getInventoryItem(RAW_KARAMBWAN_ID).getIndex(),
                 983043,
                 false);
     }
 
     private MenuEntry depositClueBottleMES(int ID) {
-        return new MenuEntry(
-                "Deposit-1",
-                "<col=ff9040>Clue bottle (medium)</col>",
+        return createMenuEntry(
                 2,
-                MenuAction.CC_OP.getId(),
+                MenuAction.CC_OP,
                 getInventoryItem(ID).getIndex(),
                 983043,
                 false);
     }
 
     private MenuEntry emptyBarrelMES() {
-        return new MenuEntry("Empty",
-                "<col=ff9040>Open fish barrel</col>",
+        return createMenuEntry(
                 9,
-                MenuAction.CC_OP_LOW_PRIORITY.getId(),
+                MenuAction.CC_OP_LOW_PRIORITY,
                 getInventoryItem(FISH_BARREL_ID).getIndex(),
                 983043, false);
     }
@@ -291,5 +283,10 @@ public class oneClickKarambwansPlugin extends Plugin {
                 .idEquals(FISHING_SPOT_ID)
                 .result(client)
                 .nearestTo(client.getLocalPlayer());
+    }
+
+    public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
+        return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
+                .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
     }
 }

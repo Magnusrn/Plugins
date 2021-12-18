@@ -187,7 +187,12 @@ public class oneclickchinsplugin extends Plugin{
                 .result(client)
                 .nearestTo(client.getLocalPlayer());
 
-        return new MenuEntry("Reset", "<col=ffff>Shaking box", CHINCHOMPA_CAUGHT, MenuAction.GAME_OBJECT_SECOND_OPTION.getId(), getLocation(gameobject).getX(), getLocation(gameobject).getY(), true);
+        return createMenuEntry(
+                CHINCHOMPA_CAUGHT,
+                MenuAction.GAME_OBJECT_SECOND_OPTION,
+                getLocation(gameobject).getX(),
+                getLocation(gameobject).getY(),
+                true);
     }
 
     private MenuEntry ResetFailedTrap() {
@@ -195,16 +200,22 @@ public class oneclickchinsplugin extends Plugin{
                 .idEquals(CHINCHOMPA_FAILED)
                 .result(client)
                 .nearestTo(client.getLocalPlayer());
-        return new MenuEntry("Reset", "<col=ffff>Box trap", CHINCHOMPA_FAILED, MenuAction.GAME_OBJECT_SECOND_OPTION.getId(), getLocation(gameobject).getX(), getLocation(gameobject).getY(), true);
+        return createMenuEntry(
+                CHINCHOMPA_FAILED,
+                MenuAction.GAME_OBJECT_SECOND_OPTION,
+                getLocation(gameobject).getX(),
+                getLocation(gameobject).getY(),
+                true);
     }
 
     private MenuEntry ResetExpiredTrap() {
-
         TileItem object = getGroundItem(BOX_TRAP_EXPIRED);
-
-        int x = object.getTile().getLocalLocation().getSceneX();
-        int y = object.getTile().getLocalLocation().getSceneY();
-        return new MenuEntry("Lay", "<col=ff9040>Box trap",BOX_TRAP_EXPIRED, MenuAction.GROUND_ITEM_FOURTH_OPTION.getId(),x,y, true);
+        return createMenuEntry(
+                BOX_TRAP_EXPIRED,
+                MenuAction.GROUND_ITEM_FOURTH_OPTION,
+                object.getTile().getLocalLocation().getSceneX(),
+                object.getTile().getLocalLocation().getSceneY(),
+                true);
     }
 
     private boolean CaughtTrapExists(){
@@ -227,5 +238,10 @@ public class oneclickchinsplugin extends Plugin{
     {
         TileItem object = getGroundItem(BOX_TRAP_EXPIRED);
         return object != null;
+    }
+
+    public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
+        return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
+                .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
     }
 }

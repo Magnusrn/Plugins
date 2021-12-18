@@ -135,76 +135,62 @@ public class OneClickGlassblowingPlugin extends Plugin {
         if (config.bankChoice()== GlassblowingType.BankChoice.Clan_Hall)
         {
             int BANK_BOOTH_ID = 10583;
-            return new MenuEntry(
-                    "Bank",
-                    "<col=ffff>Bank booth",
+            return createMenuEntry(
                     BANK_BOOTH_ID,
-                    MenuAction.GAME_OBJECT_SECOND_OPTION.getId(),
+                    MenuAction.GAME_OBJECT_SECOND_OPTION,
                     getLocation(getGameObject(BANK_BOOTH_ID)).getX(),
                     getLocation(getGameObject(BANK_BOOTH_ID)).getY(),
                     false);
         }
         int BANK_CHEST_ID = 30796;
-        return new MenuEntry(
-                "Use",
-                "<col=ffff>Bank Chest-wreck",
+        return createMenuEntry(
                 BANK_CHEST_ID,
-                MenuAction.GAME_OBJECT_FIRST_OPTION.getId(),
+                MenuAction.GAME_OBJECT_FIRST_OPTION,
                 getLocation(getGameObject(BANK_CHEST_ID)).getX(),
                 getLocation(getGameObject(BANK_CHEST_ID)).getY(),
                 true);
     }
 
     private MenuEntry depositItems(){
-        return new MenuEntry(
-                "Deposit inventory",
-                "",
+        return createMenuEntry(
                 1,
-                MenuAction.CC_OP.getId(),
+                MenuAction.CC_OP,
                 -1,
                 786474,
                 false);
     }
 
     private MenuEntry withdrawAllMoltenGlass(){
-        return new MenuEntry(
-                "Withdraw-All",
-                "Withdraw-All",
+        return createMenuEntry(
                 7,
-                MenuAction.CC_OP.getId(),
+                MenuAction.CC_OP,
                 getBankIndex(),
                 786445,
                 true);
     }
 
     private MenuEntry closeBank(){
-        return new MenuEntry(
-                "Close",
-                "",
+        return createMenuEntry(
                 1,
-                MenuAction.CC_OP.getId(),
+                MenuAction.CC_OP,
                 11,
                 786434,
                 true);
     }
 
     private MenuEntry useGlassblowingPipe(){
-        return new MenuEntry(
-                "Use",
-                "",
+        return createMenuEntry(
                 1785,
-                MenuAction.ITEM_USE.getId(),
+                MenuAction.ITEM_USE,
                 getInventoryItem(1785).getIndex(),
                 9764864,
                 true);
     }
 
     private MenuEntry useOnMoltenGlass(){
-        return new MenuEntry(
-                "Use",
-                "<col=ff9040>Glassblowing pipe<col=ffffff> -> <col=ff9040>Molten glass",
+        return createMenuEntry(
                 1775,
-                MenuAction.ITEM_USE_ON_WIDGET_ITEM.getId(),
+                MenuAction.ITEM_USE_ON_WIDGET_ITEM,
                 getInventoryItem(1775).getIndex(),
                 9764864,
                 true);
@@ -227,9 +213,9 @@ public class OneClickGlassblowingPlugin extends Plugin {
         }
         if (MENU_ID==0) return null;
 
-        return new MenuEntry("Make",
-                "<col=ff9040>Unpowered staff orb</col>",
-                1, MenuAction.CC_OP.getId(),
+        return createMenuEntry(
+                1,
+                MenuAction.CC_OP,
                 -1,
                 MENU_ID,
                 false);
@@ -276,5 +262,10 @@ public class OneClickGlassblowingPlugin extends Plugin {
 
     private boolean bankOpen() {
         return client.getItemContainer(InventoryID.BANK) != null;
+    }
+
+    public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
+        return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
+                .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
     }
 }

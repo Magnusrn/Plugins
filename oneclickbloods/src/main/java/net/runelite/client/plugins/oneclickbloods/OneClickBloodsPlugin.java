@@ -264,66 +264,54 @@ public class OneClickBloodsPlugin extends Plugin {
     }
 
     private MenuEntry runestoneToDarkAltarAreaShortcutMES(){
-        return new MenuEntry(
-                "Climb",
-                "<col=ffff>Rocks",
+        return createMenuEntry(
                 RUNESTONE_TO_DARK_ALTAR_SHORTCUT_ID,
-                MenuAction.GAME_OBJECT_FIRST_OPTION.getId(),
+                MenuAction.GAME_OBJECT_FIRST_OPTION,
                 getLocation(getGroundObject(RUNESTONE_TO_DARK_ALTAR_SHORTCUT_ID)).getX(),
                 getLocation(getGroundObject(RUNESTONE_TO_DARK_ALTAR_SHORTCUT_ID)).getY(),
                 false);
     }
 
     private MenuEntry venerateMES() {
-        return new MenuEntry(
-                "Venerate",
-                "<col=ffff>Dark Altar",
+        return createMenuEntry(
                 DARK_ALTAR_ID,
-                MenuAction.GAME_OBJECT_FIRST_OPTION.getId(),
+                MenuAction.GAME_OBJECT_FIRST_OPTION,
                 getLocation(getGameObject(DARK_ALTAR_ID)).getX(),
                 getLocation(getGameObject(DARK_ALTAR_ID)).getY(),
                 false);
     }
 
     private MenuEntry useChiselOnBlockMES() {
-        return new MenuEntry(
-                "Use",
-                "<col=ff9040>Chisel<col=ffffff> -> <col=ff9040>Dark essence block",
+        return createMenuEntry(
                 DARK_ESSENCE_BLOCK_ID,
-                MenuAction.ITEM_USE_ON_WIDGET_ITEM.getId(),
+                MenuAction.ITEM_USE_ON_WIDGET_ITEM,
                 getLastInventoryItem(DARK_ESSENCE_BLOCK_ID).getIndex(),
                 9764864,
                 false);
     }
 
     private MenuEntry useChiselOnRockSlideMES() {
-        return new MenuEntry(
-                "Use",
-                "<col=ff9040>Chisel<col=ffffff> -> <col=ffff>Rockslide",
+        return createMenuEntry(
                 11428,
-                MenuAction.ITEM_USE_ON_GAME_OBJECT.getId(),
+                MenuAction.ITEM_USE_ON_GAME_OBJECT,
                 getRockslide().getSceneMinLocation().getX(),
                 getRockslide().getSceneMinLocation().getY(),
                 false);
     }
 
     private MenuEntry runecraftMES() {
-        return new MenuEntry(
-                "Bind",
-                "<col=ffff>Blood Altar",
+        return createMenuEntry(
                 BLOOD_ALTAR_ID,
-                MenuAction.GAME_OBJECT_FIRST_OPTION.getId(),
+                MenuAction.GAME_OBJECT_FIRST_OPTION,
                 getLocation(getGameObject(BLOOD_ALTAR_ID)).getX(),
                 getLocation(getGameObject(BLOOD_ALTAR_ID)).getY(),
                 false);
     }
 
     private MenuEntry bloodAltarToRunestoneShortcutMES(){
-        return new MenuEntry(
-                "Climb",
-                "<col=ffff>Rocks",
+        return createMenuEntry(
                 BLOOD_ALTAR_TO_RUNESTONE_SHORTCUT_ID,
-                MenuAction.GAME_OBJECT_FIRST_OPTION.getId(),
+                MenuAction.GAME_OBJECT_FIRST_OPTION,
                 getLocation(getGroundObject(BLOOD_ALTAR_TO_RUNESTONE_SHORTCUT_ID)).getX(),
                 getLocation(getGroundObject(BLOOD_ALTAR_TO_RUNESTONE_SHORTCUT_ID)).getY(),
                 false);
@@ -336,11 +324,9 @@ public class OneClickBloodsPlugin extends Plugin {
             RUNESTONE_ID = SOUTH_RUNESTONE_ID;
         }
 
-        return new MenuEntry(
-                "Chip",
-                "<col=ffff>Dense runestone",
+        return createMenuEntry(
                 RUNESTONE_ID,
-                MenuAction.GAME_OBJECT_FIRST_OPTION.getId(),
+                MenuAction.GAME_OBJECT_FIRST_OPTION,
                 getLocation(getGameObject(RUNESTONE_ID)).getX(),
                 getLocation(getGameObject(RUNESTONE_ID)).getY(),
                 false);
@@ -385,6 +371,11 @@ public class OneClickBloodsPlugin extends Plugin {
             return LastItem;
         }
         return null;
+    }
+
+    public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
+        return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
+                .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
     }
 }
 

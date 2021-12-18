@@ -85,20 +85,18 @@ public class oneClick2tSwordfish extends Plugin {
         for (WidgetItem item:getInventoryItems()) {
             if (item.getId()==TUNA_ID)
             {
-                return new MenuEntry("Drop",
-                        "<col=ff9040>Raw tuna",
+                return createMenuEntry(
                         TUNA_ID, //item ID
-                        MenuAction.ITEM_FIFTH_OPTION.getId(),
+                        MenuAction.ITEM_FIFTH_OPTION,
                         item.getIndex(), //inventory index
                         9764864,
                         false);
             }
             else if (item.getId()==SWORDFISH_ID)
             {
-                return new MenuEntry("Drop",
-                        "<col=ff9040>Raw swordfish",
+                return createMenuEntry(
                         SWORDFISH_ID, //item ID
-                        MenuAction.ITEM_FIFTH_OPTION.getId(),
+                        MenuAction.ITEM_FIFTH_OPTION,
                         item.getIndex(), //inventory index
                         9764864,
                         false);
@@ -108,7 +106,11 @@ public class oneClick2tSwordfish extends Plugin {
     }
 
     private MenuEntry walkHereMES(MenuOptionClicked event){
-        return new MenuEntry("Walk here", "", 0, MenuAction.WALK.getId(), event.getParam0(), event.getParam1(), false);
+        return createMenuEntry(
+                0,
+                MenuAction.WALK,
+                event.getParam0(),
+                event.getParam1(), false);
     }
 
     @Nullable
@@ -132,5 +134,10 @@ public class oneClick2tSwordfish extends Plugin {
             }
         }
         return null;
+    }
+
+    public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
+        return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
+                .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
     }
 }

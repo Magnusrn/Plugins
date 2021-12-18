@@ -114,11 +114,9 @@ public class OneClickTenchFishingPlugin extends Plugin {
     }
 
     private MenuEntry useKnifeOnFishMenuEntry(WidgetItem Fish){
-        return new MenuEntry(
-                "Use",
-                "<col=ff9040>Knife<col=ffffff> -> <col=ff9040>Bluegill",
+        return createMenuEntry(
                 Fish.getId(),
-                MenuAction.ITEM_USE_ON_WIDGET_ITEM.getId(),
+                MenuAction.ITEM_USE_ON_WIDGET_ITEM,
                 Fish.getIndex(),
                 9764864,
                 false);
@@ -126,11 +124,9 @@ public class OneClickTenchFishingPlugin extends Plugin {
 
     private MenuEntry catchFishMenuEntry(){
         NPC FishingSpot = getFishingSpot();
-        return new MenuEntry(
-                "option",
-                "target",
+        return createMenuEntry(
                 FishingSpot.getIndex(),
-                MenuAction.NPC_FIRST_OPTION.getId(),
+                MenuAction.NPC_FIRST_OPTION,
                 getNPCLocation(FishingSpot).getX(),
                 getNPCLocation(FishingSpot).getY(),
                 true);
@@ -147,5 +143,10 @@ public class OneClickTenchFishingPlugin extends Plugin {
     private Point getNPCLocation(NPC npc)
     {
         return new Point(npc.getLocalLocation().getSceneX(),npc.getLocalLocation().getSceneY());
+    }
+
+    public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
+        return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
+                .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
     }
 }
