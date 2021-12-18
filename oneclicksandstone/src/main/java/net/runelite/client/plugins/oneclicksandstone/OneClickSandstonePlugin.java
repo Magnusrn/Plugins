@@ -114,15 +114,14 @@ public class OneClickSandstonePlugin extends Plugin {
 
     private MenuEntry mineSandStone() {
         GameObject customGameObject = checkforGameObject();
-        return new MenuEntry(
-                "option",
-                "target",
-                11386,
-                MenuAction.GAME_OBJECT_FIRST_OPTION.getId(),
-                getLocation(customGameObject).getX(),
-                getLocation(customGameObject).getY(),
-                true);
-
+        return client.createMenuEntry(-1)
+                .setOption("option")
+                .setTarget("target")
+                .setIdentifier(11386)
+                .setType(MenuAction.GAME_OBJECT_FIRST_OPTION)
+                .setParam0(getLocation(customGameObject).getX())
+                .setParam1(getLocation(customGameObject).getY())
+                .setForceLeftClick(true);
     }
 
     private Point getLocation(TileObject tileObject) {
@@ -191,26 +190,26 @@ public class OneClickSandstonePlugin extends Plugin {
 
     private MenuEntry createHumidifyMenuEntry()
     {
-        return new MenuEntry(
-                "Cast",
-                "Humidify",
-                1,
-                MenuAction.CC_OP.getId(),
-                -1,
-                14286954,
-                true);
+        return client.createMenuEntry(-1)
+                .setOption("Cast")
+                .setTarget("Humidify")
+                .setIdentifier(1)
+                .setType(MenuAction.CC_OP)
+                .setParam0(-1)
+                .setParam1(14286954)
+                .setForceLeftClick(true);
     }
 
     private MenuEntry depositGrinderMenuEntry()
     {
-        return new MenuEntry(
-                "Deposit",
-                "Grinder",
-                26199,
-                MenuAction.GAME_OBJECT_FIRST_OPTION.getId(),
-                getLocation(checkForDepositGrinder()).getX(),
-                getLocation(checkForDepositGrinder()).getY(),
-                true);
+        return client.createMenuEntry(-1)
+                .setOption("Deposit")
+                .setTarget("Grinder")
+                .setIdentifier(26199)
+                .setType(MenuAction.GAME_OBJECT_FIRST_OPTION)
+                .setParam0(getLocation(checkForDepositGrinder()).getX())
+                .setParam1(getLocation(checkForDepositGrinder()).getY())
+                .setForceLeftClick(true);
     }
 
     private boolean shouldCastHumidify(Collection<Integer> ids) {

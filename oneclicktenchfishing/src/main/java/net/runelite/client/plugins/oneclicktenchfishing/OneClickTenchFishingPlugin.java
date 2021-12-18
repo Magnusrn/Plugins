@@ -20,7 +20,7 @@ import java.util.List;
 
 @PluginDescriptor(
         name = "One Click Tench Fishing",
-        description = "Ensure some form of bait is in invent, either worms or fish chunks and a knife. Doesn't currently support dropping.",
+        description = "Ensure some form of bait is in invent, either worms or fish chunks and a knife. If there's no knife it will just drop the fish.",
         tags = {"one", "click", "tench", "fishing","aerial","arial"},
         enabledByDefault = false
 )
@@ -35,15 +35,6 @@ public class OneClickTenchFishingPlugin extends Plugin {
 
     @Inject
     private Client client;
-
-//    @Inject
-//    private OneClickTenchFishingConfig config;
-//
-//    @Provides
-//    OneClickTenchFishingConfig provideConfig(ConfigManager configManager)
-//    {
-//        return configManager.getConfig(OneClickTenchFishingConfig.class);
-//    }
 
     @Subscribe
     public void onMenuOptionClicked(MenuOptionClicked event)
