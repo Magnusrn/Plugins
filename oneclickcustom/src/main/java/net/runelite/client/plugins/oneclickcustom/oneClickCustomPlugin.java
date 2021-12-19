@@ -3,9 +3,6 @@ package net.runelite.client.plugins.oneclickcustom;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.coords.WorldArea;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.api.queries.NPCQuery;
@@ -27,7 +24,7 @@ import java.util.*;
 @Extension
 @PluginDescriptor(
         name = "One Click Custom",
-        description = "Sets test testthe Menu entry for left click anywhere",
+        description = "Sets the Menu entry for left click anywhere",
         tags = {"one click","custom"},
         enabledByDefault = false
 )
@@ -116,19 +113,19 @@ public class oneClickCustomPlugin extends Plugin{
     @Subscribe
     private void onClientTick(ClientTick event)
     {
-        if (config.oneClickType()==oneClickCustomTypes.Gather && getNearestGameObjectByPath()==null)
+        if (config.oneClickType()==oneClickCustomTypes.Gather && checkforGameObject()==null)
         {
             //System.out.println("oneclick set to gather, gameobject is null.");
             return;
         }
 
-        if ((GroundItems.size()==0 || getNearestTileItemByPath(GroundItems)==null) && config.oneClickType() == oneClickCustomTypes.Pick_Up)
+        if ((GroundItems.size()==0 || getNearestTileItem(GroundItems)==null) && config.oneClickType() == oneClickCustomTypes.Pick_Up)
         {
             //System.out.println("ground item check null");
             return;
         }
 
-        if (getNearestNPCByPath()==null &!(config.oneClickType()==oneClickCustomTypes.Gather) &! (config.oneClickType() == oneClickCustomTypes.Pick_Up))
+        if (checkForNPCObject()==null &!(config.oneClickType()==oneClickCustomTypes.Gather) &! (config.oneClickType() == oneClickCustomTypes.Pick_Up))
         {
             //System.out.println("npcobject check null");
             return;
@@ -172,7 +169,7 @@ public class oneClickCustomPlugin extends Plugin{
         if (config.oneClickType()==oneClickCustomTypes.Pick_Up)
         {
             if (!GroundItems.isEmpty()) {
-                TileItem tileItem = getNearestTileItemByPath(GroundItems);
+                TileItem tileItem = getNearestTileItem(GroundItems);
                 return createMenuEntry(
                         config.ID(),
                         MenuAction.GROUND_ITEM_THIRD_OPTION,
@@ -186,8 +183,7 @@ public class oneClickCustomPlugin extends Plugin{
         if (config.oneClickType()==oneClickCustomTypes.Gather)
         {
             //System.out.println("Should be returning Gather MES");
-            GameObject customGameObject = getNearestGameObjectByPath();
-
+            GameObject customGameObject = checkforGameObject();
             return createMenuEntry(
                     customGameObject.getId(),
                     MenuAction.GAME_OBJECT_FIRST_OPTION,
@@ -196,7 +192,7 @@ public class oneClickCustomPlugin extends Plugin{
                     true);
         }
 
-        NPC customNPCObject = getNearestNPCByPath();
+        NPC customNPCObject = checkForNPCObject();
 
         if(config.oneClickType()==oneClickCustomTypes.Fish)
         {
@@ -252,103 +248,38 @@ public class oneClickCustomPlugin extends Plugin{
         return new Point(npc.getLocalLocation().getSceneX(),npc.getLocalLocation().getSceneY());
     }
 
-    private NPC getNearestNPCByPath()
+    private NPC checkForNPCObject()
     {
-        List<NPC> NPCs = new NPCQuery()
+        return new NPCQuery()
                 .idEquals(config.ID())
                 .result(client)
-                .list;
-        if (NPCs.size()==0 || NPCs.get(0) == null)
-        {
-            return null;
-        }
-
-        NPC closestNPC = null;
-        for (NPC npc: NPCs) //determines if NPC is blocked(if final path tile is not within 1 tile of NPC)
-        {
-            if (getPathWorldPoints(npc)==null)
-            {
-                return null;
-            }
-
-            if (getPathWorldPoints(npc).get(getPathWorldPoints(npc).size()-1).distanceTo(npc.getWorldArea())<=1){ //.get returns list item by index
-                closestNPC = npc;
-                break;
-            }
-        }
-        if (closestNPC==null) //path is blocked
-        {
-            return null;
-        }
-
-        for (NPC npc: NPCs)
-        {
-            if(getPathDistance(getPathWorldPoints(npc))<getPathDistance(getPathWorldPoints(closestNPC)))
-            {
-                closestNPC = npc;
-            }
-        }
-        return closestNPC;
+                .nearestTo(client.getLocalPlayer());
     }
 
-    private GameObject getNearestGameObjectByPath()
+    private GameObject checkforGameObject()
     {
-        List<GameObject> gameObjects = new GameObjectQuery()
+        return new GameObjectQuery()
                 .idEquals(config.ID())
                 .result(client)
-                .list;
-        if (gameObjects.size()==0 || gameObjects.get(0) == null)
-        {
-            return null;
-        }
-
-        GameObject closestGameObject = gameObjects.get(0);
-        for (GameObject gameObject: gameObjects)
-        {
-            if (getPathWorldPoints(gameObject)==null
-            || getPathWorldPoints(closestGameObject)==null)
-            {
-                continue;
-            }
-            if(getPathDistance(getPathWorldPoints(gameObject))<getPathDistance(getPathWorldPoints(closestGameObject)))
-            {
-                closestGameObject = gameObject;
-            }
-        }
-        System.out.println(getPathDistance(getPathWorldPoints(closestGameObject)));
-        return closestGameObject;
+                .nearestTo(client.getLocalPlayer());
     }
 
-    private TileItem getNearestTileItemByPath(List<TileItem> tileItems)
+    private TileItem getNearestTileItem(List<TileItem> tileItems)
     {
+        int currentDistance;
         if (tileItems.size()==0 || tileItems.get(0) == null)
         {
             return null;
         }
-
-        TileItem closestTileItem = null;
-        for (TileItem tileitem: tileItems) //determines if TileItem is blocked(if final path tile is not same tile as TileItem)
+        TileItem closestTileItem = tileItems.get(0);
+        int closestDistance = closestTileItem.getTile().getWorldLocation().distanceTo(client.getLocalPlayer().getWorldLocation());
+        for (TileItem tileItem : tileItems)
         {
-            if (getPathTileItems(tileitem)==null)
-            {
-                return null;
-            }
-
-            if (getPathTileItems(tileitem).get(getPathTileItems(tileitem).size()-1).distanceTo(tileitem.getTile().getWorldLocation())==0){ //.get returns list item by index
-                closestTileItem = tileitem;
-                break;
-            }
-        }
-        if (closestTileItem==null) //path is blocked
-        {
-            return null;
-        }
-
-        for (TileItem tileItem: tileItems)
-        {
-            if(getPathDistance(getPathTileItems(tileItem))<getPathDistance(getPathTileItems(closestTileItem)))
+            currentDistance = tileItem.getTile().getWorldLocation().distanceTo(client.getLocalPlayer().getWorldLocation());
+            if (currentDistance < closestDistance)
             {
                 closestTileItem = tileItem;
+                closestDistance = currentDistance;
             }
         }
         return closestTileItem;
@@ -364,6 +295,7 @@ public class oneClickCustomPlugin extends Plugin{
 
         return new ArrayList<>(inventory.getWidgetItems());
     }
+
 
     public static int getInventQuantity(Client client) {
         Collection<WidgetItem> inventoryItems = getInventoryItems(client);
@@ -382,43 +314,8 @@ public class oneClickCustomPlugin extends Plugin{
         return count;
     }
 
-    private List<WorldPoint> getPathWorldPoints(TileObject object){
-        return client.getLocalPlayer().getWorldLocation().pathTo(client,object.getWorldLocation());
-    }
-    private List<WorldPoint> getPathTileItems(TileItem tileItem){
-        return client.getLocalPlayer().getWorldLocation().pathTo(client,tileItem.getTile().getWorldLocation());
-    }
-    private List<WorldPoint> getPathWorldPoints(NPC npc){
-        return client.getLocalPlayer().getWorldLocation().pathTo(client,npc.getWorldLocation());
-    }
-
-    private int getPathDistance(List<WorldPoint> worldPoints) {
-        if (worldPoints.size() == 0)
-        {
-            return 0;
-        }
-
-        if (worldPoints.size() == 1)
-        {
-            return client.getLocalPlayer().getWorldLocation().distanceTo(worldPoints.get(0));
-        }
-
-        int pathLength = 0;
-        int previousX = worldPoints.get(0).getX();
-        int previousY = worldPoints.get(0).getY();
-        for (WorldPoint worldPoint : worldPoints)
-        {
-            double distance = Math.hypot(Math.abs(worldPoint.getX() - previousX), Math.abs(worldPoint.getY() - previousY));
-            pathLength += distance;
-            previousX = worldPoint.getX();
-            previousY = worldPoint.getY();
-        }
-        return pathLength;
-    }
-
     public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
         return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
                 .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
     }
-
 }

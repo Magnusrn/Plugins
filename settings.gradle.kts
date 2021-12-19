@@ -37,7 +37,7 @@ include(":oneclickminnows")
 include(":oneclicksandstone")
 include(":oneclickswordfish")
 include(":oneclicktelegrab")
-include(":oneclicktenchfishing")
+include(":oneclickaerialfishing")
 include(":oneclickzmi")
 include(":tabswitcher")
 

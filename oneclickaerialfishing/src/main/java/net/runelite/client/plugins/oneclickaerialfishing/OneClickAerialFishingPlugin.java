@@ -1,7 +1,6 @@
-package net.runelite.client.plugins.oneclicktenchfishing;
+package net.runelite.client.plugins.oneclickaerialfishing;
 
 import com.google.inject.Inject;
-import com.google.inject.Provides;
 import net.runelite.api.*;
 import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.MenuOptionClicked;
@@ -9,7 +8,6 @@ import net.runelite.api.queries.NPCQuery;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
-import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -21,12 +19,12 @@ import java.util.List;
 
 @Extension
 @PluginDescriptor(
-        name = "One Click Tench Fishing",
+        name = "One Click Aerial Fishing",
         description = "Ensure some form of bait is in invent, either worms or fish chunks and a knife. If there's no knife it will just drop the fish.",
         tags = {"one", "click", "tench", "fishing","aerial","arial"},
         enabledByDefault = false
 )
-public class OneClickTenchFishingPlugin extends Plugin {
+public class OneClickAerialFishingPlugin extends Plugin {
 
     private static final int TENCH_FISHING_SPOT_NPC_ID = 8523;
     private static final int KNIFE_ID = 946;
@@ -41,7 +39,7 @@ public class OneClickTenchFishingPlugin extends Plugin {
     @Subscribe
     public void onMenuOptionClicked(MenuOptionClicked event)
     {
-        if(event.getMenuOption().equals("<col=00ff00>One Click Tench Fishing"))
+        if(event.getMenuOption().equals("<col=00ff00>One Click Aerial Fishing"))
         {
             handleClick(event);
         }
@@ -53,7 +51,7 @@ public class OneClickTenchFishingPlugin extends Plugin {
         {
             return;
         }
-        String text = "<col=00ff00>One Click Tench Fishing";
+        String text = "<col=00ff00>One Click Aerial Fishing";
         this.client.insertMenuItem(text, "", MenuAction.UNKNOWN
                 .getId(), 0, 0, 0, true);
     }
