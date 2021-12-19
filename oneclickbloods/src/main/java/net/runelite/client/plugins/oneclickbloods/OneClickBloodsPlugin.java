@@ -131,21 +131,19 @@ public class OneClickBloodsPlugin extends Plugin {
 
         if (getInventoryItem(DARK_ESSENCE_BLOCK_ID)!=null &! DARK_ESSENCE_FRAGMENTS_PILE_FULL)
         {
+            client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
+            client.setSelectedItemSlot(getInventoryItem(CHISEL_ID).getIndex());
+            client.setSelectedItemID(CHISEL_ID);
+
             if (client.getWidget(193,2)!=null)
             {
                 if (client.getWidget(193,2).getText().contains("Your pile of fragments cannot grow any larger"))
                 {
                     DARK_ESSENCE_FRAGMENTS_PILE_FULL = true;
-                    client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId()); //repeating code from few lines down, but not sure of alternative. setting as method would be out of place
-                    client.setSelectedItemSlot(getInventoryItem(CHISEL_ID).getIndex());
-                    client.setSelectedItemID(CHISEL_ID);
                     event.setMenuEntry(useChiselOnRockSlideMES());
                     return;
                 }
             }
-            client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
-            client.setSelectedItemSlot(getInventoryItem(CHISEL_ID).getIndex());
-            client.setSelectedItemID(CHISEL_ID);
             event.setMenuEntry(useChiselOnBlockMES());
             return;
         }
