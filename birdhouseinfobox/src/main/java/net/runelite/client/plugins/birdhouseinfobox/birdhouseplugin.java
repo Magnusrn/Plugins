@@ -2,9 +2,11 @@ package net.runelite.client.plugins.birdhouseinfobox;
 
 import javax.inject.Inject;
 import net.runelite.api.Client;
+import net.runelite.api.ItemID;
 import net.runelite.api.events.AnimationChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
@@ -27,12 +29,18 @@ public class birdhouseplugin extends Plugin {
     @Inject
     private InfoBoxManager infoBoxManager;
 
+    @Inject
+    private ItemManager itemManager;
+
     @Subscribe
     public void onAnimationChanged(AnimationChanged event) {
+        if (client.getLocalPlayer()==null)
+        {
+            return;
+        }
         if (this.client.getLocalPlayer().getAnimation() == 7057) {
             this.reset();
         }
-
     }
 
     protected void shutDown() throws Exception {
@@ -50,7 +58,7 @@ public class birdhouseplugin extends Plugin {
             --timeRemaining;
         }
 
-        this.BHIB = new birdhouseinfobox(this.client, this);
+        BHIB = new birdhouseinfobox(itemManager.getImage(ItemID.BIRD_HOUSE), this);
         this.infoBoxManager.addInfoBox(this.BHIB);
     }
 

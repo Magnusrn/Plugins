@@ -75,6 +75,11 @@ public class OneClickAerialFishingPlugin extends Plugin {
         {
             if (getLastInventoryItem(fish)!=null)
             {
+                if (getLastInventoryItem(KNIFE_ID)==null)
+                {
+                    event.setMenuEntry(dropFishMenuEntry(getLastInventoryItem(fish)));
+                    return;
+                }
                 client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
                 client.setSelectedItemSlot(getLastInventoryItem(KNIFE_ID).getIndex());
                 client.setSelectedItemID(KNIFE_ID);
@@ -117,6 +122,15 @@ public class OneClickAerialFishingPlugin extends Plugin {
         return createMenuEntry(
                 Fish.getId(),
                 MenuAction.ITEM_USE_ON_WIDGET_ITEM,
+                Fish.getIndex(),
+                9764864,
+                false);
+    }
+
+    private MenuEntry dropFishMenuEntry(WidgetItem Fish){
+        return createMenuEntry(
+                Fish.getId(),
+                MenuAction.ITEM_FIFTH_OPTION,
                 Fish.getIndex(),
                 9764864,
                 false);

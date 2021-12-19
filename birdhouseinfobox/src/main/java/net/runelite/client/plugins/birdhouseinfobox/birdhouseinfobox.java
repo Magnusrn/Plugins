@@ -1,18 +1,23 @@
 package net.runelite.client.plugins.birdhouseinfobox;
 
 import java.awt.Color;
-import net.runelite.api.Client;
+import java.awt.image.BufferedImage;
+
+import lombok.Getter;
+import net.runelite.client.plugins.cannon.CannonPlugin;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
-import net.runelite.client.util.ImageUtil;
+import net.runelite.client.ui.overlay.infobox.InfoBoxPriority;
 
-public class birdhouseinfobox extends InfoBox {
-    private birdhouseplugin plugin;
-    private Client client;
+@Getter
+class birdhouseinfobox extends InfoBox
+{
 
-    public birdhouseinfobox(Client client, birdhouseplugin plugin) {
-        super(ImageUtil.getResourceStreamFromClass(birdhouseplugin.class, "birdhouse.png"), plugin);
+    private final birdhouseplugin plugin;
+
+    birdhouseinfobox(BufferedImage image, birdhouseplugin plugin)
+    {
+        super(image, plugin);
         this.plugin = plugin;
-        this.client = client;
     }
 
     public String getText() {
