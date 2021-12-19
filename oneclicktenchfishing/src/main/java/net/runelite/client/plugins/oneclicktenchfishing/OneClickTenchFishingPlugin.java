@@ -13,11 +13,13 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import org.pf4j.Extension;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+@Extension
 @PluginDescriptor(
         name = "One Click Tench Fishing",
         description = "Ensure some form of bait is in invent, either worms or fish chunks and a knife. If there's no knife it will just drop the fish.",

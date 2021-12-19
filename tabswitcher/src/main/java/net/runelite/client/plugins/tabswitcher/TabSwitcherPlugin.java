@@ -13,7 +13,9 @@ import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.util.HotkeyListener;
+import org.pf4j.Extension;
 
+@Extension
 @PluginDescriptor(
         name = "Tab Switcher",
         description = "Switches to previous tab on keybind",

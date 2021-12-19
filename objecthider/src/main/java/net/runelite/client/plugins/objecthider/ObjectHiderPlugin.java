@@ -45,7 +45,9 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import org.pf4j.Extension;
 
+@Extension
 @PluginDescriptor(
         name = "Object Hider",
         description = "Hides objects from the game based on ID, modified from adams Fossil Island plugin. If you wish to unhide an object you must restart the plugin",
