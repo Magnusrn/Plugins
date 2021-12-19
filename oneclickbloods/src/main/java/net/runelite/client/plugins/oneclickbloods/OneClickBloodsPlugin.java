@@ -25,7 +25,6 @@ import java.util.Collection;
         tags = {"one","click","bloods","oneclick"},
         enabledByDefault = false
 )
-
 public class OneClickBloodsPlugin extends Plugin {
 
 
