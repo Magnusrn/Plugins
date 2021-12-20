@@ -18,11 +18,10 @@
 Nothing fancy, starts a (fairly conservative) timer upon building a birdhouse, overlays an infobox
 
 ### CoxRaidScouter
+
+Requires the "Chambers of Xeric" plugin "Raid Layout Message" option Toggled ON
+
 SWIM ran this on 3 accounts for a little under 3 months(approx 2000 raids) two temps towards the end. However this is a commonly reported activity so would only recommend using on burner accounts. Works nicely if setup on a cloud VM and webhooked to discord. Only need to check once every 6 hours if using the auto leave/rejoin cc feature
-
-
-Additional requirements
-"Chambers of Xeric" plugin Raid Layout Message Toggled ON
 
 V1.6
 Removed dependancy on iutils but no longer sends clicks and randomness removed for now. Emphasis on only use burner accounts.
