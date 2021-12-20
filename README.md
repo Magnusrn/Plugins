@@ -1,18 +1,18 @@
 |Plugin List(click for details) | Source |
 |------------- |------------- |
-| [Birdhouse Infobox](#birdhouse-infobox) | [Click Here](test) |
-| [CoxRaidScouter](#coxraidscouter)  | [Click Here](test) |
-| [One Click Aerial Fishing](#one-click-aerial-fishing)| [Click Here](test) |
-| [One Click Bloods](#one-click-bloods) | [Click Here](test) |
-| [One Click Chins](#one-click-chins) | [Click Here](etset) |
-| [One Click Custom](#one-click-custom) | [Click Here](set) |
-| [One Click Glassblowing](#one-click-glassblowing) |  [Click Here](sdf) |
-| [One Click Karambwans](#one-click-karambwans) | [Click Here](sdf) |
-| [One Click Minnows](#one-click-minnows)  | [Click Here](sdf) |
-| [One Click Sandstone](#one-click-sandstone)|  [Click Here](sdf) |
-| [One Click Swordfish](#one-click-swordfish)|   [Click Here](sdf) |
-| [One Click Telegrab](#one-click-telegrab) |  [Click Here](sdf) |
-| [One Click ZMI](#one-click-zmi) |   [Click Here](sdf) |
+| [Birdhouse Infobox](#birdhouse-infobox) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/birdhouseinfobox/src/main/java/net/runelite/client/plugins/birdhouseinfobox) |
+| [CoxRaidScouter](#coxraidscouter)  | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/coxraidscouter/src/main/java/net/runelite/client/plugins/coxraidscouter) |
+| [One Click Aerial Fishing](#one-click-aerial-fishing)| [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickaerialfishing/src/main/java/net/runelite/client/plugins/oneclickaerialfishing) |
+| [One Click Bloods](#one-click-bloods) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickbloods/src/main/java/net/runelite/client/plugins/oneclickbloods) |
+| [One Click Chins](#one-click-chins) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickchins/src/main/java/net/runelite/client/plugins/oneclickchins) |
+| [One Click Custom](#one-click-custom) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickcustom/src/main/java/net/runelite/client/plugins/oneclickcustom) |
+| [One Click Glassblowing](#one-click-glassblowing) |  [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickglassblowing/src/main/java/net/runelite/client/plugins/oneclickglassblowing) |
+| [One Click Karambwans](#one-click-karambwans) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickkarambwans/src/main/java/net/runelite/client/plugins/oneclickkarambwans) |
+| [One Click Minnows](#one-click-minnows)  | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickminnows/src/main/java/net/runelite/client/plugins/oneclickminnows) |
+| [One Click Sandstone](#one-click-sandstone)|  [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclicksandstone/src/main/java/net/runelite/client/plugins/oneclicksandstone) |
+| [One Click Swordfish](#one-click-swordfish)|   [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickswordfish/src/main/java/net/runelite/client/plugins/oneclickswordfish) |
+| [One Click Telegrab](#one-click-telegrab) |  [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclicktelegrab/src/main/java/net/runelite/client/plugins/oneclicktelegrab) |
+| [One Click ZMI](#one-click-zmi) |   [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickzmi/src/main/java/net/runelite/client/plugins/oneclickzmi) |
 
 ### Birdhouse-Infobox
 Nothing fancy, starts a (fairly conservative) timer upon building a birdhouse, overlays an infobox
