@@ -25,10 +25,10 @@ import ProjectVersions.openosrsVersion
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.0.2"
 
 project.extra["PluginName"] = "Object Hider" // This is the name that is used in the external plugin manager panel
-project.extra["PluginDescription"] = "Object Hider" // This is the description that is used in the external plugin manager panel
+project.extra["PluginDescription"] = "Hides game objects by ID with certain presets to increase performance." // This is the description that is used in the external plugin manager panel
 
 dependencies {
     annotationProcessor(Libraries.lombok)

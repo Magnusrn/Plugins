@@ -24,7 +24,7 @@ import static net.runelite.api.AnimationID.*;
 @PluginDescriptor(
         name = "One Click Glassblowing",
         enabledByDefault = false,
-        description = "One Click Glassblowing. Only works at clan bank or north fossil island bank, Set bank up with fillers and have Glassblowing pipe in inventory. Must be in the main section of bank")
+        description = "One Click Glassblowing. Only works at clan bank or north fossil island bank, Set bank up with fillers and have Glassblowing pipe in inventory. Must be in the main section of bank. credit TP")
 @Slf4j
 public class OneClickGlassblowingPlugin extends Plugin {
 

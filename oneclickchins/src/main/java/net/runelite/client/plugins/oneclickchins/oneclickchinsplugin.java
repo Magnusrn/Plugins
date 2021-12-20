@@ -16,7 +16,7 @@ import org.pf4j.Extension;
 @PluginDescriptor(
         name = "One Click Chinchompas",
         enabledByDefault = false,
-        description = "one click chinchompas. Requires you to lay the traps initially as it only resets")
+        description = "one click chinchompas. Requires you to lay the traps initially as it only resets. credit TP.")
 @Slf4j
 public class oneclickchinsplugin extends Plugin{
 

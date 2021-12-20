@@ -54,7 +54,7 @@ import org.pf4j.Extension;
 @PluginDescriptor(
         name = "One Click Sandstone",
         enabledByDefault = false,
-        description = "Mines Sand, deposits into grinder and casts humidify if needed. Hardcoded to consume clicks with rune pickaxe or dragon pickaxe")
+        description = "Mines Sand, deposits into grinder and casts humidify if needed. Hardcoded to consume clicks with rune pickaxe or dragon pickaxe. credit TP")
 @Slf4j
 public class OneClickSandstonePlugin extends Plugin {
 

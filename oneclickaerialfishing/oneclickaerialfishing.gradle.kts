@@ -28,7 +28,7 @@ import ProjectVersions.openosrsVersion
 version = "0.0.1"
 
 project.extra["PluginName"] = "One Click Aerial Fishing" // This is the name that is used in the external plugin manager panel
-project.extra["PluginDescription"] = "Java example plugin" // This is the description that is used in the external plugin manager panel
+project.extra["PluginDescription"] = "One click Molch aerial fishing, cuts or drops depending on whether you have a knife." // This is the description that is used in the external plugin manager panel
 
 dependencies {
     annotationProcessor(Libraries.lombok)
