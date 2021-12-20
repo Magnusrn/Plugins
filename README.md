@@ -1,5 +1,5 @@
 |Plugin List(click for details) | Source |
-|------------- ||------------- |
+|------------- |------------- |
 | [Birdhouse Infobox](#birdhouse-infobox) | [Click Here](test) |
 | [CoxRaidScouter](#coxraidscouter)  | [Click Here](test) |
 | [One Click Aerial Fishing](#one-click-aerial-fishing)| [Click Here](test) |
