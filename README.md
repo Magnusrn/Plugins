@@ -1,18 +1,18 @@
 |Plugin List(click for details) | Source |
 |------------- ||------------- |
-| [Birdhouse Infobox](#birdhouse-infobox) | [Click Here]() |
-| [CoxRaidScouter](#coxraidscouter)  | [Click Here]() |
-| [One Click Aerial Fishing](#one-click-aerial-fishing)| [Click Here]() |
-| [One Click Bloods](#one-click-bloods) | [Click Here]() |
-| [One Click Chins](#one-click-chins) | [Click Here]() |
-| [One Click Custom](#one-click-custom) | [Click Here]() |
-| [One Click Glassblowing](#one-click-glassblowing) |  [Click Here]() |
-| [One Click Karambwans](#one-click-karambwans) | [Click Here]() |
-| [One Click Minnows](#one-click-minnows)  | [Click Here]() |
-| [One Click Sandstone](#one-click-sandstone)|  [Click Here]() |
-| [One Click Swordfish](#one-click-swordfish)|   [Click Here]() |
-| [One Click Telegrab](#one-click-telegrab) |  [Click Here]() |
-| [One Click ZMI](#one-click-zmi) |   [Click Here]() |
+| [Birdhouse Infobox](#birdhouse-infobox) | [Click Here](test) |
+| [CoxRaidScouter](#coxraidscouter)  | [Click Here](test) |
+| [One Click Aerial Fishing](#one-click-aerial-fishing)| [Click Here](test) |
+| [One Click Bloods](#one-click-bloods) | [Click Here](test) |
+| [One Click Chins](#one-click-chins) | [Click Here](etset) |
+| [One Click Custom](#one-click-custom) | [Click Here](set) |
+| [One Click Glassblowing](#one-click-glassblowing) |  [Click Here](sdf) |
+| [One Click Karambwans](#one-click-karambwans) | [Click Here](sdf) |
+| [One Click Minnows](#one-click-minnows)  | [Click Here](sdf) |
+| [One Click Sandstone](#one-click-sandstone)|  [Click Here](sdf) |
+| [One Click Swordfish](#one-click-swordfish)|   [Click Here](sdf) |
+| [One Click Telegrab](#one-click-telegrab) |  [Click Here](sdf) |
+| [One Click ZMI](#one-click-zmi) |   [Click Here](sdf) |
 
 ### Birdhouse-Infobox
 Nothing fancy, starts a (fairly conservative) timer upon building a birdhouse, overlays an infobox
