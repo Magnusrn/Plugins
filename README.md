@@ -15,7 +15,7 @@
 | [One Click ZMI](#one-click-zmi) |   [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickzmi/src/main/java/net/runelite/client/plugins/oneclickzmi) |
 
 ### Birdhouse-Infobox
-Nothing fancy, starts a (fairly conservative) timer upon building a birdhouse, overlays an infobox
+Starts a (fairly conservative) timer upon building a birdhouse, overlays an infobox
 
 ### CoxRaidScouter
 
@@ -23,6 +23,9 @@ Requires the "Chambers of Xeric" plugin "Raid Layout Message" option Toggled ON
 
 SWIM ran this on 3 accounts for a little under 3 months(approx 2000 raids) two temps towards the end. However this is a commonly reported activity so would only recommend using on burner accounts. Works nicely if setup on a cloud VM and webhooked to discord. Only need to check once every 6 hours if using the auto leave/rejoin cc feature
 
+<details>
+  <summary>Change Log</summary>
+  
 V1.6
 Removed dependancy on iutils but no longer sends clicks and randomness removed for now. Emphasis on only use burner accounts.
 
@@ -48,6 +51,7 @@ Moved webhook.py within plugins folder for ease of setup
 Added layout to webhook (SCSPF e.g)
 Added new embed for webhook
 Added webhook message when raid is taken(user has started scouting again)
+</details>
 
 ### One Click Aerial Fishing
 Molch Aerial fishing, will cut fish if you have a knife in your invent else drops fish.
@@ -80,4 +84,4 @@ Use Pajeets One Click 2 tick instead. Does the same thing I think but his has Te
 Supports telegrabbing Wine of Zamorak at the wildy spot or the safe chaos altar.
 
 ### One Click ZMI
-This is state based so must be started near the banker at ZMI. Ensure you have 1 dose staminas in the bank and are in the main tab of the bank. Ensure Last NPC contact was to dark mage as it will repair broken pouches.|Plugin List(click for details) |
+This is state based so must be started near the banker at ZMI. Ensure you have 1 dose staminas in the bank and are in the main tab of the bank. Ensure Last NPC contact was to dark mage as it will repair broken pouches.
