@@ -1,23 +1,23 @@
 |Plugin List(click for details) |
 |------------- |
-| [Birdhouse Infobox](#Birdhouse InfoBox) | 
+| [Birdhouse Infobox](#Birdhouse-InfoBox) | 
 | [CoxRaidScouter](#CoxRaidScouter)  | 
-| [One Click Aerial Fishing](#One Click Aerial Fishing)| 
-| [One Click Bloods](#One Click Bloods) | 
-| [One Click Chins](#One Click Chins) | 
-| [One Click Custom](#One Click Custom) | 
-| [One Click Glassblowing](#One Click Glassblowing) |  
-| [One Click Karambwans](#One Click Karambwans) | 
-| [One Click Minnows](#One Click Minnows)  | 
-| [One Click Sandstone](#One Click Sandstone)|  
-| [One Click Swordfish](#One Click Swordfish)|   
-| [One Click Telegrab](#One Click Telegrab) |  
-| [One Click ZMI](#One Click ZMI) |   
+| [One Click Aerial Fishing](#One-Click-Aerial-Fishing)| 
+| [One Click Bloods](#One-Click-Bloods) | 
+| [One Click Chins](#One-Click-Chins) | 
+| [One Click Custom](#One-Click-Custom) | 
+| [One Click Glassblowing](#One-Click Glassblowing) |  
+| [One Click Karambwans](#One-Click-Karambwans) | 
+| [One Click Minnows](#One-Click-Minnows)  | 
+| [One Click Sandstone](#One-Click-Sandstone)|  
+| [One Click Swordfish](#One-Click-Swordfish)|   
+| [One Click Telegrab](#One-Click-Telegrab) |  
+| [One Click ZMI](#One-Click-ZMI) |   
 
-##Birdhouse Infobox
+#Birdhouse-Infobox
 Nothing fancy, starts a (fairly conservative) timer upon building a birdhouse, overlays an infobox
 
-##CoxRaidScouter
+#CoxRaidScouter
 SWIM ran this on 3 accounts for a little under 3 months(approx 2000 raids) two temps towards the end. However this is a commonly reported activity so would only recommend using on burner accounts. Works nicely if setup on a cloud VM and webhooked to discord. Only need to check once every 6 hours if using the auto leave/rejoin cc feature
 
 
@@ -50,7 +50,7 @@ Added layout to webhook (SCSPF e.g)
 Added new embed for webhook
 Added webhook message when raid is taken(user has started scouting again)
 
-###One Click Aerial Fishing
+##One Click Aerial Fishing
 Molch Aerial fishing, will cut fish if you have a knife in your invent else drops fish.
 
 ##One Click Bloods
