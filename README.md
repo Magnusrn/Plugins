@@ -14,10 +14,10 @@
 | [One Click Telegrab](#one-click-telegrab) |  
 | [One Click ZMI](#one-click-zmi) |   
 
-###Birdhouse-Infobox
+### Birdhouse-Infobox
 Nothing fancy, starts a (fairly conservative) timer upon building a birdhouse, overlays an infobox
 
-###CoxRaidScouter
+### CoxRaidScouter
 SWIM ran this on 3 accounts for a little under 3 months(approx 2000 raids) two temps towards the end. However this is a commonly reported activity so would only recommend using on burner accounts. Works nicely if setup on a cloud VM and webhooked to discord. Only need to check once every 6 hours if using the auto leave/rejoin cc feature
 
 
@@ -50,35 +50,35 @@ Added layout to webhook (SCSPF e.g)
 Added new embed for webhook
 Added webhook message when raid is taken(user has started scouting again)
 
-###One Click Aerial Fishing
+### One Click Aerial Fishing
 Molch Aerial fishing, will cut fish if you have a knife in your invent else drops fish.
 
-###One Click Bloods
+### One Click Bloods
 Initially requires the map to be loaded as a normal player would else it can get stuck. Currently uses a rather inelegant method of using a chisel on the cluster of rocks to get nearer to the altar. SWIM has used for approx 100h without any detection.
 
-###One Click Chins
+### One Click Chins
 Pretty simple plugin, requires initial setting of the traps and just resets them. Has the option to afk if another player is nearby as otherwise it will attempt to reset the other players traps if it's closest.
 
-###One Click Custom
+### One Click Custom
 Input ID and choose your object type. This will find the nearest of that object as the crow flies and unfortunately not nearest by tiles.
 
-###One Click Glassblowing
+### One Click Glassblowing
 Supports two banks, Clan hall and north of Fossil Island. Ensure you're in the main bank tab(Not sure why this is required)
 
-###One Click Karambwans
+### One Click Karambwans
 Ensure last destination on fairy ring is DKP. Currently supports banking at zanaris only, works with or without Fish Barrel.
 
-###One Click Minnows
+### One Click Minnows
 Made this very quickly, haven't tested much, seems to do the job.
 
-###One Click Sandstone
+### One Click Sandstone
 Ensure you have waterskins in your invent and humidify runes. If you run out of water it will cast humidify. Should add a check or toggle for this but if you run out and you don't have humidify you're dead soon anyway.
 
-###One Click Swordfish
+### One Click Swordfish
 Use Pajeets One Click 2 tick instead. Does the same thing I think but his has Teaks also.
 
-###One Click Telegrab
+### One Click Telegrab
 Supports telegrabbing Wine of Zamorak at the wildy spot or the safe chaos altar.
 
-###One Click ZMI
+### One Click ZMI
 This is state based so must be started near the banker at ZMI. Ensure you have 1 dose staminas in the bank and are in the main tab of the bank. Ensure Last NPC contact was to dark mage as it will repair broken pouches.|Plugin List(click for details) |
