@@ -365,7 +365,7 @@ public class oneClickZMIPlugin extends Plugin {
 
     private MenuEntry getBankMES(){
         return createMenuEntry(
-                12610,
+                3388,
                 MenuAction.NPC_FIRST_OPTION,
                 0,
                 0,

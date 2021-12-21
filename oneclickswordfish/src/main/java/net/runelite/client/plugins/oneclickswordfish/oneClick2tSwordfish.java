@@ -22,7 +22,7 @@ import java.util.Collection;
 @Extension
 @PluginDescriptor(
         name = "One Click 2t Swordfish",
-        description = "Shutupbitch",
+        description = "One Click 2t Swordfish",
         tags = {"one", "click", "oneclick", "2t", "swordfish"}
 )
 public class oneClick2tSwordfish extends Plugin {
