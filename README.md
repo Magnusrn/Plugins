@@ -27,27 +27,30 @@ SWIM ran this on 3 accounts for a little under 3 months(approx 2000 raids) two t
 <details>
   <summary>Change Log</summary>
   
-V1.6
+v0.07 -
+Added option to scout without Overload
+  
+V0.06 -
 Removed dependancy on iutils but no longer sends clicks and randomness removed for now. Emphasis on only use burner accounts.
 
-V1.5
+V0.05 -
 Auto Leave/Rejoin CC no longer requires you to wait for the bot to rejoin
 
-V1.4
+V0.04 -
 Added Java webhook instead of external python file
 Modified reset to be on logout instead of login due to sometimes leaving cc immediately upon login
 
-V1.3
+V0.03 -
 Added 5h login timer handling
 Added reset on login(Prevents webhook posting raid taken on relog)
 Added webhook message on logout
 
-v1.2 -
+v0.02 -
 Added Good Crabs detector
 Added ability to input specific rotations rather than just blacklist
 added os detection for python run command
 
-v1.1 -
+v0.01 -
 Moved webhook.py within plugins folder for ease of setup
 Added layout to webhook (SCSPF e.g)
 Added new embed for webhook
@@ -56,6 +59,16 @@ Added webhook message when raid is taken(user has started scouting again)
 
 ### Object Hider
 Hides objects from the game based on ID, modified from adams Fossil Island plugin.
+
+<details>
+  <summary>Change Log</summary>
+  
+v0.03 - 
+remove obselete variable cnt
+
+v0.01 -
+release
+</details>
 
 ### One Click Aerial Fishing
 Molch Aerial fishing, will cut fish if you have a knife in your invent else drops fish.
