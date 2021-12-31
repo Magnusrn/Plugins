@@ -2,6 +2,7 @@
 |------------- |------------- |
 | [Birdhouse Infobox](#birdhouse-infobox) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/birdhouseinfobox/src/main/java/net/runelite/client/plugins/birdhouseinfobox) |
 | [CoxRaidScouter](#coxraidscouter)  | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/coxraidscouter/src/main/java/net/runelite/client/plugins/coxraidscouter) |
+| [Object Hider](#object-hider)  | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/objecthider/src/main/java/net/runelite/client/plugins/objecthider) |
 | [One Click Aerial Fishing](#one-click-aerial-fishing)| [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickaerialfishing/src/main/java/net/runelite/client/plugins/oneclickaerialfishing) |
 | [One Click Bloods](#one-click-bloods) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickbloods/src/main/java/net/runelite/client/plugins/oneclickbloods) |
 | [One Click Chins](#one-click-chins) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickchins/src/main/java/net/runelite/client/plugins/oneclickchins) |
@@ -52,6 +53,9 @@ Added layout to webhook (SCSPF e.g)
 Added new embed for webhook
 Added webhook message when raid is taken(user has started scouting again)
 </details>
+
+### Object Hider
+Hides objects from the game based on ID, modified from adams Fossil Island plugin.
 
 ### One Click Aerial Fishing
 Molch Aerial fishing, will cut fish if you have a knife in your invent else drops fish.

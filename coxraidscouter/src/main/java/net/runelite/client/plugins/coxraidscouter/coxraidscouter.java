@@ -437,13 +437,12 @@ public class coxraidscouter extends Plugin
 				}
 			}
 
-
 			for (String room: roomsTrimmed) //checks for Mutt/Tek(Ovl)
 			{
 				String[] ovlRooms = {"Tekton", "Muttadiles"};
 				for (String ovlRoom: ovlRooms )
 				{
-					if (room.equals(ovlRoom))
+					if (room.equals(ovlRoom) && config.requireOverload()) //skip if require overload disabled
 					{
 						Print("Raid Found, waiting for raider.");
 						raidFound=true;
@@ -462,6 +461,25 @@ public class coxraidscouter extends Plugin
 						return; //returns if mutt or tek found, returns to prevent double printing Chat Message
 					}
 				}
+			}
+
+			if (!config.requireOverload()) //dupe code cba cleaning up rn
+			{
+				Print("Raid Found, waiting for raider.");
+				raidFound=true;
+				if (!config.webhook().equals("")) //if webhook exists, post raid, world, cc to webhook
+				{
+					DiscordWebhook webhook = new DiscordWebhook(config.webhook());
+					webhook.setTts(true);
+					webhook.addEmbed(new DiscordWebhook.EmbedObject()
+							.setTitle(client.getLocalPlayer().getName())
+							.setDescription(roomsTrimmed.toString())
+							.setColor(Color.GREEN)
+							.addField("World", String.valueOf(client.getWorld()), true)
+							.addField("Layout", raidLayout, true));
+					webhook.execute(); //Handle exception
+				}
+				return;
 			}
 			if (config.debugScouting()) //if debugScouting enabled adds reason for leaving raid to game chat
 			{

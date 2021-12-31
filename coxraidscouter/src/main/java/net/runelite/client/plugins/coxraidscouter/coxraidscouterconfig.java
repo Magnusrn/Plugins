@@ -18,6 +18,16 @@ public interface coxraidscouterconfig extends Config {
 
     @ConfigItem(
             position = 1,
+            keyName = "requireoverload",
+            name = "Require Overload",
+            description = "Disable if you want a raid without overloads"
+    )
+    default boolean requireOverload() {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 2,
             keyName = "requireGoodCrabs",
             name = "Good Crabs",
             description = "Scouts for good crabs only(If crabs in raid)"
@@ -27,7 +37,7 @@ public interface coxraidscouterconfig extends Config {
     }
 
     @ConfigItem(
-            position = 2,
+            position = 3,
             keyName = "autoLeaveCC",
             name = "Auto Leave/Rejoin CC",
             description = "Automatically Leaves and rejoins cc if someone enters raid(Make sure to not start raid until bot has rejoined)"
@@ -37,7 +47,7 @@ public interface coxraidscouterconfig extends Config {
     }
 
     @ConfigItem(
-            position = 3,
+            position = 4,
             keyName = "desiredRotationsToggle",
             name = "Enable Desired Rotations",
             description = "Enable Desired Rotations"
@@ -47,7 +57,7 @@ public interface coxraidscouterconfig extends Config {
     }
 
     @ConfigItem(
-            position = 4,
+            position = 5,
             keyName = "desiredRotations",
             name = "Desired Rotations",
             description = "Input Desired rotations, formatted e.g [Tekton,Vasa,Guardians],[Vasa,Tekton,Vespula]"
@@ -57,7 +67,7 @@ public interface coxraidscouterconfig extends Config {
     }
 
     @ConfigItem(
-            position = 5,
+            position = 6,
             keyName = "blacklistedRooms",
             name = "Blacklisted Rooms",
             description = "Blacklisted rooms, separate with comma"
@@ -67,7 +77,7 @@ public interface coxraidscouterconfig extends Config {
     }
 
     @ConfigItem(
-            position = 6,
+            position = 7,
             keyName = "webhook",
             name = "Webhook",
             description = "Add Webhook URL"
@@ -77,7 +87,7 @@ public interface coxraidscouterconfig extends Config {
     }
 
     @ConfigItem(
-            position = 7,
+            position = 8,
             keyName = "debugScouting",
             name = "Debug Scouting",
             description = "Displays reason for leaving raid in chat if unnacceptable"
@@ -87,7 +97,7 @@ public interface coxraidscouterconfig extends Config {
     }
 
     @ConfigItem(
-            position = 8,
+            position = 9,
             keyName = "5hHandler",
             name = "5h Handler",
             description = "Clicks through the 5h runescape login timer warning"
