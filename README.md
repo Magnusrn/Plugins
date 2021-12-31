@@ -92,6 +92,16 @@ release
 ### One Click Custom
 Input ID and choose your object type. This will find the nearest of that object as the crow flies and unfortunately not nearest by tiles.
 
+<details>
+  <summary>Change Log</summary>
+  
+v0.03 - 
+Changed input to be list rather than single ID
+
+v0.01 -
+release
+</details>
+
 ### One Click Glassblowing
 Supports two banks, Clan hall and north of Fossil Island. Ensure you're in the main bank tab(Not sure why this is required)
 

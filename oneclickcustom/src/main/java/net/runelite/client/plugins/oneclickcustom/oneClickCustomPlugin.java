@@ -20,12 +20,13 @@ import org.pf4j.Extension;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Extension
 @PluginDescriptor(
         name = "One Click Custom",
         description = "Sets the Menu entry for left click anywhere",
-        tags = {"one click","custom"},
+        tags = {"one click","custom","oneclick"},
         enabledByDefault = false
 )
 @Slf4j
@@ -76,7 +77,7 @@ public class oneClickCustomPlugin extends Plugin{
                 return;
             }
         }
-        if (event.getItem().getId()==config.ID())
+        if (getConfigIds().contains(event.getItem().getId()))
         {
             GroundItems.add(event.getItem());
         }
@@ -85,7 +86,7 @@ public class oneClickCustomPlugin extends Plugin{
     @Subscribe
     private void onItemDespawned(ItemDespawned event)
     {
-        if (event.getItem().getId()==config.ID())
+        if (getConfigIds().contains(event.getItem().getId()))
         {
             GroundItems.remove(event.getItem());
         }
@@ -171,7 +172,7 @@ public class oneClickCustomPlugin extends Plugin{
             if (!GroundItems.isEmpty()) {
                 TileItem tileItem = getNearestTileItem(GroundItems);
                 return createMenuEntry(
-                        config.ID(),
+                        getNearestTileItem(GroundItems).getId(),
                         MenuAction.GROUND_ITEM_THIRD_OPTION,
                         tileItem.getTile().getSceneLocation().getX(),
                         tileItem.getTile().getSceneLocation().getY(),
@@ -251,7 +252,7 @@ public class oneClickCustomPlugin extends Plugin{
     private NPC checkForNPCObject()
     {
         return new NPCQuery()
-                .idEquals(config.ID())
+                .idEquals(getConfigIds())
                 .result(client)
                 .nearestTo(client.getLocalPlayer());
     }
@@ -259,7 +260,7 @@ public class oneClickCustomPlugin extends Plugin{
     private GameObject checkforGameObject()
     {
         return new GameObjectQuery()
-                .idEquals(config.ID())
+                .idEquals(getConfigIds())
                 .result(client)
                 .nearestTo(client.getLocalPlayer());
     }
@@ -318,4 +319,10 @@ public class oneClickCustomPlugin extends Plugin{
         return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
                 .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
     }
+
+    private List<Integer> getConfigIds(){
+        List<String> IdList = Arrays.asList((config.IDs().strip()).split(","));
+        return IdList.stream().map(Integer::parseInt).collect(Collectors.toList());
+    }
+
 }

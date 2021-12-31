@@ -8,13 +8,13 @@ import net.runelite.client.config.ConfigItem;
 public interface oneClickCustomConfig extends Config {
     @ConfigItem(
             position = 0,
-            keyName = "ID",
-            name = "ID",
-            description = "Input game object or NPC(inc fishign) ID"
+            keyName = "IDs",
+            name = "IDs",
+            description = "Input game object or NPC(inc fishign) IDs. Separate with commas"
     )
-    default int ID()
+    default String IDs()
     {
-        return 0;
+        return "";
     }
 
     @ConfigItem(
