@@ -16,13 +16,15 @@ import org.pf4j.Extension;
 @PluginDescriptor(
         name = "One Click Chinchompas",
         enabledByDefault = false,
-        description = "one click chinchompas. Requires you to lay the traps initially as it only resets. credit TP.")
+        description = "one click chinchompas. Requires you to lay the traps initially as it only resets. Probably too slow to do 6 traps. Credit TP.")
 @Slf4j
 public class oneclickchinsplugin extends Plugin{
 
-
-    public static final int BOX_TRAP_EXPIRED = 10008;
-    private static final int CHINCHOMPA_CAUGHT = 9383;
+    private static final int BOX_TRAP_LAIN = 9380;
+    private static final int BOX_TRAP_EXPIRED = 10008;
+    private static final int GREY_CHINCHOMPA_CAUGHT = 9382;
+    private static final int RED_CHINCHOMPA_CAUGHT = 9383;
+    private static final int BLACK_CHINCHOMPA_CAUGHT = 721;
     private static final int CHINCHOMPA_FAILED = 9385;
     private int timeout;
     HunterState hunterState = HunterState.RESET_TRAP;
@@ -99,6 +101,7 @@ public class oneclickchinsplugin extends Plugin{
     }
 
     private void handleClick(MenuOptionClicked event) {
+        System.out.println(timeout);
 
         if (client.getLocalPlayer().isMoving()
                 || client.getLocalPlayer().getPoseAnimation() != client.getLocalPlayer().getIdlePoseAnimation()
@@ -116,13 +119,34 @@ public class oneclickchinsplugin extends Plugin{
         switch (hunterState)
         {
             case RESET_FAILED_TRAP:
-                event.setMenuEntry(ResetFailedTrap());
+                if (FailedTrapExists())
+                {
+                    event.setMenuEntry(ResetFailedTrap());
+                }
+                else
+                {
+                    event.consume();
+                }
                 break;
             case RESET_EXPIRED_TRAP:
-                event.setMenuEntry(ResetExpiredTrap());
+                if(ExpiredTrapExists())
+                {
+                    event.setMenuEntry(ResetExpiredTrap());
+                }
+                else
+                {
+                    event.consume();
+                }
                 break;
             case RESET_TRAP:
-                event.setMenuEntry(ResetTrap());
+                if (CaughtTrapExists())
+                {
+                    event.setMenuEntry(ResetTrap());
+                }
+                else
+                {
+                    event.consume();
+                }
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + hunterState);
@@ -183,12 +207,12 @@ public class oneclickchinsplugin extends Plugin{
 
     private MenuEntry ResetTrap(){
         GameObject gameobject = new GameObjectQuery()
-                .idEquals(CHINCHOMPA_CAUGHT)
+                .idEquals(getCaughtChinchompaType())
                 .result(client)
                 .nearestTo(client.getLocalPlayer());
 
         return createMenuEntry(
-                CHINCHOMPA_CAUGHT,
+                getCaughtChinchompaType(),
                 MenuAction.GAME_OBJECT_SECOND_OPTION,
                 getLocation(gameobject).getX(),
                 getLocation(gameobject).getY(),
@@ -220,7 +244,7 @@ public class oneclickchinsplugin extends Plugin{
 
     private boolean CaughtTrapExists(){
         GameObject gameobject = new GameObjectQuery()
-                .idEquals(CHINCHOMPA_CAUGHT)
+                .idEquals(getCaughtChinchompaType())
                 .result(client)
                 .nearestTo(client.getLocalPlayer());
         return gameobject != null;
@@ -243,5 +267,15 @@ public class oneclickchinsplugin extends Plugin{
     public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
         return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
                 .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
+    }
+
+    private int getCaughtChinchompaType(){
+        if (config.chinchompaType()==ChinchompaType.Grey){
+            return GREY_CHINCHOMPA_CAUGHT;
+        }
+        if (config.chinchompaType()==ChinchompaType.Red){
+            return RED_CHINCHOMPA_CAUGHT;
+        }
+        return BLACK_CHINCHOMPA_CAUGHT;
     }
 }

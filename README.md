@@ -79,6 +79,16 @@ Initially requires the map to be loaded as a normal player would else it can get
 ### One Click Chins
 Pretty simple plugin, requires initial setting of the traps and just resets them. Has the option to afk if another player is nearby as otherwise it will attempt to reset the other players traps if it's closest.
 
+<details>
+  <summary>Change Log</summary>
+  
+v0.03 - 
+Updated to allow for grey/black chinchompas
+
+v0.01 -
+release
+</details>
+
 ### One Click Custom
 Input ID and choose your object type. This will find the nearest of that object as the crow flies and unfortunately not nearest by tiles.
 

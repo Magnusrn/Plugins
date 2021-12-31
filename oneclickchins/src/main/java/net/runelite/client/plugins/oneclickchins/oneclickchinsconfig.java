@@ -17,4 +17,14 @@ public interface oneclickchinsconfig extends Config
     {
         return true;
     }
+
+    @ConfigItem(
+            keyName = "chinchompatype",
+            name = "Chinchompa Type",
+            description = "Choose which chinchompa to catch",
+            position = 1
+    )
+    default ChinchompaType chinchompaType() {
+        return ChinchompaType.Red;
+    }
 }
