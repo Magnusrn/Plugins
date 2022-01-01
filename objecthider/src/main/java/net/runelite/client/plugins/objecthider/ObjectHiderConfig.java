@@ -64,4 +64,26 @@ public interface ObjectHiderConfig extends Config
         return false;
     }
 
+    @ConfigItem(
+            position = 3,
+            keyName ="AbyssalDemons" ,
+            name = "Abyssal Demons",
+            description = "Hides the annoying bridge at Abyssal Demons in the Catacombs of Kourend"
+    )
+    default boolean AbyssalDemons()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+            position = 4,
+            keyName ="SotetsegWall" ,
+            name = "Sotetseg Wall",
+            description = "Hides the wall behind Sotetseg"
+    )
+    default boolean SotetsegWall()
+    {
+        return false;
+    }
+
 }

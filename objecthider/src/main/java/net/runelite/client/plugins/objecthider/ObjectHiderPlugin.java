@@ -38,6 +38,8 @@ import net.runelite.api.GameObject;
 import net.runelite.api.GameState;
 import net.runelite.api.Scene;
 import net.runelite.api.Tile;
+import net.runelite.api.coords.WorldArea;
+import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -54,11 +56,9 @@ import org.pf4j.Extension;
         enabledByDefault = false
 )
 @Slf4j
-public class ObjectHiderPlugin extends Plugin
-{
+public class ObjectHiderPlugin extends Plugin {
     @Provides
-    ObjectHiderConfig provideConfig(ConfigManager configManager)
-    {
+    ObjectHiderConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(ObjectHiderConfig.class);
     }
 
@@ -77,37 +77,30 @@ public class ObjectHiderPlugin extends Plugin
     }
 
     @Override
-    protected void startUp()
-    {
-        if (client.getGameState() == GameState.LOGGED_IN)
-        {
+    protected void startUp() {
+        if (client.getGameState() == GameState.LOGGED_IN) {
             hide();
         }
     }
 
     @Override
-    protected void shutDown()
-    {
+    protected void shutDown() {
         clientThread.invoke(() ->
         {
-            if (client.getGameState() == GameState.LOGGED_IN)
-            {
+            if (client.getGameState() == GameState.LOGGED_IN) {
                 client.setGameState(GameState.LOADING);
             }
         });
     }
 
     @Subscribe
-    public void onGameStateChanged(GameStateChanged gameStateChanged)
-    {
-        if (gameStateChanged.getGameState() == GameState.LOGGED_IN)
-        {
+    public void onGameStateChanged(GameStateChanged gameStateChanged) {
+        if (gameStateChanged.getGameState() == GameState.LOGGED_IN) {
             hide();
         }
     }
 
-    private void hide()
-    {
+    private void hide() {
         String OBJECT_ID_STRING = null;
         List<Integer> objectIdIntList = new ArrayList<Integer>();
 
@@ -115,11 +108,10 @@ public class ObjectHiderPlugin extends Plugin
             OBJECT_ID_STRING = config.objectIdsSet();
             String[] objectIds = OBJECT_ID_STRING.split("\\s*,\\s*");
             for (String i : objectIds) objectIdIntList.add(Integer.valueOf(i));
-        } catch(Exception ignored){
+        } catch (Exception ignored) {
         }
 
-
-        if (config.FossilIsland()){
+        if (config.FossilIsland()) {
             objectIdIntList.addAll(Arrays.asList(30822, // Small white mushrooms A
                     30825, // Small white mushrooms B
                     30799, // Small yellow mushrooms A
@@ -135,10 +127,10 @@ public class ObjectHiderPlugin extends Plugin
                     30835, // mediumBlueMushroomA
                     30836, // mediumRedMushroomA
                     30832, // mediumRedPlantA
-                    30840 )); // mediumRedPlantB));
+                    30840)); // mediumRedPlantB));
         }
 
-        if (config.ZeahRunecrafting()){
+        if (config.ZeahRunecrafting()) {
             objectIdIntList.addAll(Arrays.asList(34627, //various rocks/crystals throughout zeah
                     27881,
                     27884,
@@ -209,31 +201,59 @@ public class ObjectHiderPlugin extends Plugin
                     27977)); //end of house
         }
 
+        if (config.AbyssalDemons()) {objectIdIntList.add(28871);}
 
-        Scene scene = client.getScene();
-        Tile[][] tiles = scene.getTiles()[client.getPlane()];
-        for (int x = 0; x < Constants.SCENE_SIZE; ++x)
-        {
-            for (int y = 0; y < Constants.SCENE_SIZE; ++y)
-            {
-                Tile tile = tiles[x][y];
-                if (tile == null)
-                {
-                    continue;
-                }
+        if (config.SotetsegWall()) {objectIdIntList.addAll(Arrays.asList(33040,33041,33042,33043,33044,33045,33046,33047,33048,33049,33050,33051,33052,33053,33054,33055,33056,33057,33058,33059));}
 
-                for (GameObject gameObject : tile.getGameObjects())
-                {
-                    if (gameObject != null && objectIdIntList.contains(gameObject.getId()))
+            Scene scene = client.getScene();
+            Tile[][] tiles = scene.getTiles()[client.getPlane()];
+            Tile[][] tiles1 = scene.getTiles()[1]; //get tiles on plane[1]
+            for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+                for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
+
+                    Tile tile = tiles[x][y];
+                    Tile tile1 = tiles1[x][y];
+
+                    if (tile == null || tile1 == null) {
+                        continue;
+                    }
+
+                    for (GameObject gameObject : tile.getGameObjects()) {
+                        if (gameObject != null && objectIdIntList.contains(gameObject.getId())) {
+                            scene.removeGameObject(gameObject);
+                            break;
+                        }
+                    }
+                    for (GameObject gameObject : tile1.getGameObjects()) //iterate through tiles on plane[1] needed for hiding abyssal demon bridge
                     {
-                        scene.removeGameObject(gameObject);
-                        break;
+                        if (gameObject != null && objectIdIntList.contains(gameObject.getId())) {
+                            scene.removeGameObject(gameObject);
+                            break;
+                        }
                     }
                 }
             }
-        }
+
+
+            for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
+                for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
+                    Tile tile = tiles[x][y];
+                    if (tile == null) {
+                        continue;
+                    }
+
+                    for (GameObject gameObject : tile.getGameObjects()) {
+                        if (gameObject != null && objectIdIntList.contains(gameObject.getId())) {
+                            scene.removeGameObject(gameObject);
+                            break;
+                        }
+                    }
+                }
+            }
+
     }
 }
 
 //figure out a way to reset without having to restart
 //figure a way to hide on entry rather than on moving in game
+//clean up the repeating code for multiple planes
