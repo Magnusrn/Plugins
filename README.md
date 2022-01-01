@@ -65,12 +65,15 @@ Hides objects from the game based on ID, modified from adams Fossil Island plugi
 
 <details>
   <summary>Change Log</summary>
+ 
+v0.04 - 
+Added Sotetseg back wall and abyssal demon catacombs bridge to config  
   
 v0.03 - 
-remove obselete variable cnt
+remove obselete variable cnt 
 
 v0.01 -
-release
+release 
 </details>
 
 ### One Click Aerial Fishing
