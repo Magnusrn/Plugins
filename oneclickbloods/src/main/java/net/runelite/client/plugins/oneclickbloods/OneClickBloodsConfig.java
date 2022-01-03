@@ -17,4 +17,15 @@ public interface OneClickBloodsConfig extends Config
     {
         return false;
     }
+
+    @ConfigItem(
+            position = 0,
+            keyName = "manualwalk",
+            name = "Manually Walk",
+            description = "Disable this if you want to oneclick walk towards the altar, Disable with caution as it walks to the altar by using a chisel on the same rockslide every time."
+    )
+    default boolean manuallyWalk()
+    {
+        return false;
+    }
 }

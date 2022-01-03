@@ -19,11 +19,12 @@ import org.pf4j.Extension;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 @Extension
 @PluginDescriptor(
         name = "One Click Bloods",
-        description = "...",
+        description = "Apparently gets stuck occasionally depending on how the map is loaded. Not 100% on this though as I haven't seen it myself.",
         tags = {"one","click","bloods","oneclick"},
         enabledByDefault = false
 )
@@ -51,6 +52,7 @@ public class OneClickBloodsPlugin extends Plugin {
     private int timeout;
 
     private boolean DARK_ESSENCE_FRAGMENTS_PILE_FULL = false;
+    private boolean SHOULD_RUN_TO_ALTAR = false;
 
     @Inject
     private Client client;
@@ -66,7 +68,20 @@ public class OneClickBloodsPlugin extends Plugin {
 
     @Subscribe
     private void onClientTick(ClientTick event) {
+        if (client.getWidget(193,2)!=null)
+        {
+            if (client.getWidget(193,2).getText().contains("Your pile of fragments cannot grow any larger"))
+            {
+                DARK_ESSENCE_FRAGMENTS_PILE_FULL = true;
+                SHOULD_RUN_TO_ALTAR = true;
+            }
+        }
+
         if (this.client.getLocalPlayer() == null || this.client.getGameState() != GameState.LOGGED_IN)
+        {
+            return;
+        }
+        if (SHOULD_RUN_TO_ALTAR && config.manuallyWalk() &! isWithinBloodAltarArea())
         {
             return;
         }
@@ -86,9 +101,12 @@ public class OneClickBloodsPlugin extends Plugin {
     @Subscribe
     private void onAnimationChanged(AnimationChanged event)
     {
-        if (client.getLocalPlayer().getAnimation()==RUNECRAFTING_ANIMATION_ID)
+        if (client.getLocalPlayer()!=null)
         {
-            DARK_ESSENCE_FRAGMENTS_PILE_FULL=false;
+            if ((client.getLocalPlayer()).getAnimation()==RUNECRAFTING_ANIMATION_ID)
+            {
+                DARK_ESSENCE_FRAGMENTS_PILE_FULL=false;
+            }
         }
     }
 
@@ -115,9 +133,8 @@ public class OneClickBloodsPlugin extends Plugin {
             event.consume();
             return;
         }
-        if(client.getLocalPlayer().isMoving()
-                ||client.getLocalPlayer().getPoseAnimation()
-                != client.getLocalPlayer().getIdlePoseAnimation())
+        if((client.getLocalPlayer().isMoving() || client.getLocalPlayer().getPoseAnimation() != client.getLocalPlayer().getIdlePoseAnimation())
+                &! (isWithinBloodAltarArea() && config.manuallyWalk())) //allows you to click the altar if manual walk is enabled as soon as you can see it
         {
             event.consume();
             return;
@@ -134,16 +151,6 @@ public class OneClickBloodsPlugin extends Plugin {
             client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
             client.setSelectedItemSlot(getInventoryItem(CHISEL_ID).getIndex());
             client.setSelectedItemID(CHISEL_ID);
-
-            if (client.getWidget(193,2)!=null)
-            {
-                if (client.getWidget(193,2).getText().contains("Your pile of fragments cannot grow any larger"))
-                {
-                    DARK_ESSENCE_FRAGMENTS_PILE_FULL = true;
-                    event.setMenuEntry(useChiselOnRockSlideMES());
-                    return;
-                }
-            }
             event.setMenuEntry(useChiselOnBlockMES());
             return;
         }
@@ -175,14 +182,19 @@ public class OneClickBloodsPlugin extends Plugin {
                 return;
             }
 
-            client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
-            client.setSelectedItemSlot(getInventoryItem(CHISEL_ID).getIndex());
-            client.setSelectedItemID(CHISEL_ID);
-            event.setMenuEntry(useChiselOnRockSlideMES());
+            if (!config.manuallyWalk() && SHOULD_RUN_TO_ALTAR)
+            {
+                client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
+                client.setSelectedItemSlot(getInventoryItem(CHISEL_ID).getIndex());
+                client.setSelectedItemID(CHISEL_ID);
+                event.setMenuEntry(useChiselOnRockSlideMES());
+                return;
+            }
         }
 
         if (isWithinBloodAltarArea())
         {
+            SHOULD_RUN_TO_ALTAR = false;
             if (getInventoryItem(DARK_ESSENCE_FRAGMENTS_ID)!=null)
             {
                 event.setMenuEntry(runecraftMES());
@@ -380,9 +392,7 @@ public class OneClickBloodsPlugin extends Plugin {
 
 /*TODO
 MAYBE ADD OPTION TO NOT ONE CLICK CHISEL OR  ONE CLICK USE CHISEL ON ROCKS
-ADD EXTREME CONSUME CLICKS TO ALLOW FOR FAST AS FK CLICKING?
 ADD CONFIG OPTION FOR CONSUME CLICKS
-ADD MANUAL WALK INSTEAD OF USING CHISEL ON ROCK
  */
 
 

@@ -82,6 +82,16 @@ Molch Aerial fishing, will cut fish if you have a knife in your invent else drop
 ### One Click Bloods
 Initially requires the map to be loaded as a normal player would else it can get stuck. Currently uses a rather inelegant method of using a chisel on the cluster of rocks to get nearer to the altar, very open to suggestions on how to solve this as walking programatically seems very aids. SWIM has used for approx 100h without any detection.
 
+<details>
+  <summary>Change Log</summary>
+  
+v0.03 - 
+Updated Inventory Full check to be on clienttick instead of menuoptionclicked. Added option to manual walk towards the altar. 
+
+v0.01 -
+release
+</details>
+
 ### One Click Chins
 Pretty simple plugin, requires initial setting of the traps and just resets them. Has the option to afk if another player is nearby as otherwise it will attempt to reset the other players traps if it's closest.
 
