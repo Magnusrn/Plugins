@@ -1,0 +1,9 @@
+Gradle Clean 
+Update plugin version
+Reload gradle
+Build 
+Delete contents of plugins.json
+Delete release folder jars
+Bootstrap
+Commit 
+Push
