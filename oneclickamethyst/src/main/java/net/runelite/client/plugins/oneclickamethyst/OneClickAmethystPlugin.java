@@ -26,7 +26,7 @@ import java.util.Set;
 @PluginDescriptor(
         name = "One Click Amethyst",
         enabledByDefault = false,
-        description = "oneClickAmethyst and chisel"
+        description = "Mines and chisels Amethyst."
 )
 @Slf4j
 public class OneClickAmethystPlugin extends Plugin

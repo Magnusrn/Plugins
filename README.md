@@ -4,6 +4,7 @@
 | [CoxRaidScouter](#coxraidscouter)  | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/coxraidscouter/src/main/java/net/runelite/client/plugins/coxraidscouter) |
 | [Object Hider](#object-hider)  | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/objecthider/src/main/java/net/runelite/client/plugins/objecthider) |
 | [One Click Aerial Fishing](#one-click-aerial-fishing)| [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickaerialfishing/src/main/java/net/runelite/client/plugins/oneclickaerialfishing) |
+| [One Click Amethyst](#one-click-amethyst)| [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickamethyst/src/main/java/net/runelite/client/plugins/oneclickamethyst) |
 | [One Click Bloods](#one-click-bloods) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickbloods/src/main/java/net/runelite/client/plugins/oneclickbloods) |
 | [One Click Chins](#one-click-chins) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickchins/src/main/java/net/runelite/client/plugins/oneclickchins) |
 | [One Click Custom](#one-click-custom) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickcustom/src/main/java/net/runelite/client/plugins/oneclickcustom) |
@@ -79,6 +80,10 @@ release
 ### One Click Aerial Fishing
 Molch Aerial fishing, will cut fish if you have a knife in your invent else drops fish.
 
+### One Click Amethyst
+Mines Amethyst and cuts into products. 
+
+
 ### One Click Bloods
 Initially requires the map to be loaded as a normal player would else it can get stuck. Currently uses a rather inelegant method of using a chisel on the cluster of rocks to get nearer to the altar, very open to suggestions on how to solve this as walking programatically seems very aids. SWIM has used for approx 100h without any detection.
 
@@ -138,3 +143,13 @@ Supports telegrabbing Wine of Zamorak at the wildy spot or the safe chaos altar.
 
 ### One Click ZMI
 This is state based so must be started near the banker at ZMI. Ensure you have 1 dose staminas in the bank and are in the main tab of the bank. Ensure Last NPC contact was to dark mage as it will repair broken pouches.
+
+<details>
+  <summary>Change Log</summary>
+  
+v0.04 - 
+Updated getbanker opcode to break less
+
+v0.01 -
+release
+</details>

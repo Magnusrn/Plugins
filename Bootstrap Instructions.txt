@@ -6,4 +6,4 @@ Delete contents of plugins.json
 Delete release folder jars
 Bootstrap
 Commit 
-Push
+Push 

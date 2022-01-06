@@ -8,7 +8,7 @@ public interface OneClickAmethystConfig extends Config
     @ConfigItem(
             keyName = "Product",
             name = "Product",
-            description = "select the chosen product you want to make from the ore",
+            description = "Mines and chisels Amethyst.",
             position = 0
     )
     default Product getProduct()
