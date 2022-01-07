@@ -142,7 +142,7 @@ Use Pajeets One Click 2 tick instead. Does the same thing I think but his has Te
 Supports telegrabbing Wine of Zamorak at the wildy spot or the safe chaos altar.
 
 ### One Click ZMI
-This is state based so must be started near the banker at ZMI. Ensure you have 1 dose staminas in the bank and are in the main tab of the bank. Ensure Last NPC contact was to dark mage as it will repair broken pouches.
+This is state based so must be started near the banker at ZMI. Ensure you have 1 dose staminas in the bank and are in the main tab of the bank with the withdraw quantity set to 1. Ensure Last NPC contact was to dark mage as it will repair broken pouches. Only supports Medium/Medium + Large/Medium + Large + Giant pouches.
 
 <details>
   <summary>Change Log</summary>
