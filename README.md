@@ -83,6 +83,16 @@ Molch Aerial fishing, will cut fish if you have a knife in your invent else drop
 ### One Click Amethyst
 Mines Amethyst and cuts into products. 
 
+<details>
+  <summary>Change Log</summary>
+  
+v0.03 - 
+Updated to allow for banking if no chisel in inventory.
+
+v0.01 -
+release
+</details>
+
 
 ### One Click Bloods
 Initially requires the map to be loaded as a normal player would else it can get stuck. Currently uses a rather inelegant method of using a chisel on the cluster of rocks to get nearer to the altar, very open to suggestions on how to solve this as walking programatically seems very aids. SWIM has used for approx 100h without any detection.

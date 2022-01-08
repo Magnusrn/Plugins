@@ -6,7 +6,9 @@ import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.ClientTick;
+import net.runelite.api.events.Menu;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.api.queries.WallObjectQuery;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -26,7 +28,7 @@ import java.util.Set;
 @PluginDescriptor(
         name = "One Click Amethyst",
         enabledByDefault = false,
-        description = "Mines and chisels Amethyst."
+        description = "Mines and chisels Amethyst. If no chisel in invent it will bank instead."
 )
 @Slf4j
 public class OneClickAmethystPlugin extends Plugin
@@ -34,7 +36,8 @@ public class OneClickAmethystPlugin extends Plugin
 
     Set<Integer> MINING_ANIMATION = Set.of(6752,6758,8344,4481,7282,8345);
     private boolean CHISELING = false;
-    private int AMETHYST_ID = 21347;
+    private final int AMETHYST_ID = 21347;
+    int CHISEL_ID = 1755;
 
     @Inject
     private Client client;
@@ -98,6 +101,18 @@ public class OneClickAmethystPlugin extends Plugin
         }
         System.out.println("6");
 
+        if (bankOpen())
+        {
+            event.setMenuEntry(depositAllMES());
+            return;
+        }
+
+        if (getInventoryItem(CHISEL_ID)==null)
+        {
+            event.setMenuEntry(bankMES());
+            return;
+        }
+
         if (client.getWidget(270,5)!=null)
         {
             event.setMenuEntry(chooseProductMenuEntry());
@@ -134,7 +149,6 @@ public class OneClickAmethystPlugin extends Plugin
 
     private MenuEntry useChiselOnAmethystMenuEntry()
     {
-        int CHISEL_ID = 1755;
         client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
         client.setSelectedItemSlot(getInventoryItem(CHISEL_ID).getIndex());
         client.setSelectedItemID(CHISEL_ID);
@@ -168,6 +182,24 @@ public class OneClickAmethystPlugin extends Plugin
                 true);
     }
 
+    private MenuEntry bankMES(){
+        return createMenuEntry(
+                4483,
+                MenuAction.GAME_OBJECT_FIRST_OPTION,
+                getLocation(getGameObject(4483)).getX(),
+                getLocation(getGameObject(4483)).getY(),
+                false);
+    }
+
+    private MenuEntry depositAllMES(){
+        return createMenuEntry(
+                1,
+                MenuAction.CC_OP,
+                -1,
+                WidgetInfo.BANK_DEPOSIT_INVENTORY.getId(),
+                false);
+    }
+
     public int getEmptySlots() {
         Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
         if (inventoryWidget != null) {
@@ -188,6 +220,27 @@ public class OneClickAmethystPlugin extends Plugin
             }
         }
         return null;
+    }
+
+    private boolean bankOpen() {
+        return client.getItemContainer(InventoryID.BANK) != null;
+    }
+
+    private Point getLocation(TileObject tileObject) {
+        if (tileObject == null) {
+            return new Point(0, 0);
+        }
+        if (tileObject instanceof GameObject) {
+            return ((GameObject) tileObject).getSceneMinLocation();
+        }
+        return new Point(tileObject.getLocalLocation().getSceneX(), tileObject.getLocalLocation().getSceneY());
+    }
+
+    private GameObject getGameObject(int ID) {
+        return new GameObjectQuery()
+                .idEquals(ID)
+                .result(client)
+                .nearestTo(client.getLocalPlayer());
     }
 
     public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
