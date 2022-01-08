@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.scheduledlogout;
+package net.runelite.client.plugins.tabswitcher;
 
 import com.google.inject.Inject;
 import com.google.inject.Provides;
