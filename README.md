@@ -15,6 +15,7 @@
 | [One Click Swordfish](#one-click-swordfish)|   [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickswordfish/src/main/java/net/runelite/client/plugins/oneclickswordfish) |
 | [One Click Telegrab](#one-click-telegrab) |  [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclicktelegrab/src/main/java/net/runelite/client/plugins/oneclicktelegrab) |
 | [One Click ZMI](#one-click-zmi) |   [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickzmi/src/main/java/net/runelite/client/plugins/oneclickzmi) |
+| [Scheduled Logout](#scheduled-logout) |   [Click Here](https://github.com/Magnusrn/Plugins/tree/master/scheduledlogout/src/main/java/net/runelite/client/plugins/scheduledlogout) |
 
 ### Birdhouse-Infobox
 Starts a (fairly conservative) timer upon building a birdhouse, overlays an infobox
@@ -163,3 +164,6 @@ Updated getbanker opcode to break less
 v0.01 -
 release
 </details>
+
+### Birdhouse-Infobox
+Automatically logs out after inputted minutes

@@ -1,11 +1,10 @@
-package net.runelite.client.plugins.tabswitcher;
+package net.runelite.client.plugins.scheduledlogout;
 
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import net.runelite.api.Client;
 import net.runelite.api.VarClientInt;
 import net.runelite.api.events.ClientTick;
-import net.runelite.api.events.WidgetLoaded;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
