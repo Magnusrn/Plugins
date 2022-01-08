@@ -165,5 +165,5 @@ v0.01 -
 release
 </details>
 
-### Birdhouse-Infobox
+### Scheduled Logout
 Automatically logs out after inputted minutes
