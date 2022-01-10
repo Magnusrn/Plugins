@@ -2,6 +2,7 @@
 |------------- |------------- |
 | [Birdhouse Infobox](#birdhouse-infobox) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/birdhouseinfobox/src/main/java/net/runelite/client/plugins/birdhouseinfobox) |
 | [CoxRaidScouter](#coxraidscouter)  | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/coxraidscouter/src/main/java/net/runelite/client/plugins/coxraidscouter) |
+| [Nex Red Click](#nex-red-click) |   [Click Here](https://github.com/Magnusrn/Plugins/tree/master/nexredclick/src/main/java/net/runelite/client/plugins/nexredclick) |
 | [Object Hider](#object-hider)  | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/objecthider/src/main/java/net/runelite/client/plugins/objecthider) |
 | [One Click Aerial Fishing](#one-click-aerial-fishing)| [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickaerialfishing/src/main/java/net/runelite/client/plugins/oneclickaerialfishing) |
 | [One Click Amethyst](#one-click-amethyst)| [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickamethyst/src/main/java/net/runelite/client/plugins/oneclickamethyst) |
@@ -61,6 +62,9 @@ Added layout to webhook (SCSPF e.g)
 Added new embed for webhook
 Added webhook message when raid is taken(user has started scouting again)
 </details>
+
+### Nex Red Click 
+Remaps ctrl click on Nex to click door outside instance 
 
 ### Object Hider
 Hides objects from the game based on ID, modified from adams Fossil Island plugin.
