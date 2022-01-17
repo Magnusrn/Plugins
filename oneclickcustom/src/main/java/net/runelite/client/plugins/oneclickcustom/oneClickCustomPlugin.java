@@ -6,7 +6,6 @@ import net.runelite.api.*;
 import net.runelite.api.events.*;
 import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.api.queries.NPCQuery;
-import net.runelite.api.queries.PlayerQuery;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
