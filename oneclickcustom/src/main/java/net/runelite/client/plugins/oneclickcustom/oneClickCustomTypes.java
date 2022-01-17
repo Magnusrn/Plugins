@@ -5,5 +5,6 @@ public enum oneClickCustomTypes {
     Fish,
     Attack,
     Pickpocket,
-    Pick_Up
+    Pick_Up,
+    Use_Item_On_X
 }

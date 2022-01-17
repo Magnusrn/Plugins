@@ -136,7 +136,7 @@ public class OneClickTeaksPlugin extends Plugin {
                 .result(client)
                 .nearestTo(client.getLocalPlayer());
     }
-    
+
     private GameObject getTeakTree()
     {
 
