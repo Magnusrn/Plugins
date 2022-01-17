@@ -127,13 +127,13 @@ release
 </details>
 
 ### One Click Custom
-Input ID and choose your object type. This will find the nearest of that object as the crow flies and unfortunately not nearest by tiles. 
-Format for Use Item on X is as follows: 
-{inventory item id},{game object or npc id(one or more)}
-e.g 
-123,5545,5546,5547 
-124,5343,4436,23234 
-7575,0,2,5 
+Input ID and choose your object type. This will find the nearest of that object as the crow flies and unfortunately not nearest by tiles.  
+Format for Use Item on X is as follows:  
+{inventory item id},{game object or npc id(one or more)}  
+e.g  
+123,5545,5546,5547  
+124,5343,4436,23234  
+7575,0,2,5  
 
 <details>
   <summary>Change Log</summary>
