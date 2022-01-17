@@ -27,7 +27,8 @@ Requires the "Chambers of Xeric" plugin "Raid Layout Message" option Toggled ON
 
 SWIM ran this on 3 accounts for a little under 3 months(approx 2000 raids) two temps towards the end. However this is a commonly reported activity so would only recommend using on burner accounts. Works nicely if setup on a cloud VM and webhooked to discord. Only need to check once every 6 hours if using the auto leave/rejoin cc feature
 
-Example Desired Rotations:[Tekton,Vasa,Guardians],[Muttadiles,Shamans,Mystics],[Guardians,Vasa,Tekton],[Vasa,Tekton,Vespula],[Vespula,Tekton,Vasa],[Mystics,Shamans,Muttadiles],[Tekton,Muttadiles,Guardians],[Guardians,Muttadiles,Tekton],[Muttadiles,Vespula,Guardians],[Vespula,Guardians,Muttadiles]
+Example Desired Rotations: [Tekton,Vasa,Guardians],[Muttadiles,Shamans,Mystics],[Guardians,Vasa,Tekton],[Vasa,Tekton,Vespula],[Vespula,Tekton,Vasa],[Mystics,Shamans,Muttadiles],[Tekton,Muttadiles,Guardians],[Guardians,Muttadiles,Tekton],[Muttadiles,Vespula,Guardians],[Vespula,Guardians,Muttadiles] 
+
 Example Blacklisted Rooms: Unknown (puzzle),Unknown (combat),Ice Demon,Vanguards
 
 <details>

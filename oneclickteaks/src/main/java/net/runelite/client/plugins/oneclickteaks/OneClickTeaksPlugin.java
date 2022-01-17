@@ -6,6 +6,7 @@ import net.runelite.api.*;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ClientTick;
+import net.runelite.api.events.HitsplatApplied;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.api.widgets.Widget;
@@ -135,9 +136,10 @@ public class OneClickTeaksPlugin extends Plugin {
                 .result(client)
                 .nearestTo(client.getLocalPlayer());
     }
-
+    
     private GameObject getTeakTree()
     {
+
         HashMap<Integer, Integer> TeakTrees = new HashMap<Integer, Integer>(); //game object ID as key, tree felled varbit as value. value of 0 is choppable.
         TeakTrees.put(30481,4957);
         TeakTrees.put(30480,4955);
