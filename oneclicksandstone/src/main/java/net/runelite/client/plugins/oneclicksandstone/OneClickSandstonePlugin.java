@@ -191,7 +191,7 @@ public class OneClickSandstonePlugin extends Plugin {
                 1,
                 MenuAction.CC_OP,
                 -1,
-                14286954,
+                WidgetInfo.SPELL_HUMIDIFY.getId(),
                 true);
     }
 
