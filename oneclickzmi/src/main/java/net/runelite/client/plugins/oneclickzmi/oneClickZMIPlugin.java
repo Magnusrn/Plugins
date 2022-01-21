@@ -543,9 +543,10 @@ public class oneClickZMIPlugin extends Plugin {
                 2,
                 MenuAction.CC_OP,
                 -1,
-                14286952,
-                true);
+                WidgetInfo.SPELL_NPC_CONTACT.getId(),
+                false);
     }
+
     private MenuEntry continueChat1(){
         return createMenuEntry(
                 0,
