@@ -510,8 +510,8 @@ public class oneClickZMIPlugin extends Plugin {
                 1,
                 MenuAction.CC_OP,
                 -1,
-                14286991,
-                true);
+                WidgetInfo.SPELL_OURANIA_TELEPORT.getId(),
+                false);
     }
     private GameObject findLadder() {
         return new GameObjectQuery()
