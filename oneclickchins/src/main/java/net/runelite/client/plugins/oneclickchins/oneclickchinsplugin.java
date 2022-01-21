@@ -12,6 +12,8 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import org.pf4j.Extension;
 
+import java.util.ArrayList;
+
 @Extension
 @PluginDescriptor(
         name = "One Click Chinchompas",
@@ -20,7 +22,6 @@ import org.pf4j.Extension;
 @Slf4j
 public class oneclickchinsplugin extends Plugin{
 
-    private static final int BOX_TRAP_LAIN = 9380;
     private static final int BOX_TRAP_EXPIRED = 10008;
     private static final int GREY_CHINCHOMPA_CAUGHT = 9382;
     private static final int RED_CHINCHOMPA_CAUGHT = 9383;
@@ -69,18 +70,17 @@ public class oneclickchinsplugin extends Plugin{
             return;
         }
 
-        if (ExpiredTrapExists())
+        if (ResetExpiredTrapMenuEntry()!=null)
         {
             hunterState = HunterState.RESET_EXPIRED_TRAP;
         }
 
-        else if (CaughtTrapExists())
+        else if (getTrapMenuEntry(getCaughtChinchompaType())!=null)
         {
             hunterState = HunterState.RESET_TRAP;
-
         }
 
-        else if (FailedTrapExists())
+        else if (getTrapMenuEntry(CHINCHOMPA_FAILED)!=null)
         {
             hunterState = HunterState.RESET_FAILED_TRAP;
 
@@ -94,6 +94,7 @@ public class oneclickchinsplugin extends Plugin{
     public void onAnimationChanged(AnimationChanged event)
     {
         int TRAP_RESET_ANIMATION = 5212;
+        if (client.getLocalPlayer()==null) return;
         if (client.getLocalPlayer().getAnimation()== TRAP_RESET_ANIMATION)
         {
             timeout=9;
@@ -119,9 +120,9 @@ public class oneclickchinsplugin extends Plugin{
         switch (hunterState)
         {
             case RESET_FAILED_TRAP:
-                if (FailedTrapExists())
+                if (getTrapMenuEntry(CHINCHOMPA_FAILED)!=null)
                 {
-                    event.setMenuEntry(ResetFailedTrap());
+                    event.setMenuEntry(getTrapMenuEntry(CHINCHOMPA_FAILED));
                 }
                 else
                 {
@@ -129,9 +130,9 @@ public class oneclickchinsplugin extends Plugin{
                 }
                 break;
             case RESET_EXPIRED_TRAP:
-                if(ExpiredTrapExists())
+                if(ResetExpiredTrapMenuEntry()!=null)
                 {
-                    event.setMenuEntry(ResetExpiredTrap());
+                    event.setMenuEntry(ResetExpiredTrapMenuEntry());
                 }
                 else
                 {
@@ -139,9 +140,9 @@ public class oneclickchinsplugin extends Plugin{
                 }
                 break;
             case RESET_TRAP:
-                if (CaughtTrapExists())
+                if (getTrapMenuEntry(getCaughtChinchompaType())!=null)
                 {
-                    event.setMenuEntry(ResetTrap());
+                    event.setMenuEntry(getTrapMenuEntry(getCaughtChinchompaType()));
                 }
                 else
                 {
@@ -161,8 +162,7 @@ public class oneclickchinsplugin extends Plugin{
 
     public TileItem getGroundItem(int id)
     {
-        Scene scene = client.getScene();
-        Tile[][][] tiles = scene.getTiles();
+        Tile[][][] tiles = client.getScene().getTiles();
 
         int z = client.getPlane();
 
@@ -172,96 +172,74 @@ public class oneclickchinsplugin extends Plugin{
             {
                 Tile tile = tiles[z][x][y];
 
-                if (tile == null)
+                if (tile == null || client.getLocalPlayer() == null)
                 {
                     continue;
                 }
-                Player player = client.getLocalPlayer();
-                if (player == null)
+
+                if (client.getLocalPlayer().getWorldLocation().distanceTo(tile.getWorldLocation())>config.withinXtiles())
                 {
                     continue;
                 }
-                TileItem tileItem = findItemAtTile(tile, id);
-                if (tileItem != null)
+
+                if (tile.getItemLayer() != null)
                 {
-                    return tileItem;
+                    TileItem tileItem = (TileItem) tile.getItemLayer().getBottom();
+                    if (tileItem.getId() == id)
+                    {
+                        return tileItem;
+                    }
                 }
             }
         }
         return null;
     }
 
-    private TileItem findItemAtTile(Tile tile, int id)
-    {
-        ItemLayer tileItemPile = tile.getItemLayer();
-        if (tileItemPile != null)
+
+    private MenuEntry getTrapMenuEntry(int ID) {
+        ArrayList<GameObject> gameObjects = new GameObjectQuery()
+                .idEquals(ID)
+                .result(client)
+                .list;
+
+        GameObject closestGameObject = null;
+
+        for (GameObject gameobject: gameObjects)
         {
-            TileItem tileItem = (TileItem) tileItemPile.getBottom();
-            if (tileItem.getId() == id)
+            if (closestGameObject==null)
             {
-                return tileItem;
+                if (client.getLocalPlayer().getWorldLocation().distanceTo(gameobject.getWorldLocation()) <= config.withinXtiles())
+                {
+                    closestGameObject = gameobject;
+                }
+            }
+            else if (client.getLocalPlayer().getWorldLocation().distanceTo(gameobject.getWorldLocation())<
+                    client.getLocalPlayer().getWorldLocation().distanceTo(closestGameObject.getWorldLocation()))
+            {
+                closestGameObject = gameobject;
             }
         }
-        return null;
-    }
 
-    private MenuEntry ResetTrap(){
-        GameObject gameobject = new GameObjectQuery()
-                .idEquals(getCaughtChinchompaType())
-                .result(client)
-                .nearestTo(client.getLocalPlayer());
+        if (closestGameObject == null) return null;
 
         return createMenuEntry(
-                getCaughtChinchompaType(),
+                ID,
                 MenuAction.GAME_OBJECT_SECOND_OPTION,
-                getLocation(gameobject).getX(),
-                getLocation(gameobject).getY(),
+                getLocation(closestGameObject).getX(),
+                getLocation(closestGameObject).getY(),
                 true);
     }
 
-    private MenuEntry ResetFailedTrap() {
-        GameObject gameobject = new GameObjectQuery()
-                .idEquals(CHINCHOMPA_FAILED)
-                .result(client)
-                .nearestTo(client.getLocalPlayer());
-        return createMenuEntry(
-                CHINCHOMPA_FAILED,
-                MenuAction.GAME_OBJECT_SECOND_OPTION,
-                getLocation(gameobject).getX(),
-                getLocation(gameobject).getY(),
-                true);
-    }
-
-    private MenuEntry ResetExpiredTrap() {
+    private MenuEntry ResetExpiredTrapMenuEntry() {
         TileItem object = getGroundItem(BOX_TRAP_EXPIRED);
+
+        if (object == null) return null;
         return createMenuEntry(
                 BOX_TRAP_EXPIRED,
                 MenuAction.GROUND_ITEM_FOURTH_OPTION,
                 object.getTile().getLocalLocation().getSceneX(),
                 object.getTile().getLocalLocation().getSceneY(),
                 true);
-    }
-
-    private boolean CaughtTrapExists(){
-        GameObject gameobject = new GameObjectQuery()
-                .idEquals(getCaughtChinchompaType())
-                .result(client)
-                .nearestTo(client.getLocalPlayer());
-        return gameobject != null;
-    }
-
-    private boolean FailedTrapExists(){
-        GameObject gameobject = new GameObjectQuery()
-                .idEquals(CHINCHOMPA_FAILED)
-                .result(client)
-                .nearestTo(client.getLocalPlayer());
-        return gameobject != null;
-    }
-
-    private boolean ExpiredTrapExists()
-    {
-        TileItem object = getGroundItem(BOX_TRAP_EXPIRED);
-        return object != null;
     }
 
     public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {

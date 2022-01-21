@@ -119,6 +119,9 @@ Pretty simple plugin, requires initial setting of the traps and just resets them
 <details>
   <summary>Change Log</summary>
   
+ v0.04 -  
+Added distance check to prevent other peoples traps messing up the plugin.  
+  
 v0.03 - 
 Updated to allow for grey/black chinchompas
 

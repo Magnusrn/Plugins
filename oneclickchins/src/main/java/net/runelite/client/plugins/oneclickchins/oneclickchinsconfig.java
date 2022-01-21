@@ -27,4 +27,14 @@ public interface oneclickchinsconfig extends Config
     default ChinchompaType chinchompaType() {
         return ChinchompaType.Red;
     }
+
+    @ConfigItem(
+            keyName = "withinxtiles",
+            name = "Distance to search for traps",
+            description = "input the number of tiles you want the search radius to be from your player.",
+            position = 1
+    )
+    default int withinXtiles() {
+        return 4;
+    }
 }
