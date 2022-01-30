@@ -159,6 +159,12 @@ public class OneClickBloodsPlugin extends Plugin {
         {
             if (getEmptySlots()>0)
             {
+                if(config.useSpec()) {
+                    if (client.getVar(VarPlayer.SPECIAL_ATTACK_PERCENT) == 1000) {
+                        event.setMenuEntry(specAtk());
+                        return;
+                    }
+                }
                 event.setMenuEntry(mineRunestone());
             }
             else
@@ -280,6 +286,15 @@ public class OneClickBloodsPlugin extends Plugin {
                 MenuAction.GAME_OBJECT_FIRST_OPTION,
                 getLocation(getGroundObject(RUNESTONE_TO_DARK_ALTAR_SHORTCUT_ID)).getX(),
                 getLocation(getGroundObject(RUNESTONE_TO_DARK_ALTAR_SHORTCUT_ID)).getY(),
+                false);
+    }
+    private MenuEntry specAtk(){
+        Widget specAtk = client.getWidget(WidgetInfo.MINIMAP_SPEC_CLICKBOX);
+        return createMenuEntry(
+                1,
+                MenuAction.CC_OP,
+                -1,
+                specAtk.getId(),
                 false);
     }
 

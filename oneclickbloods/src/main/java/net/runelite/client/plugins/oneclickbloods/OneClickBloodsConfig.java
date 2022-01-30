@@ -28,4 +28,13 @@ public interface OneClickBloodsConfig extends Config
     {
         return false;
     }
+    @ConfigItem(
+            position = -1,
+            keyName = "useSpec",
+            name = "Use Special Attack",
+            description = "Uses special attack if its 100% before mining. Useful for things like dragon pickaxe"
+    )
+    default boolean useSpec(){
+        return false;
+    }
 }
