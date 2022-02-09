@@ -3,9 +3,18 @@ package net.runelite.client.plugins.oneclickcustom;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.ConfigSection;
 
 @ConfigGroup("oneclickcustom")
 public interface oneClickCustomConfig extends Config {
+    @ConfigSection(
+            name = "Full Inventory",
+            description = "Options for when inventory is full",
+            position = 7,
+            closedByDefault = true
+    )
+    String inventoryFullSection = "Full Inventory";
+
     @ConfigItem(
             position = 0,
             keyName = "oneClickType",
@@ -61,19 +70,6 @@ public interface oneClickCustomConfig extends Config {
 
     @ConfigItem(
             position = 4,
-            keyName = "InventoryFull",
-            name = "Inventory Full",
-            description = "Disable on full invent",
-            hidden = true,
-            unhide = "oneClickType",
-            unhideValue = "Gather||Fish||Pickpocket||Pick_Up"
-    )
-    default boolean InventoryFull() {
-        return true;
-    }
-
-    @ConfigItem(
-            position = 5,
             keyName = "consumeClick",
             name = "Consume Click",
             description = "Consumes click if player is not idle",
@@ -85,5 +81,58 @@ public interface oneClickCustomConfig extends Config {
         return true;
     }
 
+    @ConfigItem(
+            position = 5,
+            keyName = "InventoryFull",
+            name = "Disable",
+            description = "Disable on full invent",
+            section = inventoryFullSection,
+            hidden = true,
+            unhide = "oneClickType",
+            unhideValue = "Gather||Fish||Pickpocket||Pick_Up"
+    )
+    default boolean InventoryFull() {
+        return true;
+    }
 
+    @ConfigItem(
+            position = 6,
+            keyName = "Bank",
+            name = "Bank",
+            description = "Bank if full inventory and deposit all",
+            section = inventoryFullSection,
+            hidden = true,
+            unhide = "oneClickType",
+            unhideValue = "Gather||Fish||PickPocket||Pick_Up"
+    )
+    default boolean Bank() {
+        return false;
+    }
+
+    @ConfigItem(
+            position = 7,
+            keyName = "bankType",
+            name = "Bank Type",
+            description = "Choose",
+            section = inventoryFullSection,
+            hidden = true,
+            unhide = "oneClickType",
+            unhideValue = "Gather||Fish||PickPocket||Pick_Up"
+    )
+    default oneClickCustomBankTypes bankType() { return oneClickCustomBankTypes.NPC; }
+
+    @ConfigItem(
+            position = 8,
+            keyName = "bankID",
+            name = "Bank ID",
+            description = "Input bank ID, supports chests or NPCs",
+            section = inventoryFullSection,
+            hidden = true,
+            unhide = "oneClickType",
+            unhideValue = "Gather||Fish||PickPocket||Pick_Up"
+    )
+    default int bankID()
+    {
+        return 0;
+    }
 }
