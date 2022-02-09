@@ -51,24 +51,24 @@ open class BootstrapTask : DefaultTask() {
                     val releases = ArrayList<JsonBuilder>()
 
                     releases.add(JsonBuilder(
-                            "version" to it.project.version,
-                            "requires" to ProjectVersions.apiVersion,
-                            "date" to formatDate(Date()),
-                            "url" to "${project.rootProject.extra.get("GithubUrl")}/blob/master/release/${it.project.name}-${it.project.version}.jar?raw=true",
-                            "sha512sum" to hash(plugin.readBytes())
+                        "version" to it.project.version,
+                        "requires" to ProjectVersions.apiVersion,
+                        "date" to formatDate(Date()),
+                        "url" to "${project.rootProject.extra.get("GithubUrl")}/blob/master/release/${it.project.name}-${it.project.version}.jar?raw=true",
+                        "sha512sum" to hash(plugin.readBytes())
                     ))
 
                     val pluginObject = JsonBuilder(
-                            "name" to it.project.extra.get("PluginName"),
-                            "id" to nameToId(it.project.extra.get("PluginName") as String),
-                            "description" to it.project.extra.get("PluginDescription"),
-                            "provider" to it.project.extra.get("PluginProvider"),
-                            "projectUrl" to it.project.extra.get("ProjectSupportUrl"),
-                            "releases" to releases.toTypedArray()
+                        "name" to it.project.extra.get("PluginName"),
+                        "id" to nameToId(it.project.extra.get("PluginName") as String),
+                        "description" to it.project.extra.get("PluginDescription"),
+                        "provider" to it.project.extra.get("PluginProvider"),
+                        "projectUrl" to it.project.extra.get("ProjectSupportUrl"),
+                        "releases" to releases.toTypedArray()
                     ).jsonObject()
 
                     for (i in 0 until baseBootstrap.length()) {
-                        val item = baseBootstrap.getJSONObject(i)
+                        val item = JSONObject(baseBootstrap.toString().substring(2, baseBootstrap.toString().length - 1));
 
                         if (item.get("id") != nameToId(it.project.extra.get("PluginName") as String)) {
                             continue
@@ -89,7 +89,7 @@ open class BootstrapTask : DefaultTask() {
                         plugins.add(pluginObject)
                     }
 
-                    plugin.copyTo(Paths.get(bootstrapReleaseDir.toString(), "${it.project.name}-${it.project.version}.jar").toFile())
+                    plugin.copyTo(Paths.get(bootstrapReleaseDir.toString(), "${it.project.name}-${it.project.version}.jar").toFile(), true)
                 }
             }
 
