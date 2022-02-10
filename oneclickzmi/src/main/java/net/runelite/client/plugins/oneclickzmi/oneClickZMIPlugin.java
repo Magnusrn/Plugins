@@ -552,7 +552,7 @@ public class oneClickZMIPlugin extends Plugin {
                 0,
                 MenuAction.WIDGET_TYPE_6,
                 -1,
-                15138820,
+                15138821,
                 true);
     }
 
@@ -561,7 +561,7 @@ public class oneClickZMIPlugin extends Plugin {
                 0,
                 MenuAction.WIDGET_TYPE_6,
                 -1,
-                14221316,
+                14221317,
                 false);
     }
 
