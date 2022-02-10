@@ -1,8 +1,7 @@
 |Plugin List(click for details) | Source |
 |------------- |------------- |
 | [Birdhouse Infobox](#birdhouse-infobox) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/birdhouseinfobox/src/main/java/net/runelite/client/plugins/birdhouseinfobox) |
-| [CoxRaidScouter](#coxraidscouter)  | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/coxraidscouter/src/main/java/net/runelite/client/plugins/coxraidscouter) |
-| [Nex Red Click](#nex-red-click) |   [Click Here](https://github.com/Magnusrn/Plugins/tree/master/nexredclick/src/main/java/net/runelite/client/plugins/nexredclick) |
+| [Cox Raid Scouter](#cox-raid-scouter)  | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/coxraidscouter/src/main/java/net/runelite/client/plugins/coxraidscouter) |
 | [Object Hider](#object-hider)  | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/objecthider/src/main/java/net/runelite/client/plugins/objecthider) |
 | [One Click Aerial Fishing](#one-click-aerial-fishing)| [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickaerialfishing/src/main/java/net/runelite/client/plugins/oneclickaerialfishing) |
 | [One Click Amethyst](#one-click-amethyst)| [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickamethyst/src/main/java/net/runelite/client/plugins/oneclickamethyst) |
@@ -13,7 +12,6 @@
 | [One Click Karambwans](#one-click-karambwans) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickkarambwans/src/main/java/net/runelite/client/plugins/oneclickkarambwans) |
 | [One Click Minnows](#one-click-minnows)  | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickminnows/src/main/java/net/runelite/client/plugins/oneclickminnows) |
 | [One Click Sandstone](#one-click-sandstone)|  [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclicksandstone/src/main/java/net/runelite/client/plugins/oneclicksandstone) |
-| [One Click Swordfish](#one-click-swordfish)|   [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickswordfish/src/main/java/net/runelite/client/plugins/oneclickswordfish) |
 | [One Click Telegrab](#one-click-telegrab) |  [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclicktelegrab/src/main/java/net/runelite/client/plugins/oneclicktelegrab) |
 | [One Click ZMI](#one-click-zmi) |   [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickzmi/src/main/java/net/runelite/client/plugins/oneclickzmi) |
 | [Scheduled Logout](#scheduled-logout) |   [Click Here](https://github.com/Magnusrn/Plugins/tree/master/scheduledlogout/src/main/java/net/runelite/client/plugins/scheduledlogout) |
@@ -21,7 +19,7 @@
 ### Birdhouse-Infobox
 Starts a (fairly conservative) timer upon building a birdhouse, overlays an infobox
 
-### CoxRaidScouter
+### Cox Raid Scouter
 
 Requires the "Chambers of Xeric" plugin "Raid Layout Message" option Toggled ON
 
