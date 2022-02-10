@@ -64,9 +64,6 @@ Added new embed for webhook
 Added webhook message when raid is taken(user has started scouting again)
 </details>
 
-### Nex Red Click 
-Remaps ctrl click on Nex to click door outside instance 
-
 ### Object Hider
 Hides objects from the game based on ID, modified from adams Fossil Island plugin.
 
@@ -106,6 +103,9 @@ Initially requires the map to be loaded as a normal player would else it can get
 <details>
   <summary>Change Log</summary>
   
+v2.1.1 -  
+Removed manual walk option and added humanlike automatic walking.  
+  
 v0.03 - 
 Updated Inventory Full check to be on clienttick instead of menuoptionclicked. Added option to manual walk towards the altar. 
 
@@ -141,6 +141,10 @@ e.g
 <details>
   <summary>Change Log</summary>
   
+v2.1.1 -  
+Added Simple banking functionality  
+Added line validation to use item on x to allow for commenting  
+  
 v0.10 -  
 Added Use inventory item on Game Object/NPC 
 Added check for dead NPC for Attack 
@@ -163,9 +167,6 @@ Made this very quickly, haven't tested much, seems to do the job.
 
 ### One Click Sandstone
 Ensure you have waterskins in your invent and humidify runes. If you run out of water it will cast humidify. Should add a check or toggle for this but if you run out and you don't have humidify you're dead soon anyway.
-
-### One Click Swordfish
-Use Pajeets One Click 2 tick instead. Does the same thing I think but his has Teaks also.
 
 ### One Click Telegrab
 Supports telegrabbing Wine of Zamorak at the wildy spot or the safe chaos altar.
