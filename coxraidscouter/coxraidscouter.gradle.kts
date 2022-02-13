@@ -25,7 +25,7 @@ import ProjectVersions.openosrsVersion
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.7"
+version = "2.1.1"
 
 project.extra["PluginName"] = "Cox Raid Scouter" // This is the name that is used in the external plugin manager panel
 project.extra["PluginDescription"] = "Automatically scouts raids. Supports webhooks and automated leaving/joining." // This is the description that is used in the external plugin manager panel
