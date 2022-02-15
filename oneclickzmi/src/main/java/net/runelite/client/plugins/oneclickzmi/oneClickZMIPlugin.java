@@ -153,7 +153,7 @@ public class oneClickZMIPlugin extends Plugin {
                 case "CONTINUE_2":
                     event.setMenuEntry(continueChat2());
                     pouch_repair_state = "CAST_NPC_CONTACT";
-                    timeout+=1; //adds a timeout to allow for pouches to repair to prevent npc contact from being recasted
+                    timeout+=2; //adds a timeout to allow for pouches to repair to prevent npc contact from being recasted
                     break;
             }
             return;
@@ -169,6 +169,7 @@ public class oneClickZMIPlugin extends Plugin {
                 case "WITHDRAW":
                     event.setMenuEntry(withdrawStamina());
                     drink_stam_state = "DRINK";
+                    timeout +=1; //needs to wait a tick for the potion to withdraw from bank.
                     break;
 
                 case "DRINK":
