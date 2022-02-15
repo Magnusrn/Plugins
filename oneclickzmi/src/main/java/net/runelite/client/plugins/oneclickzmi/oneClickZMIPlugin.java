@@ -6,11 +6,14 @@ package net.runelite.client.plugins.oneclickzmi;
 
 import com.google.inject.Inject;
 import com.google.inject.Provides;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
+import net.runelite.api.Item;
+import net.runelite.api.ItemID;
 import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.NPC;
@@ -20,6 +23,7 @@ import net.runelite.api.TileObject;
 import net.runelite.api.Varbits;
 import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.queries.BankItemQuery;
 import net.runelite.api.queries.GameObjectQuery;
@@ -29,14 +33,17 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.game.RunepouchRune;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import org.apache.commons.lang3.ArrayUtils;
 import org.pf4j.Extension;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 @Extension
 @PluginDescriptor(
@@ -68,6 +75,16 @@ public class oneClickZMIPlugin extends Plugin
 	private String pouch_repair_state = "CAST_NPC_CONTACT";
 	private String eat_food_state = "WITHDRAW";
 	private String drink_stam_state = "WITHDRAW";
+	@Getter
+	private Item[] inventoryItems;
+
+	private static final Varbits[] RUNEPOUCH_AMOUNT_VARBITS = {
+			Varbits.RUNE_POUCH_AMOUNT1, Varbits.RUNE_POUCH_AMOUNT2, Varbits.RUNE_POUCH_AMOUNT3
+	};
+	private static final Varbits[] RUNEPOUCH_RUNE_VARBITS = {
+			Varbits.RUNE_POUCH_RUNE1, Varbits.RUNE_POUCH_RUNE2, Varbits.RUNE_POUCH_RUNE3
+	};
+
 
 	@Provides
 	oneClickZMIConfig getConfig(ConfigManager configManager)
@@ -149,7 +166,7 @@ public class oneClickZMIPlugin extends Plugin
 			return;
 		}
 
-		if ((getInventoryItem(MEDIUM_POUCH_DECAYED) != null || getInventoryItem(LARGE_POUCH_DECAYED) != null || getInventoryItem(GIANT_POUCH_DECAYED) != null) && !isBankOpen()) //only repairs pouch when the bank is closed naturally so not to mess with state if mid banking
+		if ((getInventoryItem(MEDIUM_POUCH_DECAYED) != null || getInventoryItem(LARGE_POUCH_DECAYED) != null || getInventoryItem(GIANT_POUCH_DECAYED) != null) && !isBankOpen() && hasCosmicRune()) //only repairs pouch when the bank is closed naturally so not to mess with state if mid banking
 		{
 			log.debug("pouch_repair_state = " + pouch_repair_state);
 			switch (pouch_repair_state)
@@ -341,7 +358,7 @@ public class oneClickZMIPlugin extends Plugin
 
 			case "TELEPORT":
 				event.setMenuEntry(castTeleport());
-				timeout += 5;
+				timeout += 6;
 				state = "CLICK_LADDER";
 				break;
 
@@ -653,6 +670,79 @@ public class oneClickZMIPlugin extends Plugin
 	{
 		return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
 				.setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
+	}
+
+	private List<Item> getRunepouchContents()
+	{
+		List<Item> items = new ArrayList<>(RUNEPOUCH_AMOUNT_VARBITS.length);
+		for (int i = 0; i < RUNEPOUCH_AMOUNT_VARBITS.length; i++)
+		{
+			int amount = client.getVar(RUNEPOUCH_AMOUNT_VARBITS[i]);
+			if (amount <= 0)
+			{
+				continue;
+			}
+
+			int varbId = client.getVar(RUNEPOUCH_RUNE_VARBITS[i]);
+			RunepouchRune rune = RunepouchRune.getRune(varbId);
+			if (rune == null)
+			{
+				continue;
+			}
+
+			Item item = new Item(rune.getItemId(), amount);
+			items.add(item);
+		}
+		return items;
+	}
+
+	@Subscribe
+	public void onItemContainerChanged(final ItemContainerChanged event)
+	{
+		if (event.getContainerId() != InventoryID.INVENTORY.getId())
+		{
+			return;
+		}
+
+		inventoryItems = event.getItemContainer().getItems();
+
+		// Add runes from rune pouch to inventoryItems
+		if (event.getItemContainer().contains(ItemID.RUNE_POUCH) || event.getItemContainer().contains(ItemID.RUNE_POUCH_L))
+		{
+			List<Item> runePouchContents = getRunepouchContents();
+
+			if (!runePouchContents.isEmpty())
+			{
+				for (int i = 0; i < inventoryItems.length; i++)
+				{
+					Item invItem = inventoryItems[i];
+					for (Item rune : runePouchContents)
+					{
+						if (invItem.getId() == rune.getId())
+						{
+							inventoryItems[i] = new Item(invItem.getId(), rune.getQuantity() + invItem.getQuantity());
+							runePouchContents.remove(rune);
+							break;
+						}
+					}
+				}
+
+				inventoryItems = ArrayUtils.addAll(inventoryItems, runePouchContents.toArray(new Item[0]));
+			}
+		}
+	}
+
+	public boolean hasCosmicRune()
+	{
+		for (int i = 0; i < inventoryItems.length; i++)
+		{
+			Item invItem = inventoryItems[i];
+				if (invItem.getId() == ItemID.COSMIC_RUNE)
+				{
+					return true;
+				}
+			}
+		return false;
 	}
 }
 

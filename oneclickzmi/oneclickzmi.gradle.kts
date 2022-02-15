@@ -25,7 +25,7 @@ import ProjectVersions.openosrsVersion
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "2.1.4"
+version = "2.1.5"
 
 project.extra["PluginName"] = "One Click ZMI Runecrafting" // This is the name that is used in the external plugin manager panel
 project.extra["PluginDescription"] = "One Click ZMI Runecrafting" // This is the description that is used in the external plugin manager panel
@@ -41,6 +41,9 @@ dependencies {
     compileOnly(Libraries.javax)
     compileOnly(Libraries.lombok)
     compileOnly(Libraries.pf4j)
+
+    implementation(group = "org.apache.commons", name = "commons-text", version = "1.9")
+
 }
 
 tasks {
