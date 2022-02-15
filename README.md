@@ -5,6 +5,7 @@
 | [Object Hider](#object-hider)  | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/objecthider/src/main/java/net/runelite/client/plugins/objecthider) |
 | [One Click Aerial Fishing](#one-click-aerial-fishing)| [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickaerialfishing/src/main/java/net/runelite/client/plugins/oneclickaerialfishing) |
 | [One Click Amethyst](#one-click-amethyst)| [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickamethyst/src/main/java/net/runelite/client/plugins/oneclickamethyst) |
+| [One Click Blast Furnace](#one-click-blast-furnace) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickblastfurnace/src/main/java/net/runelite/client/plugins/oneclickblastfurnace) |
 | [One Click Bloods](#one-click-bloods) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickbloods/src/main/java/net/runelite/client/plugins/oneclickbloods) |
 | [One Click Chins](#one-click-chins) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickchins/src/main/java/net/runelite/client/plugins/oneclickchins) |
 | [One Click Custom](#one-click-custom) | [Click Here](https://github.com/Magnusrn/Plugins/tree/master/oneclickcustom/src/main/java/net/runelite/client/plugins/oneclickcustom) |
@@ -95,6 +96,13 @@ v0.01 -
 release
 </details>
 
+### One Click Blast Furnace 
+***If doing gold must prefill the hopper with 27 gold***
+Setup bank with fillers as you would normally do blast furnace, so you can deposit all.
+Needs staminas(probably one dose and 4 dose, but definitely at least one dose, it'll drink four doses if your run energy depletes to below 20, else drinks 1 dose at 80 run).
+Must be in the main part of the bank and not a tab. Set withdraw quantity to one(not sure if this matters tbh)  
+Supports gold but it might be losing 40xp each run if you're not clicking quickly, or maybe just depends on speed of the belt at the moment.
+This is not perfect, but seems to work p well. 
 
 ### One Click Bloods
 Initially requires the map to be loaded as a normal player would else it can get stuck. Currently uses a rather inelegant method of using a chisel on the cluster of rocks to get nearer to the altar, very open to suggestions on how to solve this as walking programatically seems very aids. SWIM has used for approx 100h without any detection.
