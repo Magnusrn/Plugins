@@ -143,12 +143,12 @@ public class oneClickZMIPlugin extends Plugin {
                 case "CAST_NPC_CONTACT":
                     event.setMenuEntry(castNpcContact());
                     pouch_repair_state = "CONTINUE_1";
-                    timeout+=10; //adds timeout after casting NPC contact;
+                    timeout+=13; //adds timeout after casting NPC contact;
                     break;
                 case "CONTINUE_1":
                     event.setMenuEntry(continueChat1());
                     pouch_repair_state = "CONTINUE_2";
-                    timeout+=1; //adds timeout for next chat box to load
+                    timeout+=2; //adds timeout for next chat box to load
                     break;
                 case "CONTINUE_2":
                     event.setMenuEntry(continueChat2());
