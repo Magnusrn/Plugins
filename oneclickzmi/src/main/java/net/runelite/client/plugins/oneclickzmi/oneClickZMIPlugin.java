@@ -35,6 +35,7 @@ import org.pf4j.Extension;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 @Extension
@@ -113,7 +114,6 @@ public class oneClickZMIPlugin extends Plugin
 		if (this.client.getLocalPlayer() == null || this.client.getGameState() != GameState.LOGGED_IN)
 			return;
 
-
 		else if (client.getLocalPlayer().getAnimation() == 791)
 		{
 			text = "<col=00ff00>Runecrafting";
@@ -124,7 +124,8 @@ public class oneClickZMIPlugin extends Plugin
 		}
 		this.client.insertMenuItem(text, "", MenuAction.UNKNOWN
 				.getId(), 0, 0, 0, true);
-
+		//Ethan Vann the goat. Allows for left clicking anywhere when bank open instead of withdraw/deposit taking priority
+		client.setTempMenuEntry(Arrays.stream(client.getMenuEntries()).filter(x->x.getOption().equals(text)).findFirst().orElse(null));
 	}
 
 	private void handleClick(MenuOptionClicked event)
