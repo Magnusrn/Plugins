@@ -358,7 +358,7 @@ public class oneClickZMIPlugin extends Plugin
 
 			case "TELEPORT":
 				event.setMenuEntry(castTeleport());
-				timeout += 6;
+				timeout += 5;
 				state = "CLICK_LADDER";
 				break;
 
