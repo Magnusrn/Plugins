@@ -9,6 +9,7 @@ import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.Menu;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.queries.GameObjectQuery;
+import net.runelite.api.queries.PlayerQuery;
 import net.runelite.api.queries.WallObjectQuery;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -19,10 +20,8 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import org.pf4j.Extension;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Extension
 @PluginDescriptor(
@@ -132,10 +131,20 @@ public class OneClickAmethystPlugin extends Plugin
     private WallObject getAmethystVein()
     {
         List<Integer> Ids= Arrays.asList(11388,11389);
-        return new WallObjectQuery()
+        List<Player> players = new PlayerQuery()
+                .result(client)
+                .list;
+
+        List<WallObject> wallObjects = new WallObjectQuery()
                 .idEquals(Ids)
                 .result(client)
-                .nearestTo(client.getLocalPlayer());
+                .stream()
+                .filter(wallObject -> players.stream().noneMatch(p -> p.getWorldLocation().distanceTo(wallObject.getWorldLocation())<2))
+                .collect(Collectors.toList());
+
+        return wallObjects.stream()
+                .min(Comparator.comparing(entityType -> entityType.getLocalLocation().distanceTo(client.getLocalPlayer().getLocalLocation())))
+                .orElse(null);
     }
 
     private MenuEntry mineAmethyst() {
