@@ -7,6 +7,7 @@ import net.runelite.api.Point;
 import net.runelite.api.events.*;
 import net.runelite.api.queries.DecorativeObjectQuery;
 import net.runelite.api.queries.GameObjectQuery;
+import net.runelite.client.Notifier;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -52,6 +53,9 @@ public class coxraidscouter extends Plugin
 
 	@Inject
 	private ConfigManager configManager;
+
+	@Inject
+	private Notifier notifier;
 
 	@Provides
 	coxraidscouterconfig provideConfig(ConfigManager configManager)
@@ -465,6 +469,9 @@ public class coxraidscouter extends Plugin
 				{
 					if (room.equals(ovlRoom) && config.requireOverload()) //skip if require overload disabled
 					{
+						if (config.Notify()) {
+							notifier.notify("Raid Found!");
+						}
 						Print("Raid Found, waiting for raider.");
 						raidFound=true;
 						if (!config.webhook().equals("")) //if webhook exists, post raid, world, cc to webhook
@@ -486,6 +493,9 @@ public class coxraidscouter extends Plugin
 
 			if (!config.requireOverload()) //dupe code cba cleaning up rn
 			{
+				if (config.Notify()) {
+					notifier.notify("Raid Found!");
+				}
 				Print("Raid Found, waiting for raider.");
 				raidFound=true;
 				if (!config.webhook().equals("")) //if webhook exists, post raid, world, cc to webhook

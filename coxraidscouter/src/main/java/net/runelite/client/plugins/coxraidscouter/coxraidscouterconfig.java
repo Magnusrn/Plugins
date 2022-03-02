@@ -88,6 +88,16 @@ public interface coxraidscouterconfig extends Config {
 
     @ConfigItem(
             position = 8,
+            keyName = "Notify",
+            name = "Notify on raid found",
+            description = "Sends system notification when a raid is found if enabled."
+    )
+    default boolean Notify() {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 9,
             keyName = "debugScouting",
             name = "Debug Scouting",
             description = "Displays reason for leaving raid in chat if unnacceptable"
@@ -97,7 +107,7 @@ public interface coxraidscouterconfig extends Config {
     }
 
     @ConfigItem(
-            position = 9,
+            position = 10,
             keyName = "5hHandler",
             name = "5h Handler",
             description = "Clicks through the 5h runescape login timer warning"
