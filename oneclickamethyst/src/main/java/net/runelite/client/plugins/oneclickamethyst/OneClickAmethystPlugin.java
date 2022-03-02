@@ -134,6 +134,7 @@ public class OneClickAmethystPlugin extends Plugin
         List<Player> players = new PlayerQuery()
                 .result(client)
                 .list;
+        players.remove(client.getLocalPlayer()); //exempt own player else you move to diff rock if beside one
 
         List<WallObject> wallObjects = new WallObjectQuery()
                 .idEquals(Ids)
