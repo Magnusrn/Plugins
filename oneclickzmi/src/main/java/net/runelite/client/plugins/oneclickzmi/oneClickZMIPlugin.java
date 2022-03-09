@@ -198,7 +198,7 @@ public class oneClickZMIPlugin extends Plugin
 			return;
 		}
 
-		if (client.getBoostedSkillLevel(Skill.HITPOINTS) < 70 && isBankOpen())
+		if (client.getRealSkillLevel(Skill.HITPOINTS) - client.getBoostedSkillLevel(Skill.HITPOINTS) > 25  && isBankOpen())
 		{
 			log.debug("eat_food_state = " + eat_food_state);
 			switch (eat_food_state)
