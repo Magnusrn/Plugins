@@ -97,18 +97,34 @@ public class oneClickCustomPlugin extends Plugin{
             return;
         }
 
-        if ((getItemOnNPCsHashMap().size()!=0 && getItemOnNPCsHashMap().containsKey(event.getIdentifier()))
-                ||(getItemOnGameObjectsHashMap().size()!=0 && getItemOnGameObjectsHashMap().containsKey(event.getIdentifier())))
+        if (getItemOnNPCsHashMap().get(event.getIdentifier())!=null) //if inventory item exists in config list
         {
-            client.insertMenuItem(
-                    "One Click Custom",
-                    "",
-                    MenuAction.UNKNOWN.getId(),
-                    event.getIdentifier(),
-                    event.getActionParam0(),
-                    event.getActionParam1(),
-                    true);
+            NPC nearestnpc = getNpc(getItemOnNPCsHashMap().get(event.getIdentifier())); //gets nearest npc from key and checks if visible
+            if (nearestnpc!=null)
+            {
+                insertInventoryMenu(event);
+            }
         }
+
+        if (getItemOnGameObjectsHashMap().get(event.getIdentifier())!=null) //if inventory item exists in config list
+        {
+            GameObject nearestGameObject = getGameObject(getItemOnGameObjectsHashMap().get(event.getIdentifier())); //gets nearest gameObject from key and checks if visible
+            if (nearestGameObject!=null)
+            {
+                insertInventoryMenu(event);
+            }
+        }
+    }
+
+    private void insertInventoryMenu(MenuEntryAdded event) {
+        client.insertMenuItem(
+                "One Click Custom",
+                "",
+                MenuAction.UNKNOWN.getId(),
+                event.getIdentifier(),
+                event.getActionParam0(),
+                event.getActionParam1(),
+                true);
     }
 
     @Subscribe
