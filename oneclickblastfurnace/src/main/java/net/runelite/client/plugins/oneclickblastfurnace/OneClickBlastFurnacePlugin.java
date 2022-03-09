@@ -7,6 +7,7 @@ import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
+import net.runelite.api.kit.KitType;
 import net.runelite.api.queries.BankItemQuery;
 import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.api.widgets.Widget;
@@ -36,14 +37,15 @@ public class OneClickBlastFurnacePlugin extends Plugin{
 
     private boolean shouldWithdrawBars = false;
     private boolean coalBagFull = false; // this is in theory gettable from client.getVar(VarPlayer.POUCH_STATUS) but for some reason seems inconsistent.
-    private int withdrawStaminaCooldown = 0 ; //don't look at these
+    private int withdrawStaminaCooldown = 0 ; //don't look at these, ghetto way of being able to click fast
     private int withdrawCoalCooldown = 0 ;
     private int withdrawOreCooldown = 0;
     private int fillCoalBagCooldown = 0;
     private int depositAllCooldown = 0;
     private int equipIceGlovesCooldown = 0;
-    private int drinkStaminaCooldown = 0;
+    private int equipGoldGlovesCooldown = 0;
     private int takeBarCooldown = 0;
+    private int timeout = 0;
     private BeltState beltState = BeltState.DEPOSIT_ORE_OR_COAL;
 
     @Inject
@@ -67,8 +69,9 @@ public class OneClickBlastFurnacePlugin extends Plugin{
         fillCoalBagCooldown = 0;
         depositAllCooldown = 0;
         equipIceGlovesCooldown = 0;
-        drinkStaminaCooldown = 0;
+        equipGoldGlovesCooldown = 0;
         takeBarCooldown = 0;
+        timeout = 0;
     }
 
     @Subscribe
@@ -79,8 +82,9 @@ public class OneClickBlastFurnacePlugin extends Plugin{
         if (fillCoalBagCooldown>0) fillCoalBagCooldown--;
         if (depositAllCooldown>0) depositAllCooldown--;
         if (equipIceGlovesCooldown>0) equipIceGlovesCooldown--;
-        if (drinkStaminaCooldown>0) drinkStaminaCooldown--;
+        if (equipGoldGlovesCooldown>0) equipGoldGlovesCooldown--;
         if (takeBarCooldown>0) takeBarCooldown--;
+        if (timeout>0) timeout--;
     }
 
     @Subscribe
@@ -112,6 +116,7 @@ public class OneClickBlastFurnacePlugin extends Plugin{
     }
 
     private void handleClick(MenuOptionClicked event) {
+        if (timeout>0) { return;} //returns if waiting on stamina to withdraw
         System.out.println("shouldWithdrawBars = " + shouldWithdrawBars);
         if (config.barType() == OneClickBlastFurnaceTypes.GOLD) {
             if (getEmptySlots() != 0 && getInventoryItem(OneClickBlastFurnaceTypes.GOLD.getOreID()) == null && equipIceMES() != null && isBesideBelt() && equipIceGlovesCooldown == 0) { //edge case - if stam is drunk there'll be empty slots
@@ -126,27 +131,43 @@ public class OneClickBlastFurnacePlugin extends Plugin{
             beltState = BeltState.EMPTY_COAL_BAG;
             return;
         }
-
         if (bankOpen()) {
+            ImmutableList<Integer> StaminaIds = ImmutableList.of(12625, 12627, 12629, 12631);
+            for (Integer staminaID : StaminaIds) {
+                if (getInventoryItem(staminaID) != null) {
+                    event.setMenuEntry(drinkStamMES(staminaID));
+                    return;
+                }
+            }
+            if (client.getEnergy() < 20 ) {
+                if (getEmptySlots() < 1)
+                {
+                    event.setMenuEntry(depositAllMES());
+                    return;
+                }
+                event.setMenuEntry(withdrawFullStaminaMES());
+                System.out.println("1");
+                timeout += 1;
+                return;
+            }
+            else if (((client.getEnergy() < 80 && !iswearingRingOfEndurance()) || client.getEnergy() < 60) || client.getVar(Varbits.RUN_SLOWED_DEPLETION_ACTIVE) == 0) {
+                if (getEmptySlots() < 1)
+                {
+                    event.setMenuEntry(depositAllMES());
+                    return;
+                }
+                event.setMenuEntry(withdrawStaminaMES());
+                System.out.println("2");
+                timeout+=1;
+                return;
+            }
+
             beltState = BeltState.DEPOSIT_ORE_OR_COAL; //reset belt state
             if (getInventoryItem(config.barType().getBarID()) != null && depositAllCooldown == 0) {
                 event.setMenuEntry(depositAllMES());
-                System.out.println("1");
+                System.out.println("3");
                 depositAllCooldown += 5;
                 return;
-            }
-            if (getEmptySlots() > 0 && withdrawStaminaCooldown == 0) {
-                if (client.getEnergy() < 20) {
-                    event.setMenuEntry(withdrawFullStaminaMES());
-                    System.out.println("2");
-                    withdrawStaminaCooldown += 5;
-                    return;
-                } else if ((client.getEnergy() < 80 || client.getVar(Varbits.RUN_SLOWED_DEPLETION_ACTIVE) == 0)) {
-                    event.setMenuEntry(withdrawStaminaMES());
-                    System.out.println("3");
-                    withdrawStaminaCooldown += 5;
-                    return;
-                }
             }
             if (!coalBagFull && fillCoalBagMES() != null && fillCoalBagCooldown == 0) {
                 event.setMenuEntry(fillCoalBagMES());
@@ -171,16 +192,6 @@ public class OneClickBlastFurnacePlugin extends Plugin{
             event.setMenuEntry(depositOreMES());
             beltState = BeltState.EMPTY_COAL_BAG;
             return;
-        }
-
-        if (drinkStaminaCooldown == 0) {
-            ImmutableList<Integer> StaminaIds = ImmutableList.of(12625, 12627, 12629, 12631);
-            for (Integer staminaID : StaminaIds) {
-                if (getInventoryItem(staminaID) != null) {
-                    event.setMenuEntry(drinkStamMES(staminaID));
-                    return;
-                }
-            }
         }
 
         if (isBesideBelt()) {
@@ -230,8 +241,9 @@ public class OneClickBlastFurnacePlugin extends Plugin{
             return;
         }
 
-        if (client.getWidget(229,1)!=null && equipGoldGlovesMES()!=null) {
+        if (client.getWidget(229,1)!=null && equipGoldGlovesMES()!=null && equipGoldGlovesCooldown==0) {
             event.setMenuEntry(equipGoldGlovesMES());
+            equipGoldGlovesCooldown+=5;
             return;
         }
         event.setMenuEntry(bankMES());
@@ -338,7 +350,11 @@ public class OneClickBlastFurnacePlugin extends Plugin{
 
     private MenuEntry drinkStamMES(int id) {
         WidgetItem staminaDose = getInventoryItem(id);
-        return createMenuEntry(staminaDose.getId(), MenuAction.ITEM_FIRST_OPTION, staminaDose.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        return createMenuEntry(9, MenuAction.CC_OP_LOW_PRIORITY, staminaDose.getIndex(), WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId(), false);
+    }
+
+    private boolean iswearingRingOfEndurance() {
+        return client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.RING_OF_ENDURANCE);
     }
 
     private boolean oreInInvent() {

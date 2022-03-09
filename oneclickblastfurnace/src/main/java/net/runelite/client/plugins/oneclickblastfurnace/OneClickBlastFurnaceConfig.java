@@ -16,7 +16,4 @@ public interface OneClickBlastFurnaceConfig extends Config {
     default OneClickBlastFurnaceTypes barType() {
         return OneClickBlastFurnaceTypes.STEEL;
     }
-
-
-
 }
