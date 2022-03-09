@@ -15,4 +15,12 @@ public interface OneClickAmethystConfig extends Config
     {
         return Product.DARTS;
     }
+
+    @ConfigItem(
+            position = 1,
+            keyName = "useSpec",
+            name = "Use Special Attack",
+            description = "Uses special attack if its 100% before mining."
+    )
+    default boolean useSpec(){return false;}
 }

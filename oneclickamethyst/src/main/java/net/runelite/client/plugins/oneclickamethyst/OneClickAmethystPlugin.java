@@ -93,6 +93,13 @@ public class OneClickAmethystPlugin extends Plugin
         }
         System.out.println("5");
 
+        if(config.useSpec() && !bankOpen()) {
+            if (client.getVar(VarPlayer.SPECIAL_ATTACK_PERCENT) == 1000) {
+                event.setMenuEntry(specAtk());
+                return;
+            }
+        }
+
         if (getEmptySlots()>0)
         {
             event.setMenuEntry(mineAmethyst());
@@ -155,6 +162,16 @@ public class OneClickAmethystPlugin extends Plugin
                 MenuAction.GAME_OBJECT_FIRST_OPTION,
                 getLocation(customWallObject).getX(),
                 getLocation(customWallObject).getY(), true);
+    }
+
+    private MenuEntry specAtk(){
+        Widget specAtk = client.getWidget(WidgetInfo.MINIMAP_SPEC_CLICKBOX);
+        return createMenuEntry(
+                1,
+                MenuAction.CC_OP,
+                -1,
+                specAtk.getId(),
+                false);
     }
 
     private MenuEntry useChiselOnAmethystMenuEntry()
