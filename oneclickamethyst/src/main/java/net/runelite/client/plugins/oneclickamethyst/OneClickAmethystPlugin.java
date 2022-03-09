@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 public class OneClickAmethystPlugin extends Plugin
 {
 
+    Set<Integer> GEMS = Set.of(1623,1621,1619,1617);
     Set<Integer> MINING_ANIMATION = Set.of(6752,6758,8344,4481,7282,8345);
     private boolean CHISELING = false;
     private final int AMETHYST_ID = 21347;
@@ -92,6 +93,18 @@ public class OneClickAmethystPlugin extends Plugin
             return;
         }
         System.out.println("5");
+
+        if(config.dropGems() && !bankOpen())
+        {
+            for (int gem:GEMS)
+            {
+                if (getInventoryItem(gem)!=null)
+                {
+                    event.setMenuEntry(dropGemMES(getInventoryItem(gem)));
+                    return;
+                }
+            }
+        }
 
         if(config.useSpec() && !bankOpen()) {
             if (client.getVar(VarPlayer.SPECIAL_ATTACK_PERCENT) == 1000) {
@@ -162,6 +175,15 @@ public class OneClickAmethystPlugin extends Plugin
                 MenuAction.GAME_OBJECT_FIRST_OPTION,
                 getLocation(customWallObject).getX(),
                 getLocation(customWallObject).getY(), true);
+    }
+
+    private MenuEntry dropGemMES(WidgetItem gem){
+        return createMenuEntry(
+                gem.getId(),
+                MenuAction.ITEM_FIFTH_OPTION,
+                gem.getIndex(),
+                9764864,
+                false);
     }
 
     private MenuEntry specAtk(){

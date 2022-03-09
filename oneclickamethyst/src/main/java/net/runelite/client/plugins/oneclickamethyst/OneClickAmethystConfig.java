@@ -23,4 +23,12 @@ public interface OneClickAmethystConfig extends Config
             description = "Uses special attack if its 100% before mining."
     )
     default boolean useSpec(){return false;}
+
+    @ConfigItem(
+            position = 1,
+            keyName = "dropGems",
+            name = "Drop Gems",
+            description = "Drops gems if enabled "
+    )
+    default boolean dropGems(){return false;}
 }
