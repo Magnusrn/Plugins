@@ -144,23 +144,27 @@ public class OneClickBloodsPlugin extends Plugin {
                 || client.getLocalPlayer().getAnimation() == AnimationID.MINING_CRYSTAL_PICKAXE
                 || client.getLocalPlayer().getAnimation() == CHISELING_RUNESTONE_ANIMATION_ID)
         {
+            Print("consuming click while mining");
             event.consume();
             return;
         }
         if((client.getLocalPlayer().isMoving() || client.getLocalPlayer().getPoseAnimation() != client.getLocalPlayer().getIdlePoseAnimation()))
         {
+            Print("consuming click while not idle");
             event.consume();
             return;
         }
 
         if (timeout>0)
         {
+            Print("consuming click as timeout>0");
             event.consume();
             return;
         }
 
         if (getInventoryItem(DARK_ESSENCE_BLOCK_ID)!=null &! DARK_ESSENCE_FRAGMENTS_PILE_FULL)
         {
+            Print("Chiselling Essence");
             client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
             client.setSelectedItemSlot(getInventoryItem(CHISEL_ID).getIndex());
             client.setSelectedItemID(CHISEL_ID);
@@ -176,21 +180,24 @@ public class OneClickBloodsPlugin extends Plugin {
                 if(bloodEss!=null) {
                     WidgetItem activebloodEss = getInventoryItem(ItemID.BLOOD_ESSENCE_ACTIVE);
                     if(activebloodEss==null){
+                        Print("Activating Blood Essence");
                         event.setMenuEntry(activateBloodEssenceMES(bloodEss.getIndex()));
                         return;
                     }
                 }
                 if(config.useSpec()) {
                     if (client.getVar(VarPlayer.SPECIAL_ATTACK_PERCENT) == 1000) {
+                        Print("Using Special Attack");
                         event.setMenuEntry(specAtk());
                         return;
                     }
                 }
-
+                Print("Mining Runestone");
                 event.setMenuEntry(mineRunestone());
             }
             else
             {
+                Print("Trying to use Runestone -> Dark Altar shortcut");
                 event.setMenuEntry(runestoneToDarkAltarAreaShortcutMES());
             }
             return;
@@ -200,18 +207,21 @@ public class OneClickBloodsPlugin extends Plugin {
         {
             if (getInventoryItem(DENSE_ESSENCE_BLOCK_ID)!=null)
             {
+                Print("Venerating");
                 event.setMenuEntry(venerateMES());
                 return;
             }
 
             if (getInventoryItem(DARK_ESSENCE_FRAGMENTS_ID)!=null && getEmptySlots()>20)
             {
+                Print("Trying to use Runestone -> Dark Altar Shortcut");
                 event.setMenuEntry(runestoneToDarkAltarAreaShortcutMES()); //takes this shortcut in reverse
                 return;
             }
 
             if (SHOULD_RUN_TO_ALTAR)
             {
+                Print("Trying to walk to random point before blood area is visible");
                 walkTile();
                 return;
             }
@@ -222,9 +232,11 @@ public class OneClickBloodsPlugin extends Plugin {
             SHOULD_RUN_TO_ALTAR = false;
             if (getInventoryItem(DARK_ESSENCE_FRAGMENTS_ID)!=null)
             {
+                Print("Runecrafting");
                 event.setMenuEntry(runecraftMES());
                 return;
             }
+            Print("Trying to use Blood Altar -> Runestone Shortcut");
             event.setMenuEntry(bloodAltarToRunestoneShortcutMES());
         }
     }
@@ -431,5 +443,13 @@ public class OneClickBloodsPlugin extends Plugin {
     public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
         return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
                 .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
+    }
+
+    private void Print(String string) //used for debugging, puts a message to the in game chat.
+    {
+        if (config.debug())
+        {
+            client.addChatMessage(ChatMessageType.GAMEMESSAGE,"",string,"");
+        }
     }
 }

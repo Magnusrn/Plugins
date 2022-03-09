@@ -25,4 +25,12 @@ public interface OneClickBloodsConfig extends Config
             description = "Uses special attack if its 100% before mining. Useful for things like dragon pickaxe"
     )
     default boolean useSpec(){return false;}
+
+    @ConfigItem(
+            position = 1,
+            keyName = "debug",
+            name = "Debug",
+            description = "Enable this for bug reports if getting stuck. prints on click."
+    )
+    default boolean debug(){return false;}
 }
