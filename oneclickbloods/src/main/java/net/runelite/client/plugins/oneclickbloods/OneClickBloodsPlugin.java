@@ -148,9 +148,9 @@ public class OneClickBloodsPlugin extends Plugin {
             event.consume();
             return;
         }
-        if((client.getLocalPlayer().isMoving() || client.getLocalPlayer().getPoseAnimation() != client.getLocalPlayer().getIdlePoseAnimation()))
+        if(client.getLocalPlayer().isMoving())
         {
-            Print("consuming click while not idle");
+            Print("consuming click while moving");
             event.consume();
             return;
         }
