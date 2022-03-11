@@ -59,7 +59,7 @@ public class oneClickCustomPlugin extends Plugin{
     {
         for (TileItem item : GroundItems)
         {
-            if (item.getTile() == event.getTile()) //Don't add if tile already exists, prevents doubling when crossing loading lines
+            if (item == event.getItem()) //Don't add if item already exists, prevents doubling when crossing loading lines
             {
                 return;
             }
