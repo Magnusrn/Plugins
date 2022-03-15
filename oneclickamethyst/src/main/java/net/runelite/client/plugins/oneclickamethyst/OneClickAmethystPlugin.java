@@ -51,6 +51,7 @@ public class OneClickAmethystPlugin extends Plugin
             handleClick(event);
     }
 
+
     @Provides
     OneClickAmethystConfig provideConfig(ConfigManager configManager)
     {
