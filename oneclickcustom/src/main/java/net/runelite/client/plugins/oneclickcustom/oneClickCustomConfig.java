@@ -1,9 +1,6 @@
 package net.runelite.client.plugins.oneclickcustom;
 
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.*;
 
 @ConfigGroup("oneclickcustom")
 public interface oneClickCustomConfig extends Config {
@@ -39,7 +36,22 @@ public interface oneClickCustomConfig extends Config {
     {
         return "";
     }
-
+    @Range(
+            min = 1,
+            max = 5
+    )
+    @ConfigItem(
+            position = 100,
+            keyName = "opcode",
+            name = "Custom Opcode",
+            description = "Useful in some cases where the first action isn't the one that you want",
+            hidden = true,
+            unhide = "oneClickType",
+            unhideValue = "Gather"
+    )
+    default int opcode() {
+        return 1;
+    }
     @ConfigItem(
             name = "Item on GameObject",
             keyName = "itemongameobjectstring",

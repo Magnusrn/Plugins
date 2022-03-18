@@ -300,10 +300,28 @@ public class oneClickCustomPlugin extends Plugin{
         if (config.oneClickType()==oneClickCustomTypes.Gather)
         {
             //System.out.println("Should be returning Gather MES");
+            MenuAction action = null;
+            switch(config.opcode()){
+                case 1:
+                    action = MenuAction.GAME_OBJECT_FIRST_OPTION;
+                    break;
+                case 2:
+                    action = MenuAction.GAME_OBJECT_SECOND_OPTION;
+                    break;
+                case 3:
+                    action = MenuAction.GAME_OBJECT_THIRD_OPTION;
+                    break;
+                case 4:
+                    action = MenuAction.GAME_OBJECT_FOURTH_OPTION;
+                    break;
+                case 5:
+                    action = MenuAction.GAME_OBJECT_FIFTH_OPTION;
+                    break;
+            }
             GameObject customGameObject = getGameObject(getConfigIds());
             return createMenuEntry(
                     customGameObject.getId(),
-                    MenuAction.GAME_OBJECT_FIRST_OPTION,
+                    action,
                     getLocation(customGameObject).getX(),
                     getLocation(customGameObject).getY(),
                     true);
