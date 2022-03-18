@@ -300,7 +300,7 @@ public class oneClickCustomPlugin extends Plugin{
         if (config.oneClickType()==oneClickCustomTypes.Gather)
         {
             //System.out.println("Should be returning Gather MES");
-            MenuAction action = null;
+            MenuAction action =MenuAction.GAME_OBJECT_FIRST_OPTION ;
             switch(config.opcode()){
                 case 1:
                     action = MenuAction.GAME_OBJECT_FIRST_OPTION;
