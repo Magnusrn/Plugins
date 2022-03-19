@@ -25,10 +25,10 @@ import ProjectVersions.openosrsVersion
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "1.0.1"
 
-project.extra["PluginName"] = "One Click Teaks" // This is the name that is used in the external plugin manager panel
-project.extra["PluginDescription"] = "Cuts and banks teaks at Fossil Island" // This is the description that is used in the external plugin manager panel
+project.extra["PluginName"] = "One Click Teaks/Mahoganys" // This is the name that is used in the external plugin manager panel
+project.extra["PluginDescription"] = "Cuts and banks woodcutting patches at Fossil Island" // This is the description that is used in the external plugin manager panel
 
 dependencies {
     annotationProcessor(Libraries.lombok)

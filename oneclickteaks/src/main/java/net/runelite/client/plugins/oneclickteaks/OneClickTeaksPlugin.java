@@ -6,12 +6,10 @@ import net.runelite.api.*;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ClientTick;
-import net.runelite.api.events.HitsplatApplied;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -19,15 +17,14 @@ import net.runelite.client.plugins.PluginDescriptor;
 import org.pf4j.Extension;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
 @Extension
 @PluginDescriptor(
-        name = "One Click Teaks",
-        description = "Cuts and banks teaks at Fossil Island.",
-        tags = {"one", "click", "oneclick", "teaks", "fossil", "island"}
+        name = "One Click Teaks/Mahoganys",
+        description = "Cuts and banks teaks/mahoganys at Fossil Island.",
+        tags = {"one", "click", "oneclick", "teaks", "fossil", "island","mahogany"}
 )
 public class OneClickTeaksPlugin extends Plugin {
 
@@ -54,7 +51,7 @@ public class OneClickTeaksPlugin extends Plugin {
             return;
         }
 
-        String text = "<col=00ff00>One Click Teaks";
+        String text = "<col=00ff00>One Click Teaks/Mahoganys";
         this.client.insertMenuItem(text, "", MenuAction.UNKNOWN
                 .getId(), 0, 0, 0, true);
     }
@@ -67,7 +64,7 @@ public class OneClickTeaksPlugin extends Plugin {
         {
             event.consume();
         }
-        if (event.getMenuOption().equals("<col=00ff00>One Click Teaks"))
+        if (event.getMenuOption().equals("<col=00ff00>One Click Teaks/Mahoganys"))
         {
             handleClick(event);
         }
@@ -96,7 +93,7 @@ public class OneClickTeaksPlugin extends Plugin {
                 event.setMenuEntry(northToSouthShortcutMenuEntry());
                 return;
             }
-            event.setMenuEntry(cutTeakMenuEntry());
+            event.setMenuEntry(cutTreeMenuEntry());
         }
     }
 
@@ -112,9 +109,9 @@ public class OneClickTeaksPlugin extends Plugin {
         return createMenuEntry(31482, MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(getGameObject(31482)).getX(), getLocation(getGameObject(31482)).getY(), false);
     }
 
-    private MenuEntry cutTeakMenuEntry(){
-        int treeID = getTeakTree().getId();
-       return createMenuEntry(treeID, MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(getGameObject(treeID)).getX(), getLocation(getGameObject(treeID)).getY(), false);
+    private MenuEntry cutTreeMenuEntry(){
+        GameObject tree = getTree();
+        return createMenuEntry(tree.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tree).getX(), getLocation(tree).getY(), false);
     }
 
     private MenuEntry getBankMenuEntry(){
@@ -137,22 +134,23 @@ public class OneClickTeaksPlugin extends Plugin {
                 .nearestTo(client.getLocalPlayer());
     }
 
-    private GameObject getTeakTree()
+    private GameObject getTree()
     {
-
-        HashMap<Integer, Integer> TeakTrees = new HashMap<Integer, Integer>(); //game object ID as key, tree felled varbit as value. value of 0 is choppable.
-        TeakTrees.put(30481,4957);
-        TeakTrees.put(30480,4955);
-        TeakTrees.put(30482,4953);
+        HashMap<Integer, Integer> Trees = new HashMap<Integer, Integer>(); //game object ID as key, tree felled varbit as value. value of 0 is choppable.
+        Trees.put(30481,4957); //
+        Trees.put(30480,4955);
+        Trees.put(30482,4953);
+        System.out.println("hi");
 
         List<Integer> ChoppableTrees = new ArrayList<>();
 
-        for (Integer gameObjectID : TeakTrees.keySet()) {
-            if (client.getVarbitValue(TeakTrees.get(gameObjectID))==0)
+        for (Integer gameObjectID : Trees.keySet()) {
+            if (client.getVarbitValue(Trees.get(gameObjectID))==0 || client.getVarbitValue(Trees.get(gameObjectID))==7) //7 is if mahogany is planted
             {
                 ChoppableTrees.add(gameObjectID);
             }
         }
+        System.out.println(ChoppableTrees.size());
 
         return new GameObjectQuery()
                 .idEquals(ChoppableTrees)
