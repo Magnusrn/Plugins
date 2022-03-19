@@ -331,10 +331,29 @@ public class oneClickCustomPlugin extends Plugin{
 
         if(config.oneClickType()==oneClickCustomTypes.Fish)
         {
+            MenuAction action = MenuAction.NPC_FIRST_OPTION;
+            switch(config.opcode()){
+                case 1:
+                    action = MenuAction.NPC_FIRST_OPTION;
+                    break;
+                case 2:
+                    action = MenuAction.NPC_SECOND_OPTION;
+                    break;
+                case 3:
+                    action = MenuAction.NPC_THIRD_OPTION;
+                    break;
+                case 4:
+                    action = MenuAction.NPC_FOURTH_OPTION;
+                    break;
+                case 5:
+                    action = MenuAction.NPC_FIFTH_OPTION;
+                    break;
+            }
+
             //System.out.println("Should be returning Fish MES");
             return createMenuEntry(
                     customNPCObject.getIndex(),
-                    MenuAction.NPC_FIRST_OPTION,
+                    action,
                     getNPCLocation(customNPCObject).getX(),
                     getNPCLocation(customNPCObject).getY(),
                     true);

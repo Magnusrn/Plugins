@@ -47,7 +47,7 @@ public interface oneClickCustomConfig extends Config {
             description = "Useful in some cases where the first action isn't the one that you want",
             hidden = true,
             unhide = "oneClickType",
-            unhideValue = "Gather"
+            unhideValue = "Gather||Fish"
     )
     default int opcode() {
         return 1;
