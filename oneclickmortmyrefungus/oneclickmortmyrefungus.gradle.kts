@@ -25,7 +25,7 @@ import ProjectVersions.openosrsVersion
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "1.0.0"
+version = "1.0.1"
 
 project.extra["PluginName"] = "One Click Mort Myre Fungus" // This is the name that is used in the external plugin manager panel
 project.extra["PluginDescription"] = "For the lazy ironman" // This is the description that is used in the external plugin manager panel

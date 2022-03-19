@@ -15,7 +15,9 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.rs.api.RSClient;
 import org.pf4j.Extension;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Extension
 @PluginDescriptor(
@@ -136,7 +138,18 @@ public class OneClickMortMyreFungusPlugin extends Plugin {
     }
 
     private MenuEntry gatherFungusMES() {
-        GameObject fungiOnLog = getGameObject(3509);
+        WorldPoint worldpoint = new WorldPoint(3473,3420,0); //checks if mushrooms exist on NW log as this automatically paths optimally and saves 1t!!!
+        GameObject fungiOnLog =new GameObjectQuery()
+                .idEquals(3509)
+                .result(client)
+                .stream()
+                .filter(gameObject -> gameObject.getWorldLocation().distanceTo(worldpoint)==0)
+                .findAny().orElse(null);
+
+        if (fungiOnLog==null){
+            fungiOnLog = getGameObject(3509);
+        }
+
         if (fungiOnLog==null) return null;
         return createMenuEntry(fungiOnLog.getId(), MenuAction.GAME_OBJECT_SECOND_OPTION, getLocation(fungiOnLog).getX(), getLocation(fungiOnLog).getY(), false);
     }
