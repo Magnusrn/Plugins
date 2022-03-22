@@ -16,7 +16,7 @@ subprojects {
     group = "com.example"
 
     project.extra["PluginProvider"] = "Kitsch"
-    project.extra["ProjectSupportUrl"] = ""
+    project.extra["ProjectSupportUrl"] = "https://discord.gg/bJfqQuQgfc"
     project.extra["PluginLicense"] = "3-Clause BSD License"
 
     repositories {
