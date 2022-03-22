@@ -16,6 +16,7 @@ import net.runelite.rs.api.RSClient;
 import org.pf4j.Extension;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -133,8 +134,16 @@ public class OneClickMortMyreFungusPlugin extends Plugin {
     }
 
     private MenuEntry castBloomMES() {
-        WidgetItem sickle = getInventoryItem(2963);
-        return createMenuEntry(sickle.getId(), MenuAction.ITEM_THIRD_OPTION, sickle.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        List<Integer> itemIDs =Arrays.asList(ItemID.SILVER_SICKLE_B,ItemID.BLISTERWOOD_FLAIL,ItemID.IVANDIS_FLAIL);
+        for (Integer itemID : itemIDs )
+        {
+            if (getInventoryItem(itemID)!=null)
+            {
+                WidgetItem sickle = getInventoryItem(itemID);
+                return createMenuEntry(sickle.getId(), MenuAction.ITEM_THIRD_OPTION, sickle.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+            }
+        }
+        return null;
     }
 
     private MenuEntry gatherFungusMES() {
@@ -165,6 +174,14 @@ public class OneClickMortMyreFungusPlugin extends Plugin {
     }
 
     private MenuEntry teleportToHouseMES() {
+        if (getInventoryItem(ItemID.CONSTRUCT_CAPE)!=null)
+        {
+            return createMenuEntry(ItemID.CONSTRUCT_CAPE, MenuAction.ITEM_FOURTH_OPTION, getInventoryItem(ItemID.CONSTRUCT_CAPE).getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        }
+        if (getInventoryItem(ItemID.CONSTRUCT_CAPET)!=null)
+        {
+            return createMenuEntry(ItemID.CONSTRUCT_CAPET, MenuAction.ITEM_FOURTH_OPTION, getInventoryItem(ItemID.CONSTRUCT_CAPET).getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        }
         return createMenuEntry(1, MenuAction.CC_OP, -1, WidgetInfo.SPELL_TELEPORT_TO_HOUSE.getId(), false);
     }
 
