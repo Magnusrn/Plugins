@@ -25,7 +25,7 @@ import java.util.List;
 @Extension
 @PluginDescriptor(
         name = "One Click Bloods Morytania",
-        description = "Active One Click Bloods Runecrafting at the new altar. set fairy ring to DLS. Best to start with full invent or in one of the banks(crafting guild or lunar)",
+        description = "Set fairy ring to DLS. Best to start with full invent or in one of the banks(crafting guild or lunar).",
         enabledByDefault = false
 )
 @Slf4j
@@ -479,13 +479,17 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         {
             return createMenuEntry(conCapeT.getId(), MenuAction.ITEM_FOURTH_OPTION, conCapeT.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
-        if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE) || client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE_13342))
+        if (client.getItemContainer(InventoryID.EQUIPMENT)!=null)
         {
-            return createMenuEntry(5, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
-        }
-        if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.CONSTRUCT_CAPE) || client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.CONSTRUCT_CAPET))
-        {
-            return createMenuEntry( 4, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
+            if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE) || client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE_13342))
+            {
+                return createMenuEntry(5, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
+            }
+            if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.CONSTRUCT_CAPE) || client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.CONSTRUCT_CAPET))
+            {
+                return createMenuEntry( 4, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
+            }
+
         }
         return createMenuEntry(tab.getId(), MenuAction.ITEM_FIRST_OPTION, tab.getIndex(), WidgetInfo.INVENTORY.getId(), false);
     }
