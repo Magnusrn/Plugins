@@ -25,35 +25,34 @@ import java.util.List;
 @Extension
 @PluginDescriptor(
         name = "One Click Bloods Morytania",
-        description = "Active One Click Bloods Runecrafting at the new altar. set fairy ring to DLS",
+        description = "Active One Click Bloods Runecrafting at the new altar. set fairy ring to DLS. Best to start with full invent or in one of the banks(crafting guild or lunar)",
         enabledByDefault = false
 )
 @Slf4j
 public class OneClickBloodsMorytaniaPlugin extends Plugin {
-    //needs to reset states
+    //*TODO
+    //Add cataclytic talisman or whatever the fk its called
 
     @Inject
     private Client client;
 
     private int runecraftingState = 0;
     private int bankingState = 0;
-    private int currentxp ;
+    private int currentxp = 0;
     private boolean craftedRunes = false;
 
     @Override
     protected void startUp() throws Exception {
-        currentxp = client.getSkillExperience(Skill.RUNECRAFT);
         System.out.println(currentxp);
         reset();
     }
 
     @Subscribe
-    private void onGameStateChanged(GameStateChanged event)
+    private void onGameTick(GameTick event)
     {
-        if (event.getGameState()==GameState.LOGGED_IN)
+        if (currentxp == 0)
         {
-            System.out.println("logged in");
-            System.out.println(client.getSkillExperience(Skill.RUNECRAFT));
+            currentxp = client.getSkillExperience(Skill.RUNECRAFT);
         }
     }
 
@@ -68,7 +67,6 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         //on login this triggers going from 0 to players current XP. all xp drops(even on leagues etc) should be below 50k and this method requires 77 rc.
         if (event.getSkill() == Skill.RUNECRAFT && event.getXp()-currentxp<50000)
         {
-            System.out.println("runecraft xp drop");
             craftedRunes = true;
         }
     }
@@ -98,9 +96,21 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         WidgetItem giantPouch = getInventoryItem(ItemID.GIANT_POUCH);
         WidgetItem colossalPouch = getInventoryItem(ItemID.COLOSSAL_POUCH);
 
+        List<Integer> brokenPouches = Arrays.asList(ItemID.MEDIUM_POUCH_5511,ItemID.LARGE_POUCH_5513,ItemID.GIANT_POUCH_5515,ItemID.COLOSSAL_POUCH_26786);
+        if (brokenPouches.stream().anyMatch(pouch -> client.getItemContainer(InventoryID.INVENTORY).contains(pouch)))
+        {
+            event.setMenuEntry(repairPouchesSpellMES());
+            return;
+        }
+
+        if (handlePouchRepair()!=null)
+        {
+            event.setMenuEntry(handlePouchRepair());
+            return;
+        }
+
         if (isInBloodAltar())
         {
-            System.out.println(runecraftingState);
             switch (runecraftingState)
             {
                 case 0:
@@ -162,8 +172,11 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                 case 6:
                     event.setMenuEntry(craftRunesMES());
                 {
-                    craftedRunes = false;
-                    runecraftingState = 7;
+                    if (craftedRunes)
+                    {
+                        craftedRunes = false;
+                        runecraftingState = 7;
+                    }
                 }
                     return;
                 case 7:
@@ -294,6 +307,24 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         event.setMenuEntry(teleToPOHMES());
     }
 
+    private MenuEntry handlePouchRepair() {
+        if (client.getWidget(231,6)!=null && client.getWidget(231, 6).getText().equals("What do you want? Can't you see I'm busy?"))
+        {
+            return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, -1, 15138821, false);
+        }
+
+        if (client.getWidget(219,1)!=null && client.getWidget(219,1).getChild(2)!=null && client.getWidget(219,1).getChild(2).getText().equals("Can you repair my pouches?"))
+        {
+            return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, 2, WidgetInfo.DIALOG_OPTION_OPTION1.getId(), false);
+        }
+
+        if (client.getWidget(217,6)!=null && client.getWidget(217,6).getText().equals("Can you repair my pouches?"))
+        {
+            return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, -1, 14221317, false);
+        }
+        return null;
+    }
+
     private MenuEntry drinkFromPoolMES() {
         GameObject pool = getGameObject(29241);
         return createMenuEntry(pool.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(pool).getX(),getLocation(pool).getY(), false);
@@ -316,7 +347,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     private MenuEntry leaveMorytaniaHideout3MES() {
         //if 93 agility & 78 mining use good shortcut else use shit one
         GameObject tunnel = getGameObject(43759); //new tunnel ID
-        if (client.getBoostedSkillLevel(Skill.AGILITY)<74 || client.getBoostedSkillLevel(Skill.MINING)<78)
+        if (client.getBoostedSkillLevel(Skill.AGILITY)<93 || client.getBoostedSkillLevel(Skill.MINING)<78)
         {
             tunnel = getGameObject(12770);
         }
@@ -417,7 +448,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         GameObject lunarBank = getGameObject(16700);
         if (lunarBank!=null)
         {
-            return createMenuEntry(lunarBank.getId(), MenuAction.GAME_OBJECT_SECOND_OPTION, getLocation(lunarBank).getX(), getLocation(lunarBank).getX(), false);
+            return createMenuEntry(lunarBank.getId(), MenuAction.GAME_OBJECT_SECOND_OPTION, getLocation(lunarBank).getX(), getLocation(lunarBank).getY(), false);
         }
         return null;
     }
@@ -457,6 +488,10 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
             return createMenuEntry( 4, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
         }
         return createMenuEntry(tab.getId(), MenuAction.ITEM_FIRST_OPTION, tab.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+    }
+
+    private MenuEntry repairPouchesSpellMES() {
+        return createMenuEntry(2, MenuAction.CC_OP, -1, WidgetInfo.SPELL_NPC_CONTACT.getId(), false);
     }
 
     private boolean isInPOH() {
