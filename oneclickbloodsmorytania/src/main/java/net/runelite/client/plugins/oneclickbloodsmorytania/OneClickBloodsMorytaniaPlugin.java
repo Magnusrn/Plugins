@@ -1,6 +1,8 @@
 package net.runelite.client.plugins.oneclickbloodsmorytania;
 
 import javax.inject.Inject;
+
+import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldArea;
@@ -12,6 +14,7 @@ import net.runelite.api.queries.WallObjectQuery;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -25,7 +28,7 @@ import java.util.List;
 @Extension
 @PluginDescriptor(
         name = "One Click Bloods Morytania",
-        description = "Set fairy ring to DLS. Best to start with full invent or in one of the banks(crafting guild or lunar).",
+        description = "Check Discord for setup information. Discord.link/kitsch",
         enabledByDefault = false
 )
 @Slf4j
@@ -36,6 +39,15 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     @Inject
     private Client client;
 
+    @Inject
+    private OneClickBloodsMorytaniaConfig config;
+
+    @Provides
+    OneClickBloodsMorytaniaConfig provideConfig(ConfigManager configManager)
+    {
+        return configManager.getConfig(OneClickBloodsMorytaniaConfig.class);
+    }
+
     private int runecraftingState = 0;
     private int bankingState = 0;
     private int currentxp = 0;
@@ -43,7 +55,6 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
 
     @Override
     protected void startUp() throws Exception {
-        System.out.println(currentxp);
         reset();
     }
 
@@ -255,7 +266,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
 
         if (isInPOH())
         {
-            if (client.getEnergy()<50)
+            if (client.getEnergy()<config.runEnergy())
             {
                 event.setMenuEntry(drinkFromPoolMES());
                 return;

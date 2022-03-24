@@ -9,15 +9,13 @@ public interface OneClickBloodsMorytaniaConfig extends Config
 {
     @ConfigItem(
             position = 1,
-            keyName = "",
-            name = "",
-            description = ""
+            keyName = "runenergy",
+            name = "Run Energy",
+            description = "Drink Pool at what Run Energy?"
     )
-    default boolean config1()
+    default int runEnergy()
     {
-        return false;
+        return 50;
     }
-
-
 
 }
