@@ -5,8 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.ClientTick;
-import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.*;
 import net.runelite.api.queries.BankItemQuery;
 import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.api.queries.WallObjectQuery;
@@ -16,6 +15,7 @@ import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.party.messages.SkillUpdate;
 import org.pf4j.Extension;
 
 import java.util.Arrays;
@@ -30,12 +30,48 @@ import java.util.List;
 )
 @Slf4j
 public class OneClickBloodsMorytaniaPlugin extends Plugin {
+    //needs to reset states
 
     @Inject
     private Client client;
 
     private int runecraftingState = 0;
     private int bankingState = 0;
+    private int currentxp ;
+    private boolean craftedRunes = false;
+
+    @Override
+    protected void startUp() throws Exception {
+        currentxp = client.getSkillExperience(Skill.RUNECRAFT);
+        System.out.println(currentxp);
+        reset();
+    }
+
+    @Subscribe
+    private void onGameStateChanged(GameStateChanged event)
+    {
+        if (event.getGameState()==GameState.LOGGED_IN)
+        {
+            System.out.println("logged in");
+            System.out.println(client.getSkillExperience(Skill.RUNECRAFT));
+        }
+    }
+
+    private void reset() {
+        runecraftingState = 0;
+        bankingState = 0;
+        craftedRunes = false;
+    }
+
+    @Subscribe
+    protected void onStatChanged(StatChanged event) {
+        //on login this triggers going from 0 to players current XP. all xp drops(even on leagues etc) should be below 50k and this method requires 77 rc.
+        if (event.getSkill() == Skill.RUNECRAFT && event.getXp()-currentxp<50000)
+        {
+            System.out.println("runecraft xp drop");
+            craftedRunes = true;
+        }
+    }
 
 
     @Subscribe
@@ -62,64 +98,76 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         WidgetItem giantPouch = getInventoryItem(ItemID.GIANT_POUCH);
         WidgetItem colossalPouch = getInventoryItem(ItemID.COLOSSAL_POUCH);
 
-        if (isinBloodAltar())
+        if (isInBloodAltar())
         {
+            System.out.println(runecraftingState);
             switch (runecraftingState)
             {
                 case 0:
                     event.setMenuEntry(craftRunesMES());
-                    runecraftingState = 1;
+                    if (craftedRunes)
+                    {
+                        craftedRunes = false;
+                        runecraftingState = 1;
+                    }
                     return;
                 case 1:
                     if (colossalPouch!=null)
                     {
-                        event.setMenuEntry(emptyPouch(colossalPouch));
+                        event.setMenuEntry(emptyPouchMES(colossalPouch));
                         runecraftingState = 3;
                         return;
                     }
                     if (giantPouch!=null)
                     {
-                        event.setMenuEntry(emptyPouch(giantPouch));
+                        event.setMenuEntry(emptyPouchMES(giantPouch));
                         runecraftingState = 2;
                         return;
                     }
                 case 2:
                     if (largePouch!=null)
                     {
-                        event.setMenuEntry(emptyPouch(largePouch));
+                        event.setMenuEntry(emptyPouchMES(largePouch));
                         runecraftingState = 3;
                         return;
                     }
                 case 3:
                     event.setMenuEntry(craftRunesMES());
-                    runecraftingState = 4;
+                    if (craftedRunes)
+                    {
+                        craftedRunes = false;
+                        runecraftingState = 4;
+                    }
                     return;
                 case 4:
                     if (colossalPouch!=null)
                     {
-                        event.setMenuEntry(emptyPouch(colossalPouch));
+                        event.setMenuEntry(emptyPouchMES(colossalPouch));
                         runecraftingState = 6;
                         return;
                     }
                     if (mediumPouch!=null)
                     {
-                        event.setMenuEntry(emptyPouch(mediumPouch));
+                        event.setMenuEntry(emptyPouchMES(mediumPouch));
                         runecraftingState = 5;
                         return;
                     }
                 case 5:
                     if (smallPouch!=null)
                     {
-                        event.setMenuEntry(emptyPouch(smallPouch));
+                        event.setMenuEntry(emptyPouchMES(smallPouch));
                         runecraftingState = 6;
                         return;
                     }
                 case 6:
                     event.setMenuEntry(craftRunesMES());
+                {
+                    craftedRunes = false;
                     runecraftingState = 7;
+                }
                     return;
                 case 7:
-                    event.setMenuEntry(teleToBank());
+                    event.setMenuEntry(teleToBankMES());
                     return;
             }
         }
@@ -135,20 +183,20 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                 case 1:
                     if (colossalPouch!=null)
                     {
-                        event.setMenuEntry(fillPouch(colossalPouch));
+                        event.setMenuEntry(fillPouchMES(colossalPouch));
                         bankingState = 3;
                         return;
                     }
                     if (giantPouch!=null)
                     {
-                        event.setMenuEntry(fillPouch(giantPouch));
+                        event.setMenuEntry(fillPouchMES(giantPouch));
                         bankingState = 2;
                         return;
                     }
                 case 2:
                     if (largePouch!=null)
                     {
-                        event.setMenuEntry(fillPouch(largePouch));
+                        event.setMenuEntry(fillPouchMES(largePouch));
                         bankingState = 3;
                         return;
                     }
@@ -159,20 +207,20 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                 case 4:
                     if (colossalPouch!=null)
                     {
-                        event.setMenuEntry(fillPouch(colossalPouch));
+                        event.setMenuEntry(fillPouchMES(colossalPouch));
                         bankingState = 6;
                         return;
                     }
                     if (mediumPouch!=null)
                     {
-                        event.setMenuEntry(fillPouch(mediumPouch));
+                        event.setMenuEntry(fillPouchMES(mediumPouch));
                         bankingState = 5;
                         return;
                     }
                 case 5:
                     if (smallPouch!=null)
                     {
-                        event.setMenuEntry(fillPouch(smallPouch));
+                        event.setMenuEntry(fillPouchMES(smallPouch));
                         bankingState = 6;
                         return;
                     }
@@ -181,7 +229,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                     bankingState = 7;
                     return;
                 case 7:
-                    event.setMenuEntry(closebank());
+                    event.setMenuEntry(closebankMES());
                     return;
             }
         }
@@ -222,12 +270,12 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
             event.setMenuEntry(leaveMorytaniaHideout4LowAgilityMES());
             return;
         }
-        if (isinMorytaniaHideout5LowAgilityShortcut())
+        if (isinMorytaniaHideout5LowAgility())
         {
             event.setMenuEntry(useLowAgilityShortcut1MES());
             return;
         }
-        if (isinMorytaniaHideout5LowAgilityShortcut2())
+        if (isinMorytaniaHideout5LowAgilityShortcut())
         {
             event.setMenuEntry(useLowAgilityShortcut2MES());
             return;
@@ -243,7 +291,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
             event.setMenuEntry(bankMES());
             return;
         }
-        event.setMenuEntry(teleToPOH());
+        event.setMenuEntry(teleToPOHMES());
     }
 
     private MenuEntry drinkFromPoolMES() {
@@ -289,11 +337,17 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     }
 
     private MenuEntry useLowAgilityShortcut1MES() {
-        GameObject tunnel = getGameObject(43755); //low agility tunnel ID
+        WallObject tunnel = new WallObjectQuery()
+                .idEquals(43755)
+                .result(client)
+                .nearestTo(client.getLocalPlayer());
         return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
     }
     private MenuEntry useLowAgilityShortcut2MES() {
-        GameObject tunnel = getGameObject(43758); //low agility tunnel ID (2nd one)
+        WallObject tunnel = new WallObjectQuery()
+                .idEquals(43758)
+                .result(client)
+                .nearestTo(client.getLocalPlayer());
         return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
     }
 
@@ -326,12 +380,12 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return createMenuEntry(altar.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(altar).getX(), getLocation(altar).getY(), true);
     }
 
-    private MenuEntry emptyPouch(WidgetItem pouch) {
+    private MenuEntry emptyPouchMES(WidgetItem pouch) {
         return createMenuEntry(pouch.getId(), MenuAction.ITEM_SECOND_OPTION, pouch.getIndex(), WidgetInfo.INVENTORY.getId(), false);
     }
 
-    private MenuEntry teleToBank() {
-        if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE))
+    private MenuEntry teleToBankMES() {
+        if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE) || client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE_13342))
         {
             return createMenuEntry(4, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
         }
@@ -373,15 +427,15 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return createMenuEntry(7, MenuAction.CC_OP_LOW_PRIORITY, getBankIndex(essence), WidgetInfo.BANK_ITEM_CONTAINER.getId(), false);
     }
 
-    private MenuEntry fillPouch(WidgetItem pouch) {
+    private MenuEntry fillPouchMES(WidgetItem pouch) {
         return createMenuEntry(9, MenuAction.CC_OP_LOW_PRIORITY, pouch.getIndex(), WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId(), false);
     }
 
-    private MenuEntry closebank() {
+    private MenuEntry closebankMES() {
         return createMenuEntry(1, MenuAction.CC_OP, 11, 786434, false);
     }
 
-    private MenuEntry teleToPOH() {
+    private MenuEntry teleToPOHMES() {
         WidgetItem tab = getInventoryItem(ItemID.TELEPORT_TO_HOUSE);
         WidgetItem conCape = getInventoryItem(ItemID.CONSTRUCT_CAPE);
         WidgetItem conCapeT = getInventoryItem(ItemID.CONSTRUCT_CAPET);
@@ -406,6 +460,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     }
 
     private boolean isInPOH() {
+        reset();
         return getGameObject(4525)!=null; //checks for portal, p sure this is same for everyone if not need to do alternative check.
     }
     private boolean isInMorytaniaHideout1() {
@@ -424,13 +479,12 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return client.getLocalPlayer().getWorldLocation().isInArea(new WorldArea(new WorldPoint(3485,9859,0),new WorldPoint(3498,9879,0)));
     }
 
-    private boolean isinMorytaniaHideout5LowAgilityShortcut() {
-        return client.getLocalPlayer().getWorldLocation().isInArea(new WorldArea(new WorldPoint(3546,9785,0),new WorldPoint(3572,9812,0)))
-                || client.getLocalPlayer().getWorldLocation().isInArea(new WorldArea(new WorldPoint(3511,9807,0),new WorldPoint(3538,9832,0)));
+    private boolean isinMorytaniaHideout5LowAgility() {
+        return client.getLocalPlayer().getWorldLocation().isInArea(new WorldArea(new WorldPoint(3511,9807,0),new WorldPoint(3538,9832,0)));
     }
 
-    private boolean isinMorytaniaHideout5LowAgilityShortcut2() {
-        return false;
+    private boolean isinMorytaniaHideout5LowAgilityShortcut() {
+        return client.getLocalPlayer().getWorldLocation().isInArea(new WorldArea(new WorldPoint(3546,9785,0),new WorldPoint(3572,9812,0)));
     }
 
     private boolean isinMorytaniaHideout5HighAgilityShortcut() {
@@ -441,7 +495,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return client.getLocalPlayer().getWorldLocation().isInArea(new WorldArea(new WorldPoint(3543,9764,0),new WorldPoint(3570,9784,0)));
     }
 
-    private boolean isinBloodAltar() {
+    private boolean isInBloodAltar() {
         int BLOOD_ALTAR_ID = 43479;
         return getGameObject(BLOOD_ALTAR_ID)!=null;
     }
