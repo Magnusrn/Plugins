@@ -7,12 +7,20 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.queries.BankItemQuery;
 import net.runelite.api.queries.GameObjectQuery;
+import net.runelite.api.queries.WallObjectQuery;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import org.pf4j.Extension;
+
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 @Extension
 @PluginDescriptor(
@@ -25,6 +33,10 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
 
     @Inject
     private Client client;
+
+    private int runecraftingState = 0;
+    private int bankingState = 0;
+
 
     @Subscribe
     private void onClientTick(ClientTick event)
@@ -42,29 +54,136 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         if (event.getMenuOption().equals("<col=00ff00>One Click Bloods Morytania"))
             handleClick(event);
     }
-    private void handleClick(MenuOptionClicked event) //billion if statements but unsure of alternative method, can't assign menuentries until visible
+    private void handleClick(MenuOptionClicked event) //billion if statements but unsure of alternative method, can't assign menuentries until visible due to queries
     {
+        WidgetItem smallPouch = getInventoryItem(ItemID.SMALL_POUCH);
+        WidgetItem mediumPouch = getInventoryItem(ItemID.MEDIUM_POUCH);
+        WidgetItem largePouch = getInventoryItem(ItemID.LARGE_POUCH);
+        WidgetItem giantPouch = getInventoryItem(ItemID.GIANT_POUCH);
+        WidgetItem colossalPouch = getInventoryItem(ItemID.COLOSSAL_POUCH);
 
         if (isinBloodAltar())
         {
-            //empty pouches n shit, then tele to bank
-            event.setMenuEntry(craftRunesMES());
-            return;
+            switch (runecraftingState)
+            {
+                case 0:
+                    event.setMenuEntry(craftRunesMES());
+                    runecraftingState = 1;
+                    return;
+                case 1:
+                    if (colossalPouch!=null)
+                    {
+                        event.setMenuEntry(emptyPouch(colossalPouch));
+                        runecraftingState = 3;
+                        return;
+                    }
+                    if (giantPouch!=null)
+                    {
+                        event.setMenuEntry(emptyPouch(giantPouch));
+                        runecraftingState = 2;
+                        return;
+                    }
+                case 2:
+                    if (largePouch!=null)
+                    {
+                        event.setMenuEntry(emptyPouch(largePouch));
+                        runecraftingState = 3;
+                        return;
+                    }
+                case 3:
+                    event.setMenuEntry(craftRunesMES());
+                    runecraftingState = 4;
+                    return;
+                case 4:
+                    if (colossalPouch!=null)
+                    {
+                        event.setMenuEntry(emptyPouch(colossalPouch));
+                        runecraftingState = 6;
+                        return;
+                    }
+                    if (mediumPouch!=null)
+                    {
+                        event.setMenuEntry(emptyPouch(mediumPouch));
+                        runecraftingState = 5;
+                        return;
+                    }
+                case 5:
+                    if (smallPouch!=null)
+                    {
+                        event.setMenuEntry(emptyPouch(smallPouch));
+                        runecraftingState = 6;
+                        return;
+                    }
+                case 6:
+                    event.setMenuEntry(craftRunesMES());
+                    runecraftingState = 7;
+                    return;
+                case 7:
+                    event.setMenuEntry(teleToBank());
+                    return;
+            }
         }
 
         if (bankOpen())
         {
-            return;
-        }
-        if (isInPOH())
-        {
-            if (client.getEnergy()<50)
+            switch (bankingState)
             {
-                event.setMenuEntry(drinkFromPoolMES());
-                return;
+                case 0:
+                    event.setMenuEntry(withdrawEssence());
+                    bankingState = 1;
+                    return;
+                case 1:
+                    if (colossalPouch!=null)
+                    {
+                        event.setMenuEntry(fillPouch(colossalPouch));
+                        bankingState = 3;
+                        return;
+                    }
+                    if (giantPouch!=null)
+                    {
+                        event.setMenuEntry(fillPouch(giantPouch));
+                        bankingState = 2;
+                        return;
+                    }
+                case 2:
+                    if (largePouch!=null)
+                    {
+                        event.setMenuEntry(fillPouch(largePouch));
+                        bankingState = 3;
+                        return;
+                    }
+                case 3:
+                    event.setMenuEntry(withdrawEssence());
+                    bankingState = 4;
+                    return;
+                case 4:
+                    if (colossalPouch!=null)
+                    {
+                        event.setMenuEntry(fillPouch(colossalPouch));
+                        bankingState = 6;
+                        return;
+                    }
+                    if (mediumPouch!=null)
+                    {
+                        event.setMenuEntry(fillPouch(mediumPouch));
+                        bankingState = 5;
+                        return;
+                    }
+                case 5:
+                    if (smallPouch!=null)
+                    {
+                        event.setMenuEntry(fillPouch(smallPouch));
+                        bankingState = 6;
+                        return;
+                    }
+                case 6:
+                    event.setMenuEntry(withdrawEssence());
+                    bankingState = 7;
+                    return;
+                case 7:
+                    event.setMenuEntry(closebank());
+                    return;
             }
-            event.setMenuEntry(useFairyRingMES());
-            return;
         }
 
         if (isInBloodAltarArea())
@@ -116,11 +235,179 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
 
         if (isinMorytaniaHideout5HighAgilityShortcut())
         {
-            event.setMenuEntry(UseHighAgilityShortcut2MES());
+            event.setMenuEntry(useHighAgilityShortcut2MES());
             return;
         }
+        if (getEmptySlots()>0 && bankMES()!=null)
+        {
+            event.setMenuEntry(bankMES());
+            return;
+        }
+        event.setMenuEntry(teleToPOH());
     }
 
+    private MenuEntry drinkFromPoolMES() {
+        GameObject pool = getGameObject(29241);
+        return createMenuEntry(pool.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(pool).getX(),getLocation(pool).getY(), false);
+    }
+
+    private MenuEntry useFairyRingMES() {
+        GameObject fairyRing = getGameObject(29228);
+        return createMenuEntry(fairyRing.getId(), MenuAction.GAME_OBJECT_THIRD_OPTION, getLocation(fairyRing).getX(),getLocation(fairyRing).getY(), false);
+    }
+
+    private MenuEntry leaveMorytaniaHideout1MES() {
+        GameObject tunnel = getGameObject(16308);
+        return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
+    }
+    private MenuEntry leaveMorytaniaHideout2MES() {
+        GameObject tunnel = getGameObject(5046);
+        return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
+    }
+
+    private MenuEntry leaveMorytaniaHideout3MES() {
+        //if 93 agility & 78 mining use good shortcut else use shit one
+        GameObject tunnel = getGameObject(43759); //new tunnel ID
+        if (client.getBoostedSkillLevel(Skill.AGILITY)<74 || client.getBoostedSkillLevel(Skill.MINING)<78)
+        {
+            tunnel = getGameObject(12770);
+        }
+        return createMenuEntry( tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
+    }
+
+    private MenuEntry leaveMorytaniaHideout4LowAgilityMES() {
+        //multiple objects with same ID so need to ensure it's the south tunnel
+        WorldArea worldarea = new WorldArea(new WorldPoint(3488,9858,0),new WorldPoint(3495,9865,0));
+        GameObject tunnel = new GameObjectQuery()
+                .idEquals(12771)
+                .result(client)
+                .stream()
+                .filter(t -> t.getWorldLocation().isInArea(worldarea))
+                .findFirst()
+                .orElse(null);
+        return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
+    }
+
+    private MenuEntry useLowAgilityShortcut1MES() {
+        GameObject tunnel = getGameObject(43755); //low agility tunnel ID
+        return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
+    }
+    private MenuEntry useLowAgilityShortcut2MES() {
+        GameObject tunnel = getGameObject(43758); //low agility tunnel ID (2nd one)
+        return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
+    }
+
+    private MenuEntry useHighAgilityShortcut2MES() {
+        WallObject tunnel = new WallObjectQuery()
+                .idEquals(43762)
+                .result(client)
+                .nearestTo(client.getLocalPlayer());
+        return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
+    }
+
+    private MenuEntry enterAltarMES() {
+        GameObject altar = getGameObject(25380);
+
+        //check to see if wearing any item that allow left click altar entrance
+        List<Integer> items = Arrays.asList(ItemID.BLOOD_TIARA,ItemID.MAX_CAPE,ItemID.RUNECRAFT_CAPE,ItemID.RUNECRAFT_CAPET,ItemID.MAX_CAPE_13342);
+         if (items.stream().anyMatch(item -> client.getItemContainer(InventoryID.EQUIPMENT).contains(item)))
+         {
+             return createMenuEntry(altar.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(altar).getX(), getLocation(altar).getY(), false);
+         }
+        client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
+        client.setSelectedItemSlot(getInventoryItem(ItemID.BLOOD_TALISMAN).getIndex());
+        client.setSelectedItemID(ItemID.BLOOD_TALISMAN);
+
+        return createMenuEntry(altar.getId(), MenuAction.ITEM_USE_ON_GAME_OBJECT, getLocation(altar).getX(), getLocation(altar).getY(), false);
+    }
+
+    private MenuEntry craftRunesMES() {
+        GameObject altar = getGameObject(43479);
+        return createMenuEntry(altar.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(altar).getX(), getLocation(altar).getY(), true);
+    }
+
+    private MenuEntry emptyPouch(WidgetItem pouch) {
+        return createMenuEntry(pouch.getId(), MenuAction.ITEM_SECOND_OPTION, pouch.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+    }
+
+    private MenuEntry teleToBank() {
+        if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE))
+        {
+            return createMenuEntry(4, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
+        }
+        if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.CRAFTING_CAPE) || client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.CRAFTING_CAPET))
+        {
+            return createMenuEntry(3, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
+        }
+
+        WidgetItem craftingCape = getInventoryItem(ItemID.CRAFTING_CAPE);
+        WidgetItem craftingCapeT = getInventoryItem(ItemID.CRAFTING_CAPET);
+        if (craftingCape!=null)
+        {
+            return createMenuEntry(craftingCape.getId(), MenuAction.ITEM_THIRD_OPTION, craftingCape.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        }
+        if (craftingCapeT!=null)
+        {
+            return createMenuEntry(craftingCapeT.getId(), MenuAction.ITEM_THIRD_OPTION, craftingCapeT.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        }
+        return createMenuEntry(1, MenuAction.CC_OP, -1, WidgetInfo.SPELL_MOONCLAN_TELEPORT.getId(), false);
+    }
+
+    private MenuEntry bankMES() {
+        GameObject craftingBank = getGameObject(14886);
+        if (craftingBank!=null)
+        {
+            return createMenuEntry(craftingBank.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(craftingBank).getX(), getLocation(craftingBank).getY(), false);
+        }
+
+        GameObject lunarBank = getGameObject(16700);
+        if (lunarBank!=null)
+        {
+            return createMenuEntry(lunarBank.getId(), MenuAction.GAME_OBJECT_SECOND_OPTION, getLocation(lunarBank).getX(), getLocation(lunarBank).getX(), false);
+        }
+        return null;
+    }
+
+    private MenuEntry withdrawEssence() {
+        int essence = ItemID.PURE_ESSENCE;
+        return createMenuEntry(7, MenuAction.CC_OP_LOW_PRIORITY, getBankIndex(essence), WidgetInfo.BANK_ITEM_CONTAINER.getId(), false);
+    }
+
+    private MenuEntry fillPouch(WidgetItem pouch) {
+        return createMenuEntry(9, MenuAction.CC_OP_LOW_PRIORITY, pouch.getIndex(), WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId(), false);
+    }
+
+    private MenuEntry closebank() {
+        return createMenuEntry(1, MenuAction.CC_OP, 11, 786434, false);
+    }
+
+    private MenuEntry teleToPOH() {
+        WidgetItem tab = getInventoryItem(ItemID.TELEPORT_TO_HOUSE);
+        WidgetItem conCape = getInventoryItem(ItemID.CONSTRUCT_CAPE);
+        WidgetItem conCapeT = getInventoryItem(ItemID.CONSTRUCT_CAPET);
+
+        if (conCape!=null)
+        {
+            return createMenuEntry(conCape.getId(), MenuAction.ITEM_FOURTH_OPTION, conCape.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        }
+        if (conCapeT!=null)
+        {
+            return createMenuEntry(conCapeT.getId(), MenuAction.ITEM_FOURTH_OPTION, conCapeT.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        }
+        if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE) || client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE_13342))
+        {
+            return createMenuEntry(5, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
+        }
+        if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.CONSTRUCT_CAPE) || client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.CONSTRUCT_CAPET))
+        {
+            return createMenuEntry( 4, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
+        }
+        return createMenuEntry(tab.getId(), MenuAction.ITEM_FIRST_OPTION, tab.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+    }
+
+    private boolean isInPOH() {
+        return getGameObject(4525)!=null; //checks for portal, p sure this is same for everyone if not need to do alternative check.
+    }
     private boolean isInMorytaniaHideout1() {
         return client.getLocalPlayer().getWorldLocation().isInArea(new WorldArea(new WorldPoint(3437,9819,0),new WorldPoint(3454,9830,0)));
     }
@@ -154,89 +441,21 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return client.getLocalPlayer().getWorldLocation().isInArea(new WorldArea(new WorldPoint(3543,9764,0),new WorldPoint(3570,9784,0)));
     }
 
-    private MenuEntry drinkFromPoolMES() {
-        GameObject pool = getGameObject(29241);
-        return createMenuEntry(pool.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(pool).getX(),getLocation(pool).getY(), false);
-    }
-
-    private MenuEntry useFairyRingMES() {
-        GameObject fairyRing = getGameObject(29228);
-        return createMenuEntry(fairyRing.getId(), MenuAction.GAME_OBJECT_THIRD_OPTION, getLocation(fairyRing).getX(),getLocation(fairyRing).getY(), false);
-    }
-
-    private MenuEntry leaveMorytaniaHideout1MES() {
-        GameObject tunnel = getGameObject(16308);
-        return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
-    }
-    private MenuEntry leaveMorytaniaHideout2MES() {
-        GameObject tunnel = getGameObject(5046);
-        return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
-    }
-
-    private MenuEntry leaveMorytaniaHideout3MES() {
-        //if 93 agility & 78 mining use good shortcut else use shit one
-        GameObject tunnel = getGameObject(0); //new tunnel ID
-        if (client.getBoostedSkillLevel(Skill.AGILITY)<74 || client.getBoostedSkillLevel(Skill.MINING)<78)
-        {
-            tunnel = getGameObject(12770);
-        }
-        return createMenuEntry( tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
-    }
-
-    private MenuEntry leaveMorytaniaHideout4LowAgilityMES() {
-        //multiple objects with same ID so need to ensure it's the south tunnel
-        WorldArea worldarea = new WorldArea(new WorldPoint(3488,9858,0),new WorldPoint(3495,9865,0));
-        GameObject tunnel = new GameObjectQuery()
-                .idEquals(12771)
-                .result(client)
-                .stream()
-                .filter(t -> t.getWorldLocation().isInArea(worldarea))
-                .findFirst()
-                .orElse(null);
-        return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
-    }
-
-    private MenuEntry useLowAgilityShortcut1MES() {
-        GameObject tunnel = getGameObject(0); //low agility tunnel ID
-        return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
-    }
-    private MenuEntry useLowAgilityShortcut2MES() {
-        GameObject tunnel = getGameObject(0); //low agility tunnel ID (2nd one)
-        return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
-    }
-
-    private MenuEntry UseHighAgilityShortcut2MES() {
-        GameObject tunnel = getGameObject(0); //93 agility tunnel ID
-        return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
-    }
-
-    private MenuEntry enterAltarMES() {
-        GameObject altar = getGameObject(38044);
-        return createMenuEntry(34817, MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(altar).getX(), getLocation(altar).getY(), false);
-    }
-
-    private MenuEntry craftRunesMES()
-    {
-        GameObject altar = getGameObject(0);
-        return createMenuEntry(
-                29631,
-                MenuAction.GAME_OBJECT_FIRST_OPTION,
-                getLocation(altar).getX(),
-                getLocation(altar).getY(),
-                true);
-    }
-
-    private boolean isInPOH() {
-        return getGameObject(4525)!=null; //checks for portal, p sure this is same for everyone if not need to do alternative check.
-    }
-
     private boolean isinBloodAltar() {
-        int BLOOD_ALTAR_ID = 0;
+        int BLOOD_ALTAR_ID = 43479;
         return getGameObject(BLOOD_ALTAR_ID)!=null;
     }
 
     private boolean bankOpen() {
         return client.getItemContainer(InventoryID.BANK) != null;
+    }
+
+    private int getBankIndex(int ID){
+        WidgetItem bankItem = new BankItemQuery()
+                .idEquals(ID)
+                .result(client)
+                .first();
+        return bankItem.getWidget().getIndex();
     }
 
     private GameObject getGameObject(int ID) {
@@ -254,6 +473,28 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
             return ((GameObject) tileObject).getSceneMinLocation();
         }
         return new Point(tileObject.getLocalLocation().getSceneX(), tileObject.getLocalLocation().getSceneY());
+    }
+
+    private WidgetItem getInventoryItem(int id) {
+        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
+        if (inventoryWidget != null) {
+            Collection<WidgetItem> items = inventoryWidget.getWidgetItems();
+            for (WidgetItem item : items) {
+                if (item.getId() == id) {
+                    return item;
+                }
+            }
+        }
+        return null;
+    }
+
+    public int getEmptySlots() {
+        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
+        if (inventoryWidget != null) {
+            return 28 - inventoryWidget.getWidgetItems().size();
+        } else {
+            return -1;
+        }
     }
 
     private MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
