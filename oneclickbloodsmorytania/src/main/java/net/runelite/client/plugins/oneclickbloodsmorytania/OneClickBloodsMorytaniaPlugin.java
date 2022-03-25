@@ -321,10 +321,15 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         {
             return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, -1, 15138821, false);
         }
-
+        //if player doesn't have abyssal pouch in bank
         if (client.getWidget(219,1)!=null && client.getWidget(219,1).getChild(2)!=null && client.getWidget(219,1).getChild(2).getText().equals("Can you repair my pouches?"))
         {
             return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, 2, WidgetInfo.DIALOG_OPTION_OPTION1.getId(), false);
+        }
+        //if player has abyssal pouch in bank
+        if (client.getWidget(219,1)!=null && client.getWidget(219,1).getChild(1)!=null && client.getWidget(219,1).getChild(1).getText().equals("Can you repair my pouches?"))
+        {
+            return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, 1, WidgetInfo.DIALOG_OPTION_OPTION1.getId(), false);
         }
 
         if (client.getWidget(217,6)!=null && client.getWidget(217,6).getText().equals("Can you repair my pouches?"))

@@ -25,7 +25,7 @@ import ProjectVersions.openosrsVersion
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "1.0.3"
+version = "1.0.4"
 
 project.extra["PluginName"] = "One Click Bloods Morytania" // This is the name that is used in the external plugin manager panel
 project.extra["PluginDescription"] = "Active One Click Bloods Runecrafting at the new altar" // This is the description that is used in the external plugin manager panel
