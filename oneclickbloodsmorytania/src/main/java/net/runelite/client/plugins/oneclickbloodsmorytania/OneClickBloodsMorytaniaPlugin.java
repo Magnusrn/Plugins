@@ -105,16 +105,16 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         WidgetItem giantPouch = getInventoryItem(ItemID.GIANT_POUCH);
         WidgetItem colossalPouch = getInventoryItem(ItemID.COLOSSAL_POUCH);
 
+        if (handlePouchRepair()!=null)
+        {
+            event.setMenuEntry(handlePouchRepair());
+            return;
+        }
+
         List<Integer> brokenPouches = Arrays.asList(ItemID.MEDIUM_POUCH_5511,ItemID.LARGE_POUCH_5513,ItemID.GIANT_POUCH_5515,ItemID.COLOSSAL_POUCH_26786);
         if (brokenPouches.stream().anyMatch(pouch -> client.getItemContainer(InventoryID.INVENTORY).contains(pouch)))
         {
             event.setMenuEntry(repairPouchesSpellMES());
-            return;
-        }
-
-        if (handlePouchRepair()!=null)
-        {
-            event.setMenuEntry(handlePouchRepair());
             return;
         }
 
