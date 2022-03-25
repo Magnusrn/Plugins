@@ -33,8 +33,6 @@ import java.util.List;
 )
 @Slf4j
 public class OneClickBloodsMorytaniaPlugin extends Plugin {
-    //*TODO
-    //Add cataclytic talisman or whatever the fk its called
 
     @Inject
     private Client client;
@@ -405,14 +403,23 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         GameObject altar = getGameObject(25380);
 
         //check to see if wearing any item that allow left click altar entrance
-        List<Integer> items = Arrays.asList(ItemID.BLOOD_TIARA,ItemID.MAX_CAPE,ItemID.RUNECRAFT_CAPE,ItemID.RUNECRAFT_CAPET,ItemID.MAX_CAPE_13342);
+        List<Integer> items = Arrays.asList(ItemID.BLOOD_TIARA,ItemID.MAX_CAPE,ItemID.RUNECRAFT_CAPE,ItemID.RUNECRAFT_CAPET,ItemID.MAX_CAPE_13342,ItemID.CATALYTIC_TIARA);
          if (items.stream().anyMatch(item -> client.getItemContainer(InventoryID.EQUIPMENT).contains(item)))
          {
              return createMenuEntry(altar.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(altar).getX(), getLocation(altar).getY(), false);
          }
-        client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
-        client.setSelectedItemSlot(getInventoryItem(ItemID.BLOOD_TALISMAN).getIndex());
-        client.setSelectedItemID(ItemID.BLOOD_TALISMAN);
+
+         client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
+         if (getInventoryItem(ItemID.CATALYTIC_TALISMAN)!=null)
+         {
+             client.setSelectedItemSlot(getInventoryItem(ItemID.CATALYTIC_TALISMAN).getIndex());
+             client.setSelectedItemID(ItemID.CATALYTIC_TALISMAN);
+         }
+         else
+         {
+             client.setSelectedItemSlot(getInventoryItem(ItemID.BLOOD_TALISMAN).getIndex());
+             client.setSelectedItemID(ItemID.BLOOD_TALISMAN);
+         }
 
         return createMenuEntry(altar.getId(), MenuAction.ITEM_USE_ON_GAME_OBJECT, getLocation(altar).getX(), getLocation(altar).getY(), false);
     }

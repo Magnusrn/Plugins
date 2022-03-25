@@ -17,5 +17,4 @@ public interface OneClickBloodsMorytaniaConfig extends Config
     {
         return 50;
     }
-
 }
