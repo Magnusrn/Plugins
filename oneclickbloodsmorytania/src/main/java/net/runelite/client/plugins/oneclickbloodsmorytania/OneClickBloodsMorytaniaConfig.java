@@ -17,4 +17,15 @@ public interface OneClickBloodsMorytaniaConfig extends Config
     {
         return 50;
     }
+
+    @ConfigItem(
+            position = 2,
+            keyName = "overrideagility",
+            name = "Override Agility",
+            description = "Force use the 93 agility 78 mining shortcut"
+    )
+    default boolean overrideAgility()
+    {
+        return false;
+    }
 }

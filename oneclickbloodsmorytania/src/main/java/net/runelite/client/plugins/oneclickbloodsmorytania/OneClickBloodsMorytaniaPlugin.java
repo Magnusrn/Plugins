@@ -356,7 +356,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     private MenuEntry leaveMorytaniaHideout3MES() {
         //if 93 agility & 78 mining use good shortcut else use shit one
         GameObject tunnel = getGameObject(43759); //new tunnel ID
-        if (client.getBoostedSkillLevel(Skill.AGILITY)<93 || client.getBoostedSkillLevel(Skill.MINING)<78)
+        if ((client.getBoostedSkillLevel(Skill.AGILITY)<93 || client.getBoostedSkillLevel(Skill.MINING)<78) && !config.overrideAgility())
         {
             tunnel = getGameObject(12770);
         }
