@@ -164,7 +164,16 @@ public class OneClickMortMyreFungusPlugin extends Plugin {
     }
 
     private MenuEntry drinkFromPoolMES() {
-        GameObject pool = getGameObject(29241);
+        GameObject pool = null;
+        List<Integer> Pools = Arrays.asList(ObjectID.POOL_OF_REJUVENATION,ObjectID.FANCY_POOL_OF_REJUVENATION,ObjectID.ORNATE_POOL_OF_REJUVENATION);
+        for (Integer poolID : Pools)
+        {
+            if (getGameObject(poolID)!=null)
+            {
+                pool = getGameObject(poolID);
+            }
+        }
+        if (pool == null) return null;
         return createMenuEntry(pool.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(pool).getX(),getLocation(pool).getY(), false);
     }
 
