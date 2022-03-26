@@ -346,6 +346,11 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
 
     private MenuEntry useFairyRingMES() {
         GameObject fairyRing = getGameObject(29228);
+        if (getGameObject(22929)!=null) //if tree fairy ring combo is present
+        {
+            fairyRing = getGameObject(22929);
+            return createMenuEntry(fairyRing.getId(), MenuAction.GAME_OBJECT_FOURTH_OPTION, getLocation(fairyRing).getX(),getLocation(fairyRing).getY(), false);
+        }
         return createMenuEntry(fairyRing.getId(), MenuAction.GAME_OBJECT_THIRD_OPTION, getLocation(fairyRing).getX(),getLocation(fairyRing).getY(), false);
     }
 
