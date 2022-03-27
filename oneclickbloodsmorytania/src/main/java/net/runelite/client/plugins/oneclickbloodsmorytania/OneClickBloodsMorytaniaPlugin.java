@@ -124,12 +124,12 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
             {
                 case 0:
                     event.setMenuEntry(craftRunesMES());
-                    if (craftedRunes)
+                    if (!craftedRunes)
                     {
-                        craftedRunes = false;
-                        runecraftingState = 1;
+                        return;
                     }
-                    return;
+                    craftedRunes = false;
+                    runecraftingState = 1;
                 case 1:
                     if (colossalPouch!=null)
                     {
@@ -152,12 +152,12 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                     }
                 case 3:
                     event.setMenuEntry(craftRunesMES());
-                    if (craftedRunes)
+                    if (!craftedRunes)
                     {
-                        craftedRunes = false;
-                        runecraftingState = 4;
+                        return;
                     }
-                    return;
+                    craftedRunes = false;
+                    runecraftingState = 4;
                 case 4:
                     if (colossalPouch!=null)
                     {
@@ -180,14 +180,12 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                     }
                 case 6:
                     event.setMenuEntry(craftRunesMES());
-                {
-                    if (craftedRunes)
+                    if (!craftedRunes)
                     {
-                        craftedRunes = false;
-                        runecraftingState = 7;
+                        return;
                     }
-                }
-                    return;
+                    craftedRunes = false;
+                    runecraftingState = 7;
                 case 7:
                     event.setMenuEntry(teleToBankMES());
                     return;
