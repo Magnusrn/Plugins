@@ -7,17 +7,7 @@ package net.runelite.client.plugins.oneclickzmi;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.GameObject;
-import net.runelite.api.GameState;
-import net.runelite.api.InventoryID;
-import net.runelite.api.MenuAction;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.NPC;
-import net.runelite.api.Point;
-import net.runelite.api.Skill;
-import net.runelite.api.TileObject;
-import net.runelite.api.Varbits;
+import net.runelite.api.*;
 import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
@@ -37,6 +27,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 @Extension
 @PluginDescriptor(
@@ -149,27 +140,9 @@ public class oneClickZMIPlugin extends Plugin
 			return;
 		}
 
-		if ((getInventoryItem(MEDIUM_POUCH_DECAYED) != null || getInventoryItem(LARGE_POUCH_DECAYED) != null || getInventoryItem(GIANT_POUCH_DECAYED) != null) && !isBankOpen()) //only repairs pouch when the bank is closed naturally so not to mess with state if mid banking
+		if (handlePouchRepair()!=null)
 		{
-			log.debug("pouch_repair_state = " + pouch_repair_state);
-			switch (pouch_repair_state)
-			{
-				case "CAST_NPC_CONTACT":
-					event.setMenuEntry(castNpcContact());
-					pouch_repair_state = "CONTINUE_1";
-					timeout += 13; //adds timeout after casting NPC contact;
-					break;
-				case "CONTINUE_1":
-					event.setMenuEntry(continueChat1());
-					pouch_repair_state = "CONTINUE_2";
-					timeout += 2; //adds timeout for next chat box to load
-					break;
-				case "CONTINUE_2":
-					event.setMenuEntry(continueChat2());
-					pouch_repair_state = "CAST_NPC_CONTACT";
-					timeout += 2; //adds a timeout to allow for pouches to repair to prevent npc contact from being recasted
-					break;
-			}
+			event.setMenuEntry(handlePouchRepair());
 			return;
 		}
 
@@ -588,25 +561,35 @@ public class oneClickZMIPlugin extends Plugin
 				false);
 	}
 
-	private MenuEntry continueChat1()
-	{
-		return createMenuEntry(
-				0,
-				MenuAction.WIDGET_TYPE_6,
-				-1,
-				15138821,
-				true);
+	private MenuEntry handlePouchRepair() {
+		if (client.getWidget(231,6)!=null && client.getWidget(231, 6).getText().equals("What do you want? Can't you see I'm busy?"))
+		{
+			return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, -1, 15138821, false);
+		}
+		//if player doesn't have abyssal pouch in bank
+		if (client.getWidget(219,1)!=null && client.getWidget(219,1).getChild(2)!=null && client.getWidget(219,1).getChild(2).getText().equals("Can you repair my pouches?"))
+		{
+			return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, 2, WidgetInfo.DIALOG_OPTION_OPTION1.getId(), false);
+		}
+		//if player has abyssal pouch in bank
+		if (client.getWidget(219,1)!=null && client.getWidget(219,1).getChild(1)!=null && client.getWidget(219,1).getChild(1).getText().equals("Can you repair my pouches?"))
+		{
+			return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, 1, WidgetInfo.DIALOG_OPTION_OPTION1.getId(), false);
+		}
+
+		if (client.getWidget(217,6)!=null && client.getWidget(217,6).getText().equals("Can you repair my pouches?"))
+		{
+			return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, -1, 14221317, false);
+		}
+
+		List<Integer> brokenPouches = Arrays.asList(ItemID.MEDIUM_POUCH_5511,ItemID.LARGE_POUCH_5513,ItemID.GIANT_POUCH_5515,ItemID.COLOSSAL_POUCH_26786);
+		if (brokenPouches.stream().anyMatch(pouch -> client.getItemContainer(InventoryID.INVENTORY).contains(pouch)))
+		{
+			return castNpcContact();
+		}
+		return null;
 	}
 
-	private MenuEntry continueChat2()
-	{
-		return createMenuEntry(
-				0,
-				MenuAction.WIDGET_TYPE_6,
-				-1,
-				14221317,
-				false);
-	}
 
 	private Point getLocation(TileObject tileObject)
 	{
