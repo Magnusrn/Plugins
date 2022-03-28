@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.oneclickglassblowing;
 
 import java.util.Collection;
+import java.util.List;
 import javax.inject.Inject;
 
 import com.google.inject.Provides;
@@ -9,6 +10,7 @@ import net.runelite.api.*;
 import net.runelite.api.events.*;
 import net.runelite.api.queries.BankItemQuery;
 import net.runelite.api.queries.GameObjectQuery;
+import net.runelite.api.queries.NPCQuery;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
@@ -24,7 +26,7 @@ import static net.runelite.api.AnimationID.*;
 @PluginDescriptor(
         name = "One Click Glassblowing",
         enabledByDefault = false,
-        description = "One Click Glassblowing. Only works at clan bank or north fossil island bank, Set bank up with fillers and have Glassblowing pipe in inventory. Must be in the main section of bank. credit TP")
+        description = "One Click Glassblowing. Default bank is North of Fossil Island, Set bank up with fillers and have Glassblowing pipe in inventory. Must be in the main section of bank. credit TP")
 @Slf4j
 public class OneClickGlassblowingPlugin extends Plugin {
 
@@ -132,23 +134,36 @@ public class OneClickGlassblowingPlugin extends Plugin {
     }
 
     private MenuEntry openBank(){
-        if (config.bankChoice()== GlassblowingType.BankChoice.Clan_Hall)
-        {
-            int BANK_BOOTH_ID = 10583;
+        if (config.bankType() == BankType.Booth) {
+            GameObject gameObject = getGameObject(config.bankID());
             return createMenuEntry(
-                    BANK_BOOTH_ID,
+                    gameObject.getId(),
                     MenuAction.GAME_OBJECT_SECOND_OPTION,
-                    getLocation(getGameObject(BANK_BOOTH_ID)).getX(),
-                    getLocation(getGameObject(BANK_BOOTH_ID)).getY(),
+                    getLocation(gameObject).getX(),
+                    getLocation(gameObject).getY(),
                     false);
         }
-        int BANK_CHEST_ID = 30796;
-        return createMenuEntry(
-                BANK_CHEST_ID,
-                MenuAction.GAME_OBJECT_FIRST_OPTION,
-                getLocation(getGameObject(BANK_CHEST_ID)).getX(),
-                getLocation(getGameObject(BANK_CHEST_ID)).getY(),
-                true);
+
+        if (config.bankType() == BankType.Chest) {
+            GameObject gameObject = getGameObject(config.bankID());
+            return createMenuEntry(
+                    gameObject.getId(),
+                    MenuAction.GAME_OBJECT_FIRST_OPTION,
+                    getLocation(gameObject).getX(),
+                    getLocation(gameObject).getY(),
+                    false);
+        }
+
+        if (config.bankType() == BankType.NPC) {
+            NPC npc = getNpc(config.bankID());
+            return createMenuEntry(
+                    npc.getIndex(),
+                    MenuAction.NPC_THIRD_OPTION,
+                    getNPCLocation(npc).getX(),
+                    getNPCLocation(npc).getY(),
+                    false);
+        }
+        return null;
     }
 
     private MenuEntry depositItems(){
@@ -246,6 +261,19 @@ public class OneClickGlassblowingPlugin extends Plugin {
     private GameObject getGameObject(int ID) {
         return new GameObjectQuery()
                 .idEquals(ID)
+                .result(client)
+                .nearestTo(client.getLocalPlayer());
+    }
+
+    private Point getNPCLocation(NPC npc)
+    {
+        return new Point(npc.getLocalLocation().getSceneX(),npc.getLocalLocation().getSceneY());
+    }
+
+    private NPC getNpc(int id)
+    {
+        return new NPCQuery()
+                .idEquals(id)
                 .result(client)
                 .nearestTo(client.getLocalPlayer());
     }

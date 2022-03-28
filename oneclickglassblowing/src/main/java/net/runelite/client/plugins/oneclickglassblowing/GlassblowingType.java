@@ -6,8 +6,4 @@ public class GlassblowingType {
         Lantern_Lens,
         Light_Orb
     }
-    public enum BankChoice {
-        Fossil_Island,
-        Clan_Hall
-    }
 }

@@ -18,12 +18,20 @@ public interface OneClickGlassblowingConfig extends Config {
 
     @ConfigItem(
             position = 1,
-            keyName = "Bank",
-            name = "Bank",
-            description = "Choose which bank use."
+            keyName = "bankType",
+            name = "Bank Type",
+            description = "Choose"
     )
-    default GlassblowingType.BankChoice bankChoice() {
-        return GlassblowingType.BankChoice.Clan_Hall;
-    }
+    default BankType bankType() { return BankType.Booth; }
 
+    @ConfigItem(
+            position = 2,
+            keyName = "bankID",
+            name = "Bank ID",
+            description = "Input bank ID, supports chests/NPCs/Booths. Default is Fossil Island north Bank"
+    )
+    default int bankID()
+    {
+        return 30796;
+    }
 }
