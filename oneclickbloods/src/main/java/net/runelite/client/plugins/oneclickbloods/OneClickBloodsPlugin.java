@@ -177,7 +177,7 @@ public class OneClickBloodsPlugin extends Plugin {
         {
             if (getEmptySlots()>0)
             {
-                WidgetItem bloodEss= getInventoryItem(ItemID.BLOOD_ESSENCE);
+                WidgetItem bloodEss = getInventoryItem(ItemID.BLOOD_ESSENCE);
                 if(bloodEss!=null) {
                     WidgetItem activebloodEss = getInventoryItem(ItemID.BLOOD_ESSENCE_ACTIVE);
                     if(activebloodEss==null){
@@ -186,6 +186,7 @@ public class OneClickBloodsPlugin extends Plugin {
                         return;
                     }
                 }
+
                 if(config.useSpec()) {
                     if (client.getVar(VarPlayer.SPECIAL_ATTACK_PERCENT) == 1000) {
                         Print("Using Special Attack");
@@ -231,6 +232,17 @@ public class OneClickBloodsPlugin extends Plugin {
         if (isWithinBloodAltarArea())
         {
             SHOULD_RUN_TO_ALTAR = false;
+
+            WidgetItem bloodEss = getInventoryItem(ItemID.BLOOD_ESSENCE);
+            if(bloodEss!=null) {
+                WidgetItem activebloodEss = getInventoryItem(ItemID.BLOOD_ESSENCE_ACTIVE);
+                if(activebloodEss==null){
+                    Print("Activating Blood Essence");
+                    event.setMenuEntry(activateBloodEssenceMES(bloodEss.getIndex()));
+                    return;
+                }
+            }
+
             if (getInventoryItem(DARK_ESSENCE_FRAGMENTS_ID)!=null)
             {
                 Print("Runecrafting");
