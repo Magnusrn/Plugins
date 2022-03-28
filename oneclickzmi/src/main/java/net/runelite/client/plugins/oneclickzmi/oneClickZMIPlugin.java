@@ -140,7 +140,7 @@ public class oneClickZMIPlugin extends Plugin
 			return;
 		}
 
-		if (handlePouchRepair()!=null)
+		if (handlePouchRepair()!=null &! isBankOpen())
 		{
 			event.setMenuEntry(handlePouchRepair());
 			return;
