@@ -266,7 +266,7 @@ public class oneClickZMIPlugin extends Plugin
 
 			case "CLICK_ALTAR":
 				event.setMenuEntry(getAltarMES());
-				timeout += 4;
+				timeout += 1;
 				if (getInventoryItem(MEDIUM_POUCH) == null) //if no Medium pouch assumes no large, skips straight to teleport after first runecraft
 				{
 					state = "TELEPORT";
@@ -292,7 +292,7 @@ public class oneClickZMIPlugin extends Plugin
 
 			case "CLICK_ALTAR_2":
 				event.setMenuEntry(getAltarMES());
-				timeout += 4;
+				timeout += 1;
 				if (getInventoryItem(GIANT_POUCH) == null)
 				{
 					state = "TELEPORT";
@@ -308,7 +308,7 @@ public class oneClickZMIPlugin extends Plugin
 
 			case "CLICK_ALTAR_3":
 				event.setMenuEntry(getAltarMES());
-				timeout += 4;
+				timeout += 1;
 				state = "TELEPORT";
 				break;
 
