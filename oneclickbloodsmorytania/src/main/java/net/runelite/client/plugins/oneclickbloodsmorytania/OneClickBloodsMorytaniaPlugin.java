@@ -260,11 +260,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                     bankingState = 7;
                     return;
                 case 7:
-                    event.setMenuEntry(closebankMES());
-                    bankingState = 8;
-                    return;
-                case 8:
-                    event.setMenuEntry(teleToPOHMES()); //saves 1t after banking, prevents having to wait to see if invent is full i think
+                    event.setMenuEntry(teleToPOHMES());
                     return;
             }
         }
