@@ -28,4 +28,14 @@ public interface OneClickBloodsMorytaniaConfig extends Config
     {
         return false;
     }
+
+    @ConfigItem(
+            position = 3,
+            keyName = "essenceType",
+            name = "Essence",
+            description = "Choose Daeyalt or Pure Essence"
+    )
+    default EssenceType essenceType() {
+        return EssenceType.PURE_ESSENCE;
+    }
 }

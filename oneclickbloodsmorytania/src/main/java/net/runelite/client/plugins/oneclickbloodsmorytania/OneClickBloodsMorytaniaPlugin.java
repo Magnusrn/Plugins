@@ -261,6 +261,10 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                     return;
                 case 7:
                     event.setMenuEntry(closebankMES());
+                    bankingState = 8;
+                    return;
+                case 8:
+                    event.setMenuEntry(teleToPOHMES()); //saves 1t after banking, prevents having to wait to see if invent is full i think
                     return;
             }
         }
@@ -320,6 +324,11 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         if (getEmptySlots()>0 && bankMES()!=null)
         {
             event.setMenuEntry(bankMES());
+            return;
+        }
+        if (getEmptySlots()!=0)
+        {
+            event.setMenuEntry(teleToBankMES());
             return;
         }
         event.setMenuEntry(teleToPOHMES());
@@ -420,26 +429,22 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
 
     private MenuEntry enterAltarMES() {
         GameObject altar = getGameObject(25380);
-
-        //check to see if wearing any item that allow left click altar entrance
-        List<Integer> items = Arrays.asList(ItemID.BLOOD_TIARA,ItemID.MAX_CAPE,ItemID.RUNECRAFT_CAPE,ItemID.RUNECRAFT_CAPET,ItemID.MAX_CAPE_13342,ItemID.CATALYTIC_TIARA);
-         if (items.stream().anyMatch(item -> client.getItemContainer(InventoryID.EQUIPMENT).contains(item)))
-         {
-             return createMenuEntry(altar.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(altar).getX(), getLocation(altar).getY(), false);
-         }
-
-         client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
          if (getInventoryItem(ItemID.CATALYTIC_TALISMAN)!=null)
          {
-             client.setSelectedItemSlot(getInventoryItem(ItemID.CATALYTIC_TALISMAN).getIndex());
-             client.setSelectedItemID(ItemID.CATALYTIC_TALISMAN);
+             return useItemOnAltarMES(altar, ItemID.CATALYTIC_TALISMAN);
          }
-         else
+         if (getInventoryItem(ItemID.BLOOD_TALISMAN)!=null)
          {
-             client.setSelectedItemSlot(getInventoryItem(ItemID.BLOOD_TALISMAN).getIndex());
-             client.setSelectedItemID(ItemID.BLOOD_TALISMAN);
+             return useItemOnAltarMES(altar, ItemID.BLOOD_TALISMAN);
          }
+         //else assume something is worn giving access to altar
+        return createMenuEntry(altar.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(altar).getX(), getLocation(altar).getY(), false);
+    }
 
+    private MenuEntry useItemOnAltarMES(GameObject altar,int itemID) {
+        client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
+        client.setSelectedItemSlot(getInventoryItem(itemID).getIndex());
+        client.setSelectedItemID(itemID);
         return createMenuEntry(altar.getId(), MenuAction.ITEM_USE_ON_GAME_OBJECT, getLocation(altar).getX(), getLocation(altar).getY(), false);
     }
 
@@ -492,6 +497,10 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
 
     private MenuEntry withdrawEssence() {
         int essence = ItemID.PURE_ESSENCE;
+        if (config.essenceType()== EssenceType.DAEYALT_ESSENCE)
+        {
+            essence = ItemID.DAEYALT_ESSENCE;
+        }
         return createMenuEntry(7, MenuAction.CC_OP_LOW_PRIORITY, getBankIndex(essence), WidgetInfo.BANK_ITEM_CONTAINER.getId(), false);
     }
 
@@ -556,7 +565,8 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     }
 
     private boolean isinMorytaniaHideout5LowAgility() {
-        return client.getLocalPlayer().getWorldLocation().isInArea(new WorldArea(new WorldPoint(3511,9807,0),new WorldPoint(3538,9832,0)));
+        return client.getLocalPlayer().getWorldLocation().isInArea(new WorldArea(new WorldPoint(3511,9807,0),new WorldPoint(3538,9832,0)))
+                || client.getLocalPlayer().getWorldLocation().isInArea(new WorldArea(new WorldPoint(3536,9811,0),new WorldPoint(3563,9832,0)));
     }
 
     private boolean isinMorytaniaHideout5LowAgilityShortcut() {
