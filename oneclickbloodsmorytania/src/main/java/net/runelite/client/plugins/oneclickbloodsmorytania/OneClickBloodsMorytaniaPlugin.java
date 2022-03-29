@@ -18,7 +18,6 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.party.messages.SkillUpdate;
 import org.pf4j.Extension;
 
 import java.util.Arrays;
@@ -48,7 +47,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
 
     private int runecraftingState = 0;
     private int bankingState = 0;
-    private int currentxp = 0;
+    private int cachedXP = 0;
     private boolean craftedRunes = false;
 
     @Override
@@ -59,9 +58,9 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     @Subscribe
     private void onGameTick(GameTick event)
     {
-        if (currentxp == 0)
+        if (cachedXP == 0)
         {
-            currentxp = client.getSkillExperience(Skill.RUNECRAFT);
+            cachedXP = client.getSkillExperience(Skill.RUNECRAFT);
         }
     }
 
@@ -69,14 +68,26 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         runecraftingState = 0;
         bankingState = 0;
         craftedRunes = false;
+        cachedXP = 0;
     }
 
     @Subscribe
     protected void onStatChanged(StatChanged event) {
-        //on login this triggers going from 0 to players current XP. all xp drops(even on leagues etc) should be below 50k and this method requires 77 rc.
-        if (event.getSkill() == Skill.RUNECRAFT && event.getXp()-currentxp<50000)
+        //on login this method triggers going from 0 to players current XP. all xp drops(even on leagues etc) should be below 50k and this method requires 77 rc.
+        if (event.getSkill() == Skill.RUNECRAFT && event.getXp()- cachedXP <50000)
         {
             craftedRunes = true;
+            cachedXP = client.getSkillExperience(Skill.RUNECRAFT);
+        }
+    }
+
+    @Subscribe
+    public void onChatMessage(ChatMessage event)
+    {
+        if (event.getMessage().contains("There are no essences in this pouch."))
+        {
+            //not perfect but it works, prevents spam crafting if pouch is empty due to broken pouches previously
+            craftedRunes = true ;
         }
     }
 
