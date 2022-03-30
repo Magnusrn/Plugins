@@ -125,6 +125,7 @@ public class coxraidscouter extends Plugin
 		{
 			return;
 		}
+		System.out.println("State: "+state);
 
 		switch (state)
 		{
@@ -135,9 +136,7 @@ public class coxraidscouter extends Plugin
 						.nearestTo(client.getLocalPlayer());
 				if (recruitingBoardObject != null) {
 					client.invokeMenuAction("Read", "<col=ffff>Recruiting board", recruitingBoardObject.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION.getId(), getLocation(recruitingBoardObject).getX(), getLocation(recruitingBoardObject).getY());
-					//mouse.delayMouseClick(client.getMouseCanvasPosition(), SleepDelay(300, 800));
 					state = "check for existing raid";
-					timeout += 8;//tick delay between actions
 				}
 				break;
 
@@ -158,15 +157,12 @@ public class coxraidscouter extends Plugin
 					state = "make party";
 					raidFound = false;
 				}
-				timeout +=1;
 				break;
 
 			case "make party":
 				if (client.getWidget(499, 58) != null) {
 					client.invokeMenuAction("Make party", "", 1, MenuAction.CC_OP.getId(), -1, 32702522);
-					//mouse.delayMouseClick(client.getMouseCanvasPosition(), SleepDelay(300, 800));
 					state = "enter";
-					timeout += 4;
 				}
 				break;
 			case "enter":
@@ -177,9 +173,7 @@ public class coxraidscouter extends Plugin
 				if (EnterRaidObject != null) {
 					client.invokeMenuAction("Enter", "<col=ffff>Chambers of Xeric", EnterRaidObject.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION.getId(), getLocation(EnterRaidObject).getX(), getLocation(EnterRaidObject).getY());
 
-					//mouse.delayMouseClick(client.getMouseCanvasPosition(), SleepDelay(300, 800));
 					state = "start raid";
-					timeout += 16;
 				}
 				break;
 			case "start raid": //main logic for leaving raid, either starts and continues scouting or waits til raider joins then leaves and rejoins cc
@@ -191,8 +185,6 @@ public class coxraidscouter extends Plugin
 						if (client.getWidget(229, 1).getText().startsWith("You have been logged in for a very long time"))
 						{
 							client.invokeMenuAction("Continue", "", 0, MenuAction.WIDGET_TYPE_6.getId(), -1, 15007746);
-							//mouse.delayMouseClick(client.getMouseCanvasPosition(), SleepDelay(300, 800));
-							timeout += 4;
 							return;
 						}
 					}
@@ -202,8 +194,6 @@ public class coxraidscouter extends Plugin
 						if (client.getWidget(219, 1).getChild(1).getText().startsWith("Yes, and don't ask again in this session"))
 						{
 							client.invokeMenuAction("Continue", "", 0, MenuAction.WIDGET_TYPE_6.getId(), 1, 14352385);
-							//mouse.delayMouseClick(client.getMouseCanvasPosition(), SleepDelay(300, 800));
-							timeout += 4;
 							return;
 						}
 					}
@@ -215,8 +205,6 @@ public class coxraidscouter extends Plugin
 							case "Awaiting Raider":
 								if (client.getWidget(707, 3) != null) {
 									client.invokeMenuAction("Chat-channel", "", 1, MenuAction.CC_OP.getId(), -1, 46333955);
-									//mouse.delayMouseClick(client.getMouseCanvasPosition(), SleepDelay(300, 500));
-									timeout += 2;
 									raidLeaverState = "Leaving CC";
 								}
 								break;
@@ -232,8 +220,6 @@ public class coxraidscouter extends Plugin
 										}
 										Print("Raider in raid, should be leaving cc");
 										client.invokeMenuAction("Leave", "", 6, MenuAction.CC_OP_LOW_PRIORITY.getId(), -1, 458770);
-										//mouse.delayMouseClick(client.getMouseCanvasPosition(), SleepDelay(100, 300));
-										timeout += 4;
 										raidLeaverState = "ClickToContinue";
 									}
 								}
@@ -246,8 +232,6 @@ public class coxraidscouter extends Plugin
 										.nearestTo(client.getLocalPlayer());
 								if (recruitingBoardObject != null) {
 									client.invokeMenuAction("Continue", "", 0, MenuAction.WIDGET_TYPE_6.getId(), -1, 15007746);
-									//mouse.delayMouseClick(client.getMouseCanvasPosition(), SleepDelay(300, 800));
-									timeout += 3;
 									raidLeaverState = "RejoinCC";
 								}
 								break;
@@ -255,8 +239,6 @@ public class coxraidscouter extends Plugin
 							case "RejoinCC":
 								if (client.getWidget(7, 18) != null) {
 									client.invokeMenuAction("Join", "", 1, MenuAction.CC_OP.getId(), -1, 458770);
-									//mouse.delayMouseClick(client.getMouseCanvasPosition(), SleepDelay(300, 800));
-									timeout += 3;
 									raidLeaverState = "PressEnter";
 								}
 								break;
@@ -266,7 +248,6 @@ public class coxraidscouter extends Plugin
 									Executors.newSingleThreadExecutor() //runs pressKey function to press enter once
 											.submit(this::pressKey);
 									raidLeaverState = "Idle";
-									timeout += 3;
 								}
 								break;
 							case "Idle":
@@ -276,19 +257,17 @@ public class coxraidscouter extends Plugin
 					} else {
 						timeout += 36000; //if raid found and auto/rejoin is disabled then wait for 6h
 					}
-				} else if (client.getWidget(500, 12) != null) {
+				} else if (client.getWidget(500, 14) != null
+						&& client.getWidget(500,14).getChild(9)!=null
+						&& client.getWidget(500,14).getChild(9).getText().equals("Start raid")) {
 					client.invokeMenuAction("Start raid", "", 1, MenuAction.CC_OP.getId(), -1, 32768014);
-					//mouse.delayMouseClick(client.getMouseCanvasPosition(), SleepDelay(300, 800));
 					state = "continue";
-					timeout += 4;
 				}
 				break;
 			case "continue":
 				if (client.getWidget(219, 1) != null) {
 					client.invokeMenuAction("Continue", "", 0, MenuAction.WIDGET_TYPE_6.getId(), 1, 14352385);
-					//mouse.delayMouseClick(client.getMouseCanvasPosition(), SleepDelay(300, 800));
 					state = "climb";
-					timeout += 4;
 				}
 				break;
 			case "climb":
@@ -298,22 +277,37 @@ public class coxraidscouter extends Plugin
 						.nearestTo(client.getLocalPlayer());
 				if (ClimbStepsObject != null) {
 					client.invokeMenuAction("Climb", "<col=ffff>Steps", ClimbStepsObject.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION.getId(), getLocation(ClimbStepsObject).getX(), getLocation(ClimbStepsObject).getY());
-					//mouse.delayMouseClick(client.getMouseCanvasPosition(), SleepDelay(300, 800));
 					state = "leave raid";
-					timeout += 4;
 				}
 				break;
 			case "leave raid":
 				if (client.getWidget(219, 1) != null) {
 					client.invokeMenuAction("Continue", "", 0, MenuAction.WIDGET_TYPE_6.getId(), 1, 14352385);
-					//mouse.delayMouseClick(client.getMouseCanvasPosition(), SleepDelay(300, 800));
 					state = "read";
-					timeout +=6;
 				}
 				break;
 		}
 	}
 
+	@Subscribe
+	public void onDecorativeObjectSpawned(DecorativeObjectSpawned event)
+	{
+		if (event.getDecorativeObject().getId()==29776)
+		{
+			//board isn't clickable for 2t after it's visible due to still being leaving raid
+			timeout=config.timeout();
+		}
+	}
+
+	@Subscribe
+	public void onGameObjectSpawned(GameObjectSpawned event)
+	{
+		if (event.getGameObject().getId()==29778)
+		{
+			//2 tick timeout to allow time for layout to post
+			timeout=config.timeout();
+		}
+	}
 
 	@Override
 	protected void shutDown()

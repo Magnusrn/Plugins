@@ -115,4 +115,14 @@ public interface coxraidscouterconfig extends Config {
     default boolean fivehHandler() {
         return true;
     }
+
+    @ConfigItem(
+            position = 11,
+            keyName = "timeout",
+            name = "timeout",
+            description = "Increase this if the 2t timeout is causing problems. Works fine for me on 2t but in case of lag I left the option in."
+    )
+    default int timeout() {
+        return 2;
+    }
 }
