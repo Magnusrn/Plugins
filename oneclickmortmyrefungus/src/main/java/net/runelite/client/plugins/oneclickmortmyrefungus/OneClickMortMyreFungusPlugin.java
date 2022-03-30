@@ -179,6 +179,11 @@ public class OneClickMortMyreFungusPlugin extends Plugin {
 
     private MenuEntry useFairyRingMES() {
         GameObject fairyRing = getGameObject(29228);
+        if (getGameObject(29229)!=null) //if tree fairy ring combo is present
+        {
+            fairyRing = getGameObject(29229);
+            return createMenuEntry(fairyRing.getId(), MenuAction.GAME_OBJECT_FOURTH_OPTION, getLocation(fairyRing).getX(),getLocation(fairyRing).getY(), false);
+        }
         return createMenuEntry(fairyRing.getId(), MenuAction.GAME_OBJECT_THIRD_OPTION, getLocation(fairyRing).getX(),getLocation(fairyRing).getY(), false);
     }
 
