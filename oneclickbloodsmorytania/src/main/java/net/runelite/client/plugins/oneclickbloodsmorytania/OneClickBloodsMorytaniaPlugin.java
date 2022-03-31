@@ -425,15 +425,15 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
 
     private MenuEntry enterAltarMES() {
         GameObject altar = getGameObject(25380);
-         if (getInventoryItem(ItemID.CATALYTIC_TALISMAN)!=null)
-         {
-             return useItemOnAltarMES(altar, ItemID.CATALYTIC_TALISMAN);
-         }
-         if (getInventoryItem(ItemID.BLOOD_TALISMAN)!=null)
-         {
-             return useItemOnAltarMES(altar, ItemID.BLOOD_TALISMAN);
-         }
-         //else assume something is worn giving access to altar
+        if (getInventoryItem(ItemID.CATALYTIC_TALISMAN)!=null)
+        {
+            return useItemOnAltarMES(altar, ItemID.CATALYTIC_TALISMAN);
+        }
+        if (getInventoryItem(ItemID.BLOOD_TALISMAN)!=null)
+        {
+            return useItemOnAltarMES(altar, ItemID.BLOOD_TALISMAN);
+        }
+        //else assume something is worn giving access to altar
         return createMenuEntry(altar.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(altar).getX(), getLocation(altar).getY(), false);
     }
 
@@ -473,6 +473,10 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         {
             return createMenuEntry(craftingCapeT.getId(), MenuAction.ITEM_THIRD_OPTION, craftingCapeT.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
+        if (client.getVarbitValue(4070)==0) //if on standard spellbook
+        {
+            return createMenuEntry(2, MenuAction.CC_OP, -1, WidgetInfo.SPELL_CAMELOT_TELEPORT.getId(), false);
+        }
         return createMenuEntry(1, MenuAction.CC_OP, -1, WidgetInfo.SPELL_MOONCLAN_TELEPORT.getId(), false);
     }
 
@@ -482,11 +486,15 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         {
             return createMenuEntry(craftingBank.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(craftingBank).getX(), getLocation(craftingBank).getY(), false);
         }
-
         GameObject lunarBank = getGameObject(16700);
         if (lunarBank!=null)
         {
             return createMenuEntry(lunarBank.getId(), MenuAction.GAME_OBJECT_SECOND_OPTION, getLocation(lunarBank).getX(), getLocation(lunarBank).getY(), false);
+        }
+        GameObject seersBank = getGameObject(25808);
+        if (seersBank!=null)
+        {
+            return createMenuEntry(seersBank.getId(), MenuAction.GAME_OBJECT_SECOND_OPTION, getLocation(seersBank).getX(), getLocation(seersBank).getY(), false);
         }
         return null;
     }
@@ -504,10 +512,6 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return createMenuEntry(9, MenuAction.CC_OP_LOW_PRIORITY, pouch.getIndex(), WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId(), false);
     }
 
-    private MenuEntry closebankMES() {
-        return createMenuEntry(1, MenuAction.CC_OP, 11, 786434, false);
-    }
-
     private MenuEntry teleToPOHMES() {
         WidgetItem tab = getInventoryItem(ItemID.TELEPORT_TO_HOUSE);
         WidgetItem conCape = getInventoryItem(ItemID.CONSTRUCT_CAPE);
@@ -521,6 +525,10 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         {
             return createMenuEntry(conCapeT.getId(), MenuAction.ITEM_FOURTH_OPTION, conCapeT.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
+        if (tab!=null)
+        {
+            return createMenuEntry(tab.getId(), MenuAction.ITEM_FIRST_OPTION, tab.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        }
         if (client.getItemContainer(InventoryID.EQUIPMENT)!=null)
         {
             if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE) || client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE_13342))
@@ -531,9 +539,8 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
             {
                 return createMenuEntry( 4, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
             }
-
         }
-        return createMenuEntry(tab.getId(), MenuAction.ITEM_FIRST_OPTION, tab.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        return createMenuEntry(1, MenuAction.CC_OP, -1, WidgetInfo.SPELL_TELEPORT_TO_HOUSE.getId(), false);
     }
 
     private MenuEntry repairPouchesSpellMES() {
