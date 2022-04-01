@@ -1,7 +1,7 @@
 package net.runelite.client.plugins.oneclickglassblowing;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import javax.inject.Inject;
 
 import com.google.inject.Provides;
@@ -24,9 +24,9 @@ import static net.runelite.api.AnimationID.*;
 
 @Extension
 @PluginDescriptor(
-        name = "One Click Glassblowing",
+        name = "One Click Glass",
         enabledByDefault = false,
-        description = "One Click Glassblowing. Default bank is North of Fossil Island, Set bank up with fillers and have Glassblowing pipe in inventory. Must be in the main section of bank. credit TP")
+        description = "One Click Glassblowing/Superglass Make. Default bank is North of Fossil Island. Check Discord for setup info")
 @Slf4j
 public class OneClickGlassblowingPlugin extends Plugin {
 
@@ -42,12 +42,16 @@ public class OneClickGlassblowingPlugin extends Plugin {
         return configManager.getConfig(OneClickGlassblowingConfig.class);
     }
 
-    private int stage = 1;
+    private int glassblowingStage = 1;
+    private int superglassMakeStage = 1;
+    private int seaweedCount = 0;
     private int timeout;
 
     @Override
     protected void startUp() throws Exception {
-        stage = 1;
+        glassblowingStage = 1;
+        superglassMakeStage = 1;
+        seaweedCount = 0;
     }
 
     @Subscribe
@@ -73,68 +77,131 @@ public class OneClickGlassblowingPlugin extends Plugin {
             event.consume();
             return;
         }
-        if (event.getMenuOption().equals("<col=00ff00>One Click Glassblowing"))
+        if (event.getMenuOption().equals("<col=00ff00>One Click Molten Glass"))
         {
-            handleClick(event);
+            if (config.mode()== Types.Mode.GLASSBLOWING)
+            {
+                blowGlassHandler(event);
+                return;
+            }
+            superGlassMakeHandler(event);
         }
     }
 
     @Subscribe
     private void onClientTick(ClientTick event) {
-        String text;
-
-        if (this.client.getLocalPlayer() == null || this.client.getGameState() != GameState.LOGGED_IN)
+        if (client.getLocalPlayer() == null || client.getGameState() != GameState.LOGGED_IN)
         {
             return;
         }
-        else
-        {
-            text = "<col=00ff00>One Click Glassblowing";
-        }
-        this.client.insertMenuItem(text, "", MenuAction.UNKNOWN
-                .getId(), 0, 0, 0, true);
+        String text = "<col=00ff00>One Click Molten Glass";
+        client.insertMenuItem(text, "", MenuAction.UNKNOWN.getId(), 0, 0, 0, true);
+        client.setTempMenuEntry(Arrays.stream(client.getMenuEntries()).filter(x->x.getOption().equals(text)).findFirst().orElse(null));
     }
 
-    private void handleClick(MenuOptionClicked event){
-        //System.out.println("stage = " + stage);
-        switch (stage)
+    private void blowGlassHandler(MenuOptionClicked event){
+        System.out.println("glassblowingStage = " + glassblowingStage);
+        switch (glassblowingStage)
         {
             case 1:
                 event.setMenuEntry(openBank());
-                stage = 2;
-                timeout++;
-                break;
+                if (!bankOpen())
+                {
+                    return;
+                }
+                glassblowingStage = 2;
             case 2:
                 event.setMenuEntry(depositItems());
-                stage = 3;
-                break;
+                glassblowingStage = 3;
+                return;
             case 3:
                 event.setMenuEntry(withdrawAllMoltenGlass());
-                stage = 4;
-                break;
+                glassblowingStage = 4;
+                return;
             case 4:
-                event.setMenuEntry(closeBank());
-                stage = 5;
-                break;
+                if (usePipeOnGlass()==null)
+                {
+                    return;
+                }
+                event.setMenuEntry(usePipeOnGlass());
+                glassblowingStage = 5;
+                return;
             case 5:
-                event.setMenuEntry(useGlassblowingPipe());
-                stage = 6;
-                break;
-            case 6:
-                event.setMenuEntry(useOnMoltenGlass());
-                stage = 7;
-                timeout+=2;
-                break;
-            case 7:
                 event.setMenuEntry(selectGlassblowingItem());
-                stage = 1;
-                timeout+=2;
-                break;
+                if (getInventoryItem(ItemID.MOLTEN_GLASS)!=null)
+                {
+                    return;
+                }
+                event.setMenuEntry(openBank());
+                glassblowingStage = 1;
         }
     }
 
+    private void superGlassMakeHandler(MenuOptionClicked event){
+        if (timeout>0) return;
+        System.out.println("superglassMakeStage = " + superglassMakeStage);
+
+        switch (superglassMakeStage)
+        {
+            case 1:
+                event.setMenuEntry(openBank());
+                seaweedCount = 0;
+                if (!bankOpen())
+                {
+                    return;
+                }
+                superglassMakeStage = 2;
+            case 2:
+                event.setMenuEntry(depositItems());
+                superglassMakeStage = 3;
+                return;
+            case 3:
+                if (withdrawOneSeaweed()==null) return;
+                if (seaweedCount<3)
+                {
+                    event.setMenuEntry(withdrawOneSeaweed());
+                    seaweedCount++;
+                    return;
+                }
+                superglassMakeStage = 4;
+            case 4:
+                if (withdrawXSand()==null) return;
+                event.setMenuEntry(withdrawXSand());
+                superglassMakeStage = 5;
+                return;
+            case 5:
+                event.setMenuEntry(castSuperglassMake());
+                timeout = 4;
+                superglassMakeStage = 1;
+        }
+    }
+
+    private MenuEntry castSuperglassMake() {
+        return createMenuEntry(1, MenuAction.CC_OP, -1, WidgetInfo.SPELL_SUPERGLASS_MAKE.getId(), false);
+    }
+
+    private MenuEntry withdrawOneSeaweed() {
+        if (getBankIndex(ItemID.GIANT_SEAWEED) ==-1) return null;
+        return createMenuEntry(
+                1,
+                MenuAction.CC_OP,
+                getBankIndex(ItemID.GIANT_SEAWEED),
+                786445,
+                true);
+    }
+
+    private MenuEntry withdrawXSand() {
+        if (getBankIndex(ItemID.BUCKET_OF_SAND) ==-1) return null;
+        return createMenuEntry(
+                5,
+                MenuAction.CC_OP,
+                getBankIndex(ItemID.BUCKET_OF_SAND),
+                786445,
+                true);
+    }
+
     private MenuEntry openBank(){
-        if (config.bankType() == BankType.Booth) {
+        if (config.bankType() == Types.Banks.BOOTH) {
             GameObject gameObject = getGameObject(config.bankID());
             return createMenuEntry(
                     gameObject.getId(),
@@ -144,7 +211,7 @@ public class OneClickGlassblowingPlugin extends Plugin {
                     false);
         }
 
-        if (config.bankType() == BankType.Chest) {
+        if (config.bankType() == Types.Banks.CHEST) {
             GameObject gameObject = getGameObject(config.bankID());
             return createMenuEntry(
                     gameObject.getId(),
@@ -154,7 +221,7 @@ public class OneClickGlassblowingPlugin extends Plugin {
                     false);
         }
 
-        if (config.bankType() == BankType.NPC) {
+        if (config.bankType() == Types.Banks.NPC) {
             NPC npc = getNpc(config.bankID());
             return createMenuEntry(
                     npc.getIndex(),
@@ -176,53 +243,37 @@ public class OneClickGlassblowingPlugin extends Plugin {
     }
 
     private MenuEntry withdrawAllMoltenGlass(){
+        if (getBankIndex(ItemID.MOLTEN_GLASS) ==-1) return null;
         return createMenuEntry(
                 7,
                 MenuAction.CC_OP,
-                getBankIndex(),
+                getBankIndex(ItemID.MOLTEN_GLASS),
                 786445,
                 true);
     }
 
-    private MenuEntry closeBank(){
-        return createMenuEntry(
-                1,
-                MenuAction.CC_OP,
-                11,
-                786434,
-                true);
-    }
-
-    private MenuEntry useGlassblowingPipe(){
-        return createMenuEntry(
-                1785,
-                MenuAction.ITEM_USE,
-                getInventoryItem(1785).getIndex(),
-                9764864,
-                true);
-    }
-
-    private MenuEntry useOnMoltenGlass(){
-        return createMenuEntry(
-                1775,
-                MenuAction.ITEM_USE_ON_WIDGET_ITEM,
-                getInventoryItem(1775).getIndex(),
-                9764864,
-                true);
+    private MenuEntry usePipeOnGlass(){
+        int itemID = ItemID.GLASSBLOWING_PIPE;
+        WidgetItem moltenGlass = getInventoryItem(ItemID.MOLTEN_GLASS);
+        client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
+        client.setSelectedItemSlot(getInventoryItem(itemID).getIndex());
+        client.setSelectedItemID(itemID);
+        if (moltenGlass == null) return null;
+        return createMenuEntry(moltenGlass.getId(), MenuAction.ITEM_USE_ON_WIDGET_ITEM, moltenGlass.getIndex(), 9764864, true);
     }
 
     private MenuEntry selectGlassblowingItem(){
         int MENU_ID = 0;
-        if(config.glassblowingType()==GlassblowingType.GlassblowingItem.Light_Orb)
+        if(config.product()== Types.Product.LIGHT_ORB)
         {
             MENU_ID = 17694741;
         }
-        if(config.glassblowingType()==GlassblowingType.GlassblowingItem.Lantern_Lens)
+        if(config.product()== Types.Product.LANTERN_LENS)
         {
             MENU_ID = 17694740;
         }
 
-        if(config.glassblowingType()==GlassblowingType.GlassblowingItem.Unpowered_Orb)
+        if(config.product()== Types.Product.UNPOWERED_ORB)
         {
             MENU_ID = 17694739;
         }
@@ -236,12 +287,12 @@ public class OneClickGlassblowingPlugin extends Plugin {
                 false);
     }
 
-    private int getBankIndex(){
-        int MOLTEN_GLASS = 1775;
+    private int getBankIndex(int id){
         WidgetItem bankItem = new BankItemQuery()
-                .idEquals(MOLTEN_GLASS)
+                .idEquals(id)
                 .result(client)
                 .first();
+        if (bankItem == null) return -1;
         return bankItem.getWidget().getIndex();
     }
 
@@ -265,9 +316,14 @@ public class OneClickGlassblowingPlugin extends Plugin {
                 .nearestTo(client.getLocalPlayer());
     }
 
-    private Point getNPCLocation(NPC npc)
-    {
-        return new Point(npc.getLocalLocation().getSceneX(),npc.getLocalLocation().getSceneY());
+    private Point getLocation(TileObject tileObject) {
+        if (tileObject == null) {
+            return new Point(0, 0);
+        }
+        if (tileObject instanceof GameObject) {
+            return ((GameObject) tileObject).getSceneMinLocation();
+        }
+        return new Point(tileObject.getLocalLocation().getSceneX(), tileObject.getLocalLocation().getSceneY());
     }
 
     private NPC getNpc(int id)
@@ -278,14 +334,9 @@ public class OneClickGlassblowingPlugin extends Plugin {
                 .nearestTo(client.getLocalPlayer());
     }
 
-    private Point getLocation(TileObject tileObject) {
-        if (tileObject == null) {
-            return new Point(0, 0);
-        }
-        if (tileObject instanceof GameObject) {
-            return ((GameObject) tileObject).getSceneMinLocation();
-        }
-        return new Point(tileObject.getLocalLocation().getSceneX(), tileObject.getLocalLocation().getSceneY());
+    private Point getNPCLocation(NPC npc)
+    {
+        return new Point(npc.getLocalLocation().getSceneX(),npc.getLocalLocation().getSceneY());
     }
 
     private boolean bankOpen() {
