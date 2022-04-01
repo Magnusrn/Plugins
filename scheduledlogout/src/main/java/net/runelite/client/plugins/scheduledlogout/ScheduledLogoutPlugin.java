@@ -14,6 +14,7 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.overlay.OverlayManager;
 import org.pf4j.Extension;
 
 @Extension
@@ -39,6 +40,13 @@ public class ScheduledLogoutPlugin extends Plugin {
     @Inject
     private KeyManager keyManager;
 
+    @Inject
+    private ScheduledLogoutOverlay overlay;
+
+    @Inject
+    private OverlayManager overlayManager;
+
+
     @Provides
     ScheduledLogoutConfig provideConfig(ConfigManager configManager) {
         return (ScheduledLogoutConfig) configManager.getConfig(ScheduledLogoutConfig.class);
@@ -49,12 +57,19 @@ public class ScheduledLogoutPlugin extends Plugin {
     {
         CountdownTimer = config.minutesToLogout()*100; //convert to ticks
         clientThread.invokeLater(() -> {Print("Logging out in " + config.minutesToLogout() + " minutes"); });
+        overlayManager.add(overlay);
+    }
+
+    @Override
+    protected void shutDown() throws Exception
+    {
+        overlayManager.remove(overlay);
     }
 
     @Subscribe
     public void onConfigChanged(ConfigChanged event)
     {
-        if (event.getOldValue().equals("false") || event.getOldValue().equals("true")) //if plugin not being turned on/off
+        if (!event.getKey().equals("minutestologout"))
         {
             return;
         }

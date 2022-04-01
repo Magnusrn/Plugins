@@ -17,4 +17,15 @@ public interface ScheduledLogoutConfig extends Config {
     {
         return 60;
     }
+
+    @ConfigItem(
+            position = 1,
+            keyName = "overlay",
+            name = "Overlay",
+            description = ""
+    )
+    default boolean overlay()
+    {
+        return true;
+    }
 }
