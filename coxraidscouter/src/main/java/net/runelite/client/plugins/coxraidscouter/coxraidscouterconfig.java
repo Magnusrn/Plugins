@@ -119,10 +119,20 @@ public interface coxraidscouterconfig extends Config {
     @ConfigItem(
             position = 11,
             keyName = "timeout",
-            name = "timeout",
-            description = "Increase this if the 2t timeout is causing problems. Works fine for me on 2t but in case of lag I left the option in."
+            name = "Start raid/Read board Timeout",
+            description = "Increase this if the timeout is causing problems. Works fine for me on 2t but in case of lag I left the option in. Defaults to 3t"
     )
     default int timeout() {
-        return 2;
+        return 3;
+    }
+
+    @ConfigItem(
+            position = 12,
+            keyName = "leavecctimeout",
+            name = "Leave CC Timeout",
+            description = "Timeout after leaving/rejoining CC on successful raid found. I Think this prevents a rare bug when you rejoin cc with 'raid started' message not showing while joining cc"
+    )
+    default int leaveCCTimeout() {
+        return 10;
     }
 }

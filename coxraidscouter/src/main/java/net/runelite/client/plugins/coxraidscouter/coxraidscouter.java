@@ -105,14 +105,14 @@ public class coxraidscouter extends Plugin
 		}
 	}
 
-	private void pressKey()
+	private void pressEnter()
 	{
-		KeyEvent keyPress = new KeyEvent(this.client.getCanvas(), KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER);
-		this.client.getCanvas().dispatchEvent(keyPress);
-		KeyEvent keyRelease = new KeyEvent(this.client.getCanvas(), KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER);
-		this.client.getCanvas().dispatchEvent(keyRelease);
-		KeyEvent keyTyped = new KeyEvent(this.client.getCanvas(), KeyEvent.KEY_TYPED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER);
-		this.client.getCanvas().dispatchEvent(keyTyped);
+		KeyEvent keyPress = new KeyEvent(this.client.getCanvas(), KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER,KeyEvent.CHAR_UNDEFINED);
+		client.getCanvas().dispatchEvent(keyPress);
+		KeyEvent keyRelease = new KeyEvent(this.client.getCanvas(), KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER,KeyEvent.CHAR_UNDEFINED);
+		client.getCanvas().dispatchEvent(keyRelease);
+		KeyEvent keyTyped = new KeyEvent(this.client.getCanvas(), KeyEvent.KEY_TYPED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER,KeyEvent.CHAR_UNDEFINED);
+		client.getCanvas().dispatchEvent(keyTyped);
 	}
 
 	private void Print(String string) //used for debugging, puts a message to the in game chat.
@@ -200,6 +200,7 @@ public class coxraidscouter extends Plugin
 				}
 
 				if (raidFound) {
+					System.out.println("raidleaverstate : " + raidLeaverState);
 					if (config.autoLeaveCC()) {
 						switch (raidLeaverState) {
 							case "Awaiting Raider":
@@ -208,7 +209,6 @@ public class coxraidscouter extends Plugin
 									raidLeaverState = "Leaving CC";
 								}
 								break;
-
 							case "Leaving CC":
 								if (client.getWidget(7, 18) != null) {
 									if (client.getPlayers().size() > 1) {
@@ -220,37 +220,32 @@ public class coxraidscouter extends Plugin
 										}
 										Print("Raider in raid, should be leaving cc");
 										client.invokeMenuAction("Leave", "", 6, MenuAction.CC_OP_LOW_PRIORITY.getId(), -1, 458770);
-										raidLeaverState = "ClickToContinue";
+										raidLeaverState = "RejoinCC";
 									}
 								}
 								break;
-
-							case "ClickToContinue":
+							case "RejoinCC":
 								recruitingBoardObject = new DecorativeObjectQuery()
 										.idEquals(ObjectID.RECRUITING_BOARD)
 										.result(client)
 										.nearestTo(client.getLocalPlayer());
-								if (recruitingBoardObject != null) {
-									client.invokeMenuAction("Continue", "", 0, MenuAction.WIDGET_TYPE_6.getId(), -1, 15007746);
-									raidLeaverState = "RejoinCC";
-								}
-								break;
-
-							case "RejoinCC":
-								if (client.getWidget(7, 18) != null) {
+								if (recruitingBoardObject != null && client.getWidget(7, 18) != null) {
 									client.invokeMenuAction("Join", "", 1, MenuAction.CC_OP.getId(), -1, 458770);
 									raidLeaverState = "PressEnter";
 								}
 								break;
-
 							case "PressEnter":
 								if (client.getWidget(162, 37) != null) {
 									Executors.newSingleThreadExecutor() //runs pressKey function to press enter once
-											.submit(this::pressKey);
-									raidLeaverState = "Idle";
+											.submit(this::pressEnter);
+									raidLeaverState = "Delay";
 								}
 								break;
-							case "Idle":
+							case "Delay": //adds a delay after rejoining cc as sometimes the cc bugs out and doesn't post the raid started messageif raid is start quickly i think? cox problems smh
+								timeout = config.leaveCCTimeout();
+								raidLeaverState = "Reset";
+								break;
+							case "Reset": //restart scouting
 								reset();
 								break;
 						}
@@ -294,7 +289,7 @@ public class coxraidscouter extends Plugin
 	{
 		if (event.getDecorativeObject().getId()==29776)
 		{
-			//board isn't clickable for 2t after it's visible due to still being leaving raid
+			//board isn't clickable for after it's visible due to still being leaving raid
 			timeout=config.timeout();
 		}
 	}
@@ -304,7 +299,7 @@ public class coxraidscouter extends Plugin
 	{
 		if (event.getGameObject().getId()==29778)
 		{
-			//2 tick timeout to allow time for layout to post
+			//timeout to allow time for layout to post
 			timeout=config.timeout();
 		}
 	}
@@ -324,8 +319,8 @@ public class coxraidscouter extends Plugin
 				DiscordWebhook webhook = new DiscordWebhook(config.webhook());
 				webhook.setContent(client.getLocalPlayer().getName() + " - Logged out");
 				webhook.execute();
-				reset();
 			}
+			reset();
 		}
 	}
 
