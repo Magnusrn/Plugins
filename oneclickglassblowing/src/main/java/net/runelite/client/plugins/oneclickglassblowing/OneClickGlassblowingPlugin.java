@@ -146,6 +146,7 @@ public class OneClickGlassblowingPlugin extends Plugin {
             case 1:
                 event.setMenuEntry(openBank());
                 seaweedCount = 0;
+                timeout = 1;
                 if (!bankOpen())
                 {
                     return;
