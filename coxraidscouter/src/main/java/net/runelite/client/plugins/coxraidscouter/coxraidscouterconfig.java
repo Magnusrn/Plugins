@@ -97,6 +97,28 @@ public interface coxraidscouterconfig extends Config {
     }
 
     @ConfigItem(
+            position = 8,
+            keyName = "SendLayoutToCC",
+            name = "Send layout to cc",
+            description = "Sends the layout to cc when a raid is found."
+    )
+    default boolean SendLayoutToCC()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+        position = 8,
+        keyName = "RespondToLayoutRequest",
+        name = "Respond to layout request",
+        description = "Sends the layout to cc when someone types ?l in cc."
+    )
+    default boolean RespondToLayoutRequest()
+    {
+        return true;
+    }
+
+    @ConfigItem(
             position = 9,
             keyName = "debugScouting",
             name = "Debug Scouting",

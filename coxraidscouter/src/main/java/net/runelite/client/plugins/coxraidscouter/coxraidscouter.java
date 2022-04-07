@@ -69,6 +69,7 @@ public class coxraidscouter extends Plugin
 	private boolean raidFound = false;
 	private boolean raidStarted = false;
 	private String raidLayout = null;
+	private String lastRooms = null;
 
 	@Override
 	protected void startUp() throws Exception {
@@ -333,8 +334,25 @@ public class coxraidscouter extends Plugin
 		StateHandler();
 	}
 
+	private void SendLayoutToCC(String layout)
+	{
+		VarClientStr var = VarClientStr.CHATBOX_TYPED_TEXT;
+		String text = "/" + layout;
+		client.setVar(var, text);
+		Executors.newSingleThreadExecutor().submit(this::pressEnter);
+	}
+
 	@Subscribe
 	public void onChatMessage(ChatMessage event) throws IOException {
+		if (event.getType() == ChatMessageType.FRIENDSCHAT
+			&& config.RespondToLayoutRequest()
+			&& Text.removeTags(event.getMessage()).equalsIgnoreCase("?l")
+			&& raidFound
+		)
+		{
+			SendLayoutToCC(raidLayout + " " + lastRooms);
+		}
+
 		if ((Text.removeTags((event.getMessage())).endsWith("start the raid without you. Sorry."))) //Restarts the plugin if someone starts the raid currently held
 		{
 			raidStarted = true;
@@ -351,6 +369,7 @@ public class coxraidscouter extends Plugin
 			{
 				roomsTrimmed.add(room.trim());
 			}
+			lastRooms = roomsTrimmed.toString();
 
 			if (roomsTrimmed.size()!=5) //returns if not 3c2p (or 4c1p but these are unscoutable)
 			{
@@ -458,6 +477,10 @@ public class coxraidscouter extends Plugin
 				{
 					if (room.equals(ovlRoom) && config.requireOverload()) //skip if require overload disabled
 					{
+						if (config.SendLayoutToCC())
+						{
+							SendLayoutToCC(raidLayout + " " + lastRooms);
+						}
 						if (config.Notify()) {
 							notifier.notify("Raid Found!");
 						}
