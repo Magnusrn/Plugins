@@ -104,7 +104,7 @@ public interface coxraidscouterconfig extends Config {
     )
     default boolean SendLayoutToCC()
     {
-        return true;
+        return false;
     }
 
     @ConfigItem(
