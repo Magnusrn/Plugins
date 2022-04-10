@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.oneclickkarambwans;
 
 import com.google.inject.Inject;
+import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.ClientTick;
@@ -10,21 +11,22 @@ import net.runelite.api.queries.NPCQuery;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import org.pf4j.Extension;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
 @Extension
 @PluginDescriptor(
         name = "One Click Karambwans",
-        description = "Computer aided gaming. Make sure you're wearing dramen staff and recent fairy ring is DKP. Untested with Barrel.",
+        description = "Set recent fairy ring to DKP. Supports Fish Barrel",
         tags = {"karambwans,one click,zanaris,fishing,oneclick"},
         enabledByDefault = false
 )
@@ -33,20 +35,19 @@ import java.util.Set;
 public class oneClickKarambwansPlugin extends Plugin {
 
     private final int FAIRY_RING_KARAMJA_ID = 29495;
-    private final int FAIRY_RING_ZANARIS_ID = 29560;
-    private final int BANK_ID = 26711;
-    private final int KARAMBWANJI_ID = 3150;
-    private final int KARAMBWAN_VESSEL_ID = 3159;
-    private final int RAW_KARAMBWAN_ID = 3142;
-    private final int FISH_BARREL_ID = 25584;
-    private final int FISHING_ANIMATION = 1193;
-    private final int FAIRY_RING_ANIMATION1 = 3265;
-    private final int FAIRY_RING_ANIMATION2 = 3266;
-    private final int FISHING_SPOT_ID = 4712;//might not be right
     private String state = "BARREL";
 
     @Inject
     private Client client;
+
+    @Inject
+    private oneClickKarambwansConfig config;
+
+    @Provides
+    oneClickKarambwansConfig provideConfig(ConfigManager configManager)
+    {
+        return configManager.getConfig(oneClickKarambwansConfig.class);
+    }
 
     @Override
     protected void startUp() throws Exception {
@@ -61,24 +62,22 @@ public class oneClickKarambwansPlugin extends Plugin {
     }
 
     @Subscribe
-    private void onClientTick(ClientTick event) {
-        String text;
-
-        if (this.client.getLocalPlayer() == null || this.client.getGameState() != GameState.LOGGED_IN) {
-            return;
-        } else {
-            text = "<col=00ff00>One Click Karambwans";
-        }
-        this.client.insertMenuItem(text, "", MenuAction.UNKNOWN
-                .getId(), 0, 0, 0, true);
-
+    private void onClientTick(ClientTick event)
+    {
+        if (this.client.getLocalPlayer() == null || this.client.getGameState() != GameState.LOGGED_IN) return;
+        String text = "<col=00ff00>One Click Karambwans";
+        client.insertMenuItem(text, "", MenuAction.UNKNOWN.getId(), 0, 0, 0, true);
+        //Ethan Vann the goat. Allows for left clicking anywhere when bank open instead of withdraw/deposit taking priority
+        client.setTempMenuEntry(Arrays.stream(client.getMenuEntries()).filter(x->x.getOption().equals(text)).findFirst().orElse(null));
     }
 
     private void handleClick(MenuOptionClicked event) {
+        int FAIRY_RING_ANIMATION1 = 3265;
+        int FAIRY_RING_ANIMATION2 = 3266;
         if ((client.getLocalPlayer().isMoving()
                 || client.getLocalPlayer().getPoseAnimation()
                 != client.getLocalPlayer().getIdlePoseAnimation()
-                || client.getLocalPlayer().getAnimation() == FISHING_ANIMATION
+                || client.getLocalPlayer().getAnimation() == AnimationID.FISHING_KARAMBWAN
                 || client.getLocalPlayer().getAnimation() == FAIRY_RING_ANIMATION1
                 || client.getLocalPlayer().getAnimation() == FAIRY_RING_ANIMATION2)
                 & !bankOpen()) {
@@ -88,7 +87,7 @@ public class oneClickKarambwansPlugin extends Plugin {
         }
         System.out.println("1");
 
-        if (getInventQuantity(KARAMBWANJI_ID) == 0 || getInventQuantity(KARAMBWAN_VESSEL_ID) == 0) {
+        if (getInventQuantity(ItemID.RAW_KARAMBWANJI) == 0 || getInventQuantity(ItemID.KARAMBWAN_VESSEL_3159) == 0) {
             System.out.println("Consume event because no karambwanji or vessel");
             event.consume();
             return;
@@ -97,21 +96,29 @@ public class oneClickKarambwansPlugin extends Plugin {
 
         if (getEmptySlots() == 0) {
             if (getGameObject(FAIRY_RING_KARAMJA_ID) != null) {
-                event.setMenuEntry(toZanarisMES());
+                event.setMenuEntry(teleToBankMES());
                 return;
-            } else if (!bankOpen()) {
+            }
+            if (!bankOpen())
+            {
                 event.setMenuEntry(bankMES());
                 return;
             }
         }
 
-        if (getInventQuantity(RAW_KARAMBWAN_ID) == 0 && getGameObject(FAIRY_RING_ZANARIS_ID) != null) {
-            event.setMenuEntry(toKaramjaMES());
+        if (getInventQuantity(ItemID.RAW_KARAMBWAN) == 0 && getGameObject(FAIRY_RING_KARAMJA_ID) == null)
+        {
+            if (useFairyRingMES()!=null)
+            {
+                event.setMenuEntry(useFairyRingMES());
+                return;
+            }
+            event.setMenuEntry(teleToFairyRingMES());
             return;
         }
 
         if (bankOpen()) {
-            Set<Integer> CLUE_BOTTLE_SET = Set.<Integer>of(ItemID.CLUE_BOTTLE_BEGINNER,ItemID.CLUE_BOTTLE_EASY,ItemID.CLUE_BOTTLE_MEDIUM,ItemID.CLUE_BOTTLE_HARD,ItemID.CLUE_BOTTLE_ELITE);
+            Set<Integer> CLUE_BOTTLE_SET = Set.of(ItemID.CLUE_BOTTLE_BEGINNER,ItemID.CLUE_BOTTLE_EASY,ItemID.CLUE_BOTTLE_MEDIUM,ItemID.CLUE_BOTTLE_HARD,ItemID.CLUE_BOTTLE_ELITE);
             for (int ClueBottle : CLUE_BOTTLE_SET)
             {
                 if (getInventoryItem(ClueBottle)!=null)
@@ -121,7 +128,7 @@ public class oneClickKarambwansPlugin extends Plugin {
                 }
             }
 
-            if (getInventoryItem(FISH_BARREL_ID) != null) {
+            if (getInventoryItem(ItemID.OPEN_FISH_BARREL) != null) {
                 switch (state) {
                     case "BARREL":
                         event.setMenuEntry(emptyBarrelMES());
@@ -153,38 +160,172 @@ public class oneClickKarambwansPlugin extends Plugin {
                 false);
     }
 
-    private MenuEntry toZanarisMES() {
-        return createMenuEntry(
-                29495,
-                MenuAction.GAME_OBJECT_FIRST_OPTION,
-                getLocation(getGameObject(FAIRY_RING_KARAMJA_ID)).getX(),
-                getLocation(getGameObject(FAIRY_RING_KARAMJA_ID)).getY(),
-                false);
+    private MenuEntry teleToBankMES() {
+        state = "BARREL"; //reset state before banking, workaround in case of spam clicking in bank messing up state before game has registered the container change
+
+        if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE) || client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE_13342))
+        {
+            return createMenuEntry(4, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
+        }
+        if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.CRAFTING_CAPE) || client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.CRAFTING_CAPET))
+        {
+            return createMenuEntry(3, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
+        }
+
+        WidgetItem craftingCape = getInventoryItem(ItemID.CRAFTING_CAPE);
+        WidgetItem craftingCapeT = getInventoryItem(ItemID.CRAFTING_CAPET);
+        if (craftingCape!=null)
+        {
+            return createMenuEntry(craftingCape.getId(), MenuAction.ITEM_THIRD_OPTION, craftingCape.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        }
+        if (craftingCapeT!=null)
+        {
+            return createMenuEntry(craftingCapeT.getId(), MenuAction.ITEM_THIRD_OPTION, craftingCapeT.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        }
+        if (config.bankAtSeers()) // not possible to check if seers tele is castable without spellbook being loaded
+        {
+            return createMenuEntry(2, MenuAction.CC_OP, -1, WidgetInfo.SPELL_CAMELOT_TELEPORT.getId(), false);
+        }
+        return createMenuEntry(FAIRY_RING_KARAMJA_ID, MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(getGameObject(FAIRY_RING_KARAMJA_ID)).getX(), getLocation(getGameObject(FAIRY_RING_KARAMJA_ID)).getY(), false);
     }
 
     private MenuEntry bankMES() {
-        return createMenuEntry(
-                26711,
-                MenuAction.GAME_OBJECT_FIRST_OPTION,
-                getLocation(getGameObject(BANK_ID)).getX(),
-                getLocation(getGameObject(BANK_ID)).getY(),
-                false);
+        GameObject craftingBank = getGameObject(14886);
+        if (craftingBank!=null)
+        {
+            return createMenuEntry(craftingBank.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(craftingBank).getX(), getLocation(craftingBank).getY(), false);
+        }
+        GameObject lunarBank = getGameObject(16700);
+        if (lunarBank!=null)
+        {
+            return createMenuEntry(lunarBank.getId(), MenuAction.GAME_OBJECT_SECOND_OPTION, getLocation(lunarBank).getX(), getLocation(lunarBank).getY(), false);
+        }
+        GameObject seersBank = getGameObject(25808);
+        if (seersBank!=null)
+        {
+            return createMenuEntry(seersBank.getId(), MenuAction.GAME_OBJECT_SECOND_OPTION, getLocation(seersBank).getX(), getLocation(seersBank).getY(), false);
+        }
+
+        GameObject zanarisBank = getGameObject(26711);
+        if (zanarisBank!=null)
+        {
+            return createMenuEntry(
+                    zanarisBank.getId(),
+                    MenuAction.GAME_OBJECT_FIRST_OPTION,
+                    getLocation(zanarisBank).getX(),
+                    getLocation(zanarisBank).getY(),
+                    false);
+        }
+        return null;
     }
 
-    private MenuEntry toKaramjaMES() {
-        return createMenuEntry(
-                29560,
-                MenuAction.GAME_OBJECT_THIRD_OPTION,
-                getLocation(getGameObject(FAIRY_RING_ZANARIS_ID)).getX(),
-                getLocation(getGameObject(FAIRY_RING_ZANARIS_ID)).getY(),
-                false);
+    private MenuEntry useFairyRingMES() {
+        GameObject fairyRing = null;
+        GameObject zanarisToKaramjaFR = getGameObject(29560);
+        GameObject legendsToKaramjaFr = getGameObject(29495);
+        GameObject pohFairyRing = getGameObject(29228);
+        GameObject pohFairyRingTreeCombo = getGameObject(29229);
+
+        if (pohFairyRingTreeCombo!=null) //if tree fairy ring combo is present, different opcode to other fairy rings.
+        {
+            return createMenuEntry(pohFairyRingTreeCombo.getId(), MenuAction.GAME_OBJECT_FOURTH_OPTION, getLocation(pohFairyRingTreeCombo).getX(),getLocation(pohFairyRingTreeCombo).getY(), false);
+        }
+
+        if (zanarisToKaramjaFR!=null)
+        {
+            fairyRing = zanarisToKaramjaFR;
+        }
+
+        if (legendsToKaramjaFr!=null)
+        {
+            fairyRing = legendsToKaramjaFr;
+        }
+
+        if (pohFairyRing!=null)
+        {
+            fairyRing = pohFairyRing;
+        }
+
+        if (fairyRing!=null)
+        {
+            return createMenuEntry(fairyRing.getId(), MenuAction.GAME_OBJECT_THIRD_OPTION, getLocation(fairyRing).getX(), getLocation(fairyRing).getY(), false);
+        }
+        return null;
+    }
+
+    private MenuEntry teleToFairyRingMES() {
+        if (config.pohFairyRing())
+        {
+            return teleToPOHMES();
+        }
+        if (useQuestCapeTeleMES()!=null)
+        {
+            return useQuestCapeTeleMES();
+        }
+        return null;
+    }
+
+
+
+    private MenuEntry useQuestCapeTeleMES() {
+        WidgetItem questCape = getInventoryItem(ItemID.QUEST_POINT_CAPE);
+        WidgetItem questCapeT = getInventoryItem(ItemID.QUEST_POINT_CAPE_T);
+
+        if (questCapeT!=null)
+        {
+            return createMenuEntry(questCapeT.getId(), MenuAction.ITEM_THIRD_OPTION, questCapeT.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        }
+        if (questCape!=null)
+        {
+            return createMenuEntry(questCape.getId(), MenuAction.ITEM_THIRD_OPTION, questCape.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        }
+
+        if (client.getItemContainer(InventoryID.EQUIPMENT)!=null
+                && (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.QUEST_POINT_CAPE)
+                || (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.QUEST_POINT_CAPE_T))))
+        {
+            return createMenuEntry(3, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
+        }
+        return null;
+    }
+
+
+    private MenuEntry teleToPOHMES() {
+        WidgetItem tab = getInventoryItem(ItemID.TELEPORT_TO_HOUSE);
+        WidgetItem conCape = getInventoryItem(ItemID.CONSTRUCT_CAPE);
+        WidgetItem conCapeT = getInventoryItem(ItemID.CONSTRUCT_CAPET);
+
+        if (conCape!=null)
+        {
+            return createMenuEntry(conCape.getId(), MenuAction.ITEM_FOURTH_OPTION, conCape.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        }
+        if (conCapeT!=null)
+        {
+            return createMenuEntry(conCapeT.getId(), MenuAction.ITEM_FOURTH_OPTION, conCapeT.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        }
+        if (tab!=null)
+        {
+            return createMenuEntry(tab.getId(), MenuAction.ITEM_FIRST_OPTION, tab.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        }
+        if (client.getItemContainer(InventoryID.EQUIPMENT)!=null)
+        {
+            if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE) || client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE_13342))
+            {
+                return createMenuEntry(5, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
+            }
+            if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.CONSTRUCT_CAPE) || client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.CONSTRUCT_CAPET))
+            {
+                return createMenuEntry( 4, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
+            }
+        }
+        return createMenuEntry(1, MenuAction.CC_OP, -1, WidgetInfo.SPELL_TELEPORT_TO_HOUSE.getId(), false);
     }
 
     private MenuEntry depositKarambwansMES() {
         return createMenuEntry(
                 8,
                 MenuAction.CC_OP_LOW_PRIORITY,
-                getInventoryItem(RAW_KARAMBWAN_ID).getIndex(),
+                getInventoryItem(ItemID.RAW_KARAMBWAN).getIndex(),
                 983043,
                 false);
     }
@@ -202,7 +343,7 @@ public class oneClickKarambwansPlugin extends Plugin {
         return createMenuEntry(
                 9,
                 MenuAction.CC_OP_LOW_PRIORITY,
-                getInventoryItem(FISH_BARREL_ID).getIndex(),
+                getInventoryItem(ItemID.OPEN_FISH_BARREL).getIndex(),
                 983043, false);
     }
 
@@ -280,7 +421,7 @@ public class oneClickKarambwansPlugin extends Plugin {
     private NPC getFishingSpot()
     {
         return new NPCQuery()
-                .idEquals(FISHING_SPOT_ID)
+                .idEquals(NpcID.FISHING_SPOT_4712)
                 .result(client)
                 .nearestTo(client.getLocalPlayer());
     }
