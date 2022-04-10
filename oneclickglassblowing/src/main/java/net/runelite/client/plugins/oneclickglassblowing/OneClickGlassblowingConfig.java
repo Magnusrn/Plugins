@@ -28,6 +28,20 @@ public interface OneClickGlassblowingConfig extends Config {
     }
 
     @ConfigItem(
+            position = 1,
+            keyName = "superglassMakeMethod",
+            name = "Superglass Make Method",
+            description = "Choose Superglass Make Method",
+            hidden = true,
+            unhide = "mode",
+            unhideValue = "SUPERGLASS_MAKE"
+    )
+    default Types.SuperGlassMakeMethod superglassMakeMethod(){
+        return Types.SuperGlassMakeMethod.THREE_EIGHTEEN;
+    }
+
+
+    @ConfigItem(
             position = 2,
             keyName = "bankType",
             name = "Bank Type",

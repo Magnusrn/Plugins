@@ -100,7 +100,7 @@ public class OneClickGlassblowingPlugin extends Plugin {
     }
 
     private void blowGlassHandler(MenuOptionClicked event){
-        System.out.println("glassblowingStage = " + glassblowingStage);
+        System.out.println("glassblowingStage = " + glassblowingStage + " timeout = " + timeout);
         switch (glassblowingStage)
         {
             case 1:
@@ -133,6 +133,7 @@ public class OneClickGlassblowingPlugin extends Plugin {
                     return;
                 }
                 event.setMenuEntry(openBank());
+                timeout = 1;
                 glassblowingStage = 1;
         }
     }
@@ -157,9 +158,17 @@ public class OneClickGlassblowingPlugin extends Plugin {
                 superglassMakeStage = 3;
                 return;
             case 3:
-                if (withdrawOneSeaweed()==null) return;
-                if (seaweedCount<3)
+                if ((config.superglassMakeMethod()==Types.SuperGlassMakeMethod.THREE_EIGHTEEN || config.superglassMakeMethod()==Types.SuperGlassMakeMethod.TWO_TWELVE)
+                        && withdrawOneSeaweed()==null) return;
+                if (config.superglassMakeMethod()==Types.SuperGlassMakeMethod.THIRTEEN_THIRTEEN && withdrawXsodaAshOrSeaweed()==null) return;
+                if (seaweedCount<config.superglassMakeMethod().seaweedCount)
                 {
+                    if (config.superglassMakeMethod()==Types.SuperGlassMakeMethod.THIRTEEN_THIRTEEN)
+                    {
+                        event.setMenuEntry(withdrawXsodaAshOrSeaweed());
+                        seaweedCount++;
+                        return;
+                    }
                     event.setMenuEntry(withdrawOneSeaweed());
                     seaweedCount++;
                     return;
@@ -189,6 +198,28 @@ public class OneClickGlassblowingPlugin extends Plugin {
                 getBankIndex(ItemID.GIANT_SEAWEED),
                 786445,
                 true);
+    }
+
+    private MenuEntry withdrawXsodaAshOrSeaweed() {
+        if (getBankIndex(ItemID.SODA_ASH)!=-1)
+        {
+            return createMenuEntry(
+                    5,
+                    MenuAction.CC_OP,
+                    getBankIndex(ItemID.SODA_ASH),
+                    786445,
+                    true);
+        }
+        if (getBankIndex(ItemID.SEAWEED)!=-1)
+        {
+            return createMenuEntry(
+                    5,
+                    MenuAction.CC_OP,
+                    getBankIndex(ItemID.SEAWEED),
+                    786445,
+                    true);
+        }
+        return null;
     }
 
     private MenuEntry withdrawXSand() {
@@ -264,22 +295,7 @@ public class OneClickGlassblowingPlugin extends Plugin {
     }
 
     private MenuEntry selectGlassblowingItem(){
-        int MENU_ID = 0;
-        if(config.product()== Types.Product.LIGHT_ORB)
-        {
-            MENU_ID = 17694741;
-        }
-        if(config.product()== Types.Product.LANTERN_LENS)
-        {
-            MENU_ID = 17694740;
-        }
-
-        if(config.product()== Types.Product.UNPOWERED_ORB)
-        {
-            MENU_ID = 17694739;
-        }
-        if (MENU_ID==0) return null;
-
+        int MENU_ID = config.product().ID;
         return createMenuEntry(
                 1,
                 MenuAction.CC_OP,
