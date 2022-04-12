@@ -37,4 +37,24 @@ public interface oneClickZMIConfig extends Config{
     default boolean drinkStamina() {
         return true;
     }
+
+    @ConfigItem(
+            position = 3,
+            keyName = "consumeclicks",
+            name = "Consume Clicks when running",
+            description = "Consume Clicks"
+    )
+    default boolean consumeClicks() {
+        return false;
+    }
+
+    @ConfigItem(
+            position = 4,
+            keyName = "debug",
+            name = "Debug",
+            description = "Debug"
+    )
+    default boolean debug() {
+        return false;
+    }
 }

@@ -8,9 +8,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.events.ClientTick;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.*;
 import net.runelite.api.queries.BankItemQuery;
 import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.api.queries.NPCQuery;
@@ -23,8 +21,6 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import org.pf4j.Extension;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -40,161 +36,152 @@ import java.util.List;
 @Slf4j
 public class oneClickZMIPlugin extends Plugin
 {
-
-	private final int STAMINA_DOSE = 12631;
-	private final int MEDIUM_POUCH = 5510;
-	private final int MEDIUM_POUCH_DECAYED = 5511;
-	private final int LARGE_POUCH = 5512;
-	private final int LARGE_POUCH_DECAYED = 5513;
-	private final int GIANT_POUCH = 5514;
-	private final int GIANT_POUCH_DECAYED = 5515;
-	private final int LADDER = 29635;
 	@Inject
 	private Client client;
+
 	@Inject
 	private oneClickZMIConfig config;
+
 	private int timeout = 0;
-	private int ESSENCE;
 	private String state = "BANK";
-	private String pouch_repair_state = "CAST_NPC_CONTACT";
-	private String eat_food_state = "WITHDRAW";
-	private String drink_stam_state = "WITHDRAW";
+	private int cachedXP = 0;
+	private boolean craftedRunes = false;
 
 	@Provides
-	oneClickZMIConfig getConfig(ConfigManager configManager)
-	{
+	oneClickZMIConfig getConfig(ConfigManager configManager) {
 		return configManager.getConfig(oneClickZMIConfig.class);
 	}
 
 	@Override
-	protected void startUp() throws Exception
-	{
+	protected void startUp() throws Exception {
 		reset();
 	}
 
-	private void reset()
-	{
+	private void reset() {
 		timeout = 0;
 		state = "BANK";
-		pouch_repair_state = "CAST_NPC_CONTACT";
-		eat_food_state = "WITHDRAW";
-		drink_stam_state = "WITHDRAW";
+		craftedRunes = false;
+		cachedXP = 0;
 	}
 
 	@Subscribe
-	public void onGameTick(GameTick tick)
-	{
+	public void onGameTick(GameTick tick) {
 		if (timeout > 0)
 		{
 			timeout--;
 		}
+		if (cachedXP == 0)
+		{
+			cachedXP = client.getSkillExperience(Skill.RUNECRAFT);
+		}
+		System.out.println(state);
 	}
 
 	@Subscribe
-	public void onMenuOptionClicked(MenuOptionClicked event) throws InterruptedException
+	protected void onStatChanged(StatChanged event) {
+		//on login this method triggers going from 0 to players current XP. all xp drops(even on leagues etc) should be below 50k and this method requires 77 rc.
+		if (event.getSkill() == Skill.RUNECRAFT && event.getXp()- cachedXP <1000)
+		{
+			craftedRunes = true;
+			cachedXP = client.getSkillExperience(Skill.RUNECRAFT);
+		}
+	}
+
+	@Subscribe
+	public void onChatMessage(ChatMessage event)
 	{
+		if (event.getMessage().contains("There are no essences in this pouch."))
+		{
+			//not perfect but it works, prevents spam crafting if pouch is empty due to broken pouches previously
+			craftedRunes = true ;
+		}
+	}
+
+	@Subscribe
+	public void onMenuOptionClicked(MenuOptionClicked event) throws InterruptedException {
 		if (event.getMenuOption().equals("<col=00ff00>One Click ZMI"))
 			handleClick(event);
 	}
 
 	@Subscribe
-	private void onClientTick(ClientTick event)
-	{
-		String text;
-
-		if (this.client.getLocalPlayer() == null || this.client.getGameState() != GameState.LOGGED_IN)
-			return;
-
-		else if (client.getLocalPlayer().getAnimation() == 791)
-		{
-			text = "<col=00ff00>Runecrafting";
-		}
-		else
-		{
-			text = "<col=00ff00>One Click ZMI";
-		}
-		this.client.insertMenuItem(text, "", MenuAction.UNKNOWN
-				.getId(), 0, 0, 0, true);
+	private void onClientTick(ClientTick event) {
+		if (this.client.getLocalPlayer() == null || this.client.getGameState() != GameState.LOGGED_IN) return;
+		String text = "<col=00ff00>One Click ZMI";
+		client.insertMenuItem(text, "", MenuAction.UNKNOWN.getId(), 0, 0, 0, true);
 		//Ethan Vann the goat. Allows for left clicking anywhere when bank open instead of withdraw/deposit taking priority
 		client.setTempMenuEntry(Arrays.stream(client.getMenuEntries()).filter(x->x.getOption().equals(text)).findFirst().orElse(null));
 	}
 
-	private void handleClick(MenuOptionClicked event)
-	{
-
-		if (timeout != 0)
+	private void handleClick(MenuOptionClicked event) {
+		if (config.debug())
 		{
-			log.debug("Consuming event because timeout is not 0");
-			event.consume();
-			return;
-
+			client.addChatMessage(ChatMessageType.GAMEMESSAGE,"",state,"");
 		}
-		if ((client.getLocalPlayer().isMoving()
+		if (config.consumeClicks() && (client.getLocalPlayer().isMoving()
 				|| client.getLocalPlayer().getPoseAnimation()
 				!= client.getLocalPlayer().getIdlePoseAnimation()
 				|| client.getLocalPlayer().getAnimation() == 791)
-				& !isBankOpen()) //for some reason it consumes the first click at the bank?
+				& !bankOpen()) //for some reason it consumes the first click at the bank?
 		{
 			log.debug("Consume event because not idle?");
 			event.consume();
 			return;
 		}
+		if (AboveLadder())
+		{
+			event.setMenuEntry(clickLadder());
+			return;
+		}
+		if (timeout != 0)
+		{
+			log.debug("Consuming event because timeout is not 0");
+			event.consume();
+			return;
+		}
 
-		if (handlePouchRepair()!=null &! isBankOpen())
+		if (handlePouchRepair()!=null && !bankOpen() && isNearAltar())
 		{
 			event.setMenuEntry(handlePouchRepair());
 			return;
 		}
 
 		if ((client.getEnergy() < 80 || client.getVar(Varbits.RUN_SLOWED_DEPLETION_ACTIVE) == 0) //if run energy below threshold or stamina not active
-				&& config.drinkStamina() && isBankOpen()
-				&& (getEmptySlots() > 0 || getInventoryItem(STAMINA_DOSE) != null))
+				&& config.drinkStamina() && bankOpen()
+				&& (getEmptySlots() > 0 || getInventoryItem(ItemID.STAMINA_POTION1) != null))
 		{
-			log.debug("drink_stam_state = " + drink_stam_state);
-			switch (drink_stam_state)
+			event.setMenuEntry(withdrawStamina());
+			timeout += 1; //needs to wait a tick for the potion to withdraw from bank.
+			if (getInventoryItem(ItemID.STAMINA_POTION1) != null)
 			{
-				case "WITHDRAW":
-					event.setMenuEntry(withdrawStamina());
-					drink_stam_state = "DRINK";
-					timeout += 1; //needs to wait a tick for the potion to withdraw from bank.
-					break;
-
-				case "DRINK":
-					if (getInventoryItem(STAMINA_DOSE) != null)
-					{
-						event.setMenuEntry(drinkStamina());
-					}
-
-					drink_stam_state = "WITHDRAW";
-					break;
+				event.setMenuEntry(drinkStamina());
 			}
 			return;
 		}
 
-		if (client.getRealSkillLevel(Skill.HITPOINTS) - client.getBoostedSkillLevel(Skill.HITPOINTS) > 25  && isBankOpen())
+		if (client.getRealSkillLevel(Skill.HITPOINTS) - client.getBoostedSkillLevel(Skill.HITPOINTS) > 25  && bankOpen())
 		{
-			log.debug("eat_food_state = " + eat_food_state);
-			switch (eat_food_state)
+			event.setMenuEntry(withdrawFood());
+			timeout += 1; //needs to wait a tick for the food to withdraw from bank.
+			if (getInventoryItem(config.foodID()) != null)
 			{
-				case "WITHDRAW":
-					event.setMenuEntry(withdrawFood());
-					eat_food_state = "EAT";
-					timeout += 1; //needs to wait a tick for the food to withdraw from bank.
-					break;
-
-				case "EAT":
-					if (getInventoryItem(config.foodID()) != null)
-					{
-						event.setMenuEntry(eatFood());
-					}
-
-					eat_food_state = "WITHDRAW";
-					break;
+				event.setMenuEntry(eatFood());
 			}
 			return;
 		}
 
-		log.debug("state = " + state);
+		if (getInventoryItem(ItemID.COLOSSAL_POUCH)!=null || getInventoryItem(ItemID.COLOSSAL_POUCH_26786) !=null)
+		{
+			colossalPouchHandler(event);
+			return;
+		}
+		smallerPouchHandler(event);
+	}
+
+	private boolean isNearAltar() {
+		return client.getLocalPlayer().getWorldLocation().distanceTo(getAltar().getWorldLocation())<5;
+	}
+
+	private void colossalPouchHandler(MenuOptionClicked event) {
 		switch (state)
 		{
 			case "BANK":
@@ -204,150 +191,214 @@ public class oneClickZMIPlugin extends Plugin
 					timeout += 1; //adds 1t timeout when clicking bank before movement detection kicks in
 					state = "DEPOSIT_ALL";
 				}
-				else
-				{
-					log.debug("Banker is null");
-				}
-				break;
-
+				return;
 			case "DEPOSIT_ALL":
-				if (!isBankOpen())
+				if (!bankOpen())
 				{
 					return;
 				}
 				event.setMenuEntry(depositAll());
-				state = "WITHDRAW_DAEYALT";
-				break;
+				state = "WITHDRAW_ESSENCE";
+				return;
+			case "WITHDRAW_ESSENCE":
+				event.setMenuEntry(withdrawEssence());
+				state = "FILL_POUCH";
+				return;
+			case "FILL_POUCH":
+				event.setMenuEntry(fillColossalPouch());
+				state = "WITHDRAW_ESSENCE_2";
+				return;
+			case "WITHDRAW_ESSENCE_2":
+				event.setMenuEntry(withdrawEssence());
+				state = "FILL_POUCH_2";
+				return;
+			case "FILL_POUCH_2":
+				event.setMenuEntry(fillColossalPouch());
+				state = "WITHDRAW_ESSENCE_3";
+				return;
+			case "WITHDRAW_ESSENCE_3":
+				event.setMenuEntry(withdrawEssence());
+				state = "CLICK_ALTAR";
+				return;
+			case "CLICK_ALTAR":
+				if (!craftedRunes)
+				{
+					event.setMenuEntry(getAltarMES());
+					timeout +=1;
+					return;
+				}
+				craftedRunes = false;
+				state = "EMPTY_COLOSSAL";
+			case "EMPTY_COLOSSAL":
+				event.setMenuEntry(emptyColossalPouch());
+				state = "CLICK_ALTAR_2";
+				return;
+			case "CLICK_ALTAR_2":
+				if (!craftedRunes)
+				{
+					event.setMenuEntry(getAltarMES());
+					timeout +=1;
+					return;
+				}
+				craftedRunes = false;
+				state = "EMPTY_COLOSSAL_2";
+			case "EMPTY_COLOSSAL_2":
+				event.setMenuEntry(emptyColossalPouch());
+				state = "CLICK_ALTAR_3";
+				return;
+			case "CLICK_ALTAR_3":
+				if (!craftedRunes)
+				{
+					event.setMenuEntry(getAltarMES());
+					timeout +=1;
+					return;
+				}
+				craftedRunes = false;
+				state = "EMPTY_COLOSSAL_3";
+			case "EMPTY_COLOSSAL_3":
+				event.setMenuEntry(emptyColossalPouch());
+				state = "CLICK_ALTAR_4";
+				return;
+			case "CLICK_ALTAR_4":
+				if (!craftedRunes)
+				{
+					event.setMenuEntry(getAltarMES());
+					timeout +=1;
+					return;
+				}
+				craftedRunes = false;
+				state = "TELEPORT";
+			case "TELEPORT":
+				event.setMenuEntry(castTeleport());
+				timeout += 5;
+				state = "BANK";
+		}
+	}
 
-			case "WITHDRAW_DAEYALT":
-				event.setMenuEntry(withdrawDaeyalt());
-				if (getInventoryItem(MEDIUM_POUCH) == null) //if no Medium pouch assumes no large, skips straight to clicking altar
+	private void smallerPouchHandler(MenuOptionClicked event) {
+		switch (state)
+		{
+			case "BANK":
+				if (getBanker() != null)
+				{
+					event.setMenuEntry(getBankMES());
+					timeout += 1; //adds 1t timeout when clicking bank before movement detection kicks in
+					state = "DEPOSIT_ALL";
+				}
+				return;
+			case "DEPOSIT_ALL":
+				if (!bankOpen())
+				{
+					return;
+				}
+				event.setMenuEntry(depositAll());
+				state = "WITHDRAW_ESSENCE";
+				return;
+			case "WITHDRAW_ESSENCE":
+				event.setMenuEntry(withdrawEssence());
+				if (getInventoryItem(ItemID.MEDIUM_POUCH) == null) //if no Medium pouch assumes no large, skips straight to clicking altar
 				{
 					state = "CLICK_ALTAR";
-					break;
+					return;
 				}
 				state = "FILL_MEDIUM";
-				break;
-
+				return;
 			case "FILL_MEDIUM":
 				event.setMenuEntry(fillMediumPouch());
-				if (getInventoryItem(LARGE_POUCH) == null)
+				if (getInventoryItem(ItemID.LARGE_POUCH) == null)
 				{
-					state = "WITHDRAW_DAEYALT_2";
-					break;
+					state = "WITHDRAW_ESSENCE_2";
+					return;
 				}
 				state = "FILL_LARGE";
-				break;
-
+				return;
 			case "FILL_LARGE":
 				event.setMenuEntry(fillLargePouch());
-				state = "WITHDRAW_DAEYALT_2";
-				break;
-
-			case "WITHDRAW_DAEYALT_2":
-				event.setMenuEntry(withdrawDaeyalt());
-				if (getInventoryItem(GIANT_POUCH) == null)
+				state = "WITHDRAW_ESSENCE_2";
+				return;
+			case "WITHDRAW_ESSENCE_2":
+				event.setMenuEntry(withdrawEssence());
+				if (getInventoryItem(ItemID.GIANT_POUCH) == null)
 				{
 					state = "CLICK_ALTAR";
-					break;
+					return;
 				}
 				state = "FILL_GIANT";
-				break;
-
+				return;
 			case "FILL_GIANT":
 				event.setMenuEntry(fillGiantPouch());
-				state = "WITHDRAW_DAEYALT_3";
-				break;
-
-			case "WITHDRAW_DAEYALT_3":
-				event.setMenuEntry(withdrawDaeyalt());
+				state = "WITHDRAW_ESSENCE_3";
+				return;
+			case "WITHDRAW_ESSENCE_3":
+				event.setMenuEntry(withdrawEssence());
 				state = "CLICK_ALTAR";
-				break;
-
+				return;
 			case "CLICK_ALTAR":
-				event.setMenuEntry(getAltarMES());
-				timeout += 4;
-				if (getInventoryItem(MEDIUM_POUCH) == null) //if no Medium pouch assumes no large, skips straight to teleport after first runecraft
+				if (!craftedRunes)
+				{
+					event.setMenuEntry(getAltarMES());
+					timeout +=1;
+					return;
+				}
+				if (getInventoryItem(ItemID.MEDIUM_POUCH) == null) //if no Medium pouch assumes no large, skips straight to teleport after first runecraft
 				{
 					state = "TELEPORT";
 					break;
 				}
 				state = "EMPTY_MEDIUM";
-				break;
-
 			case "EMPTY_MEDIUM":
 				event.setMenuEntry(emptyMedPouch());
-				if (getInventoryItem(LARGE_POUCH) == null)
+				craftedRunes = false;
+				if (getInventoryItem(ItemID.LARGE_POUCH) == null)
 				{
 					state = "CLICK_ALTAR_2";
-					break;
+					return;
 				}
 				state = "EMPTY_LARGE";
-				break;
-
+				return;
 			case "EMPTY_LARGE":
 				event.setMenuEntry(emptyLargePouch());
 				state = "CLICK_ALTAR_2";
-				break;
-
+				return;
 			case "CLICK_ALTAR_2":
-				event.setMenuEntry(getAltarMES());
-				timeout += 4;
-				if (getInventoryItem(GIANT_POUCH) == null)
+				if (!craftedRunes)
+				{
+					event.setMenuEntry(getAltarMES());
+					timeout +=1;
+					return;
+				}
+				craftedRunes = false;
+				if (getInventoryItem(ItemID.GIANT_POUCH) == null)
 				{
 					state = "TELEPORT";
 					break;
 				}
 				state = "EMPTY_GIANT";
-				break;
-
 			case "EMPTY_GIANT":
 				event.setMenuEntry(emptyGiantPouch());
 				state = "CLICK_ALTAR_3";
-				break;
-
+				return;
 			case "CLICK_ALTAR_3":
-				event.setMenuEntry(getAltarMES());
-				timeout += 4;
+				if (!craftedRunes)
+				{
+					event.setMenuEntry(getAltarMES());
+					timeout +=1;
+					return;
+				}
+				craftedRunes = false;
 				state = "TELEPORT";
-				break;
-
 			case "TELEPORT":
 				event.setMenuEntry(castTeleport());
 				timeout += 5;
-				state = "CLICK_LADDER";
-				break;
-
-			case "CLICK_LADDER":
-				event.setMenuEntry(clickLadder());
-				timeout += 4; //add timeout until character starts moving else you can spam click through states. timeout value is irrelevant just needs to be >0
 				state = "BANK";
-				break;
 		}
-
 	}
 
-	private boolean isBankOpen()
-	{
+	private boolean bankOpen() {
 		return client.getItemContainer(InventoryID.BANK) != null;
 	}
 
-	@Nullable
-	private Collection<WidgetItem> getInventoryItems()
-	{
-		Widget inventory = client.getWidget(WidgetInfo.INVENTORY);
-
-		if (inventory == null)
-		{
-			return null;
-		}
-
-		return new ArrayList<>(inventory.getWidgetItems());
-	}
-
-
-	private MenuEntry depositAll()
-	{
+	private MenuEntry depositAll() {
 		return createMenuEntry(
 				1,
 				MenuAction.CC_OP,
@@ -356,8 +407,7 @@ public class oneClickZMIPlugin extends Plugin
 				true);
 	}
 
-	private MenuEntry getBankMES()
-	{
+	private MenuEntry getBankMES() {
 		return createMenuEntry(
 				getBanker().getIndex(),
 				MenuAction.NPC_FIRST_OPTION,
@@ -366,16 +416,8 @@ public class oneClickZMIPlugin extends Plugin
 				false);
 	}
 
-	private MenuEntry withdrawDaeyalt()
-	{
-		if (config.essenceType() == EssenceType.Daeyalt)
-		{
-			ESSENCE = 24704;
-		}
-		else
-		{
-			ESSENCE = 7936;
-		}
+	private MenuEntry withdrawEssence() {
+		int ESSENCE = config.essenceType().getID();
 		return createMenuEntry(
 				7,
 				MenuAction.CC_OP_LOW_PRIORITY,
@@ -384,28 +426,25 @@ public class oneClickZMIPlugin extends Plugin
 				false);
 	}
 
-	private MenuEntry drinkStamina()
-	{
+	private MenuEntry drinkStamina() {
 		return createMenuEntry(
 				9,
 				MenuAction.CC_OP_LOW_PRIORITY,
-				getInventoryItem(STAMINA_DOSE).getIndex(),
+				getInventoryItem(ItemID.STAMINA_POTION1).getIndex(),
 				983043,
 				false);
 	}
 
-	private MenuEntry withdrawStamina()
-	{
+	private MenuEntry withdrawStamina() {
 		return createMenuEntry(
 				1,
 				MenuAction.CC_OP,
-				getBankIndex(STAMINA_DOSE),
+				getBankIndex(ItemID.STAMINA_POTION1),
 				786445,
 				false);
 	}
 
-	private MenuEntry withdrawFood()
-	{
+	private MenuEntry withdrawFood() {
 		return createMenuEntry(
 				1,
 				MenuAction.CC_OP,
@@ -414,8 +453,7 @@ public class oneClickZMIPlugin extends Plugin
 				false);
 	}
 
-	private MenuEntry eatFood()
-	{
+	private MenuEntry eatFood() {
 		return createMenuEntry(
 				9,
 				MenuAction.CC_OP_LOW_PRIORITY,
@@ -425,8 +463,7 @@ public class oneClickZMIPlugin extends Plugin
 	}
 
 
-	private int getBankIndex(int id)
-	{
+	private int getBankIndex(int id) {
 		WidgetItem bankItem = new BankItemQuery()
 				.idEquals(id)
 				.result(client)
@@ -434,68 +471,89 @@ public class oneClickZMIPlugin extends Plugin
 		return bankItem.getWidget().getIndex();
 	}
 
-	private MenuEntry fillMediumPouch()
-	{
+	private MenuEntry fillMediumPouch() {
 		return createMenuEntry(
 				9,
 				MenuAction.CC_OP,
-				getInventoryItem(MEDIUM_POUCH).getIndex(),
+				getInventoryItem(ItemID.MEDIUM_POUCH).getIndex(),
 				983043,
 				true);
 	}
 
-	private MenuEntry fillLargePouch()
-	{
+	private MenuEntry fillLargePouch() {
 		return createMenuEntry(
 				9,
 				MenuAction.CC_OP,
-				getInventoryItem(LARGE_POUCH).getIndex(),
+				getInventoryItem(ItemID.LARGE_POUCH).getIndex(),
 				983043,
 				true);
 	}
 
-	private MenuEntry fillGiantPouch()
-	{
+	private MenuEntry fillGiantPouch() {
 		return createMenuEntry(
 				9,
 				MenuAction.CC_OP_LOW_PRIORITY,
-				getInventoryItem(GIANT_POUCH).getIndex(),
+				getInventoryItem(ItemID.GIANT_POUCH).getIndex(),
 				983043,
 				false);
 	}
 
-	private MenuEntry emptyMedPouch()
-	{
+	private MenuEntry fillColossalPouch() {
+		WidgetItem pouch = getInventoryItem(ItemID.COLOSSAL_POUCH);
+		if (getInventoryItem(ItemID.COLOSSAL_POUCH_26786)!=null)
+		{
+			pouch = getInventoryItem(ItemID.COLOSSAL_POUCH_26786);
+		}
+		return createMenuEntry(
+				9,
+				MenuAction.CC_OP,
+				pouch.getIndex(),
+				983043,
+				true);
+	}
+
+	private MenuEntry emptyMedPouch() {
 		return createMenuEntry(
 				5510,
 				MenuAction.ITEM_SECOND_OPTION,
-				getInventoryItem(MEDIUM_POUCH).getIndex(),
+				getInventoryItem(ItemID.MEDIUM_POUCH).getIndex(),
 				9764864,
 				true);
 	}
 
-	private MenuEntry emptyLargePouch()
-	{
+	private MenuEntry emptyLargePouch() {
 		return createMenuEntry(
 				5512,
 				MenuAction.ITEM_SECOND_OPTION,
-				getInventoryItem(LARGE_POUCH).getIndex(),
+				getInventoryItem(ItemID.LARGE_POUCH).getIndex(),
 				9764864,
 				true);
 	}
 
-	private MenuEntry emptyGiantPouch()
-	{
+	private MenuEntry emptyGiantPouch() {
 		return createMenuEntry(
 				5514,
 				MenuAction.ITEM_SECOND_OPTION,
-				getInventoryItem(GIANT_POUCH).getIndex(),
+				getInventoryItem(ItemID.GIANT_POUCH).getIndex(),
 				9764864,
 				false);
 	}
 
-	private GameObject getNearestAltar()
-	{
+	private MenuEntry emptyColossalPouch() {
+		WidgetItem pouch = getInventoryItem(ItemID.COLOSSAL_POUCH);
+		if (getInventoryItem(ItemID.COLOSSAL_POUCH_26786)!=null)
+		{
+			pouch = getInventoryItem(ItemID.COLOSSAL_POUCH_26786);
+		}
+		return createMenuEntry(
+				pouch.getId(),
+				MenuAction.ITEM_SECOND_OPTION,
+				pouch.getIndex(),
+				9764864,
+				true);
+	}
+
+	private GameObject getAltar() {
 		return new GameObjectQuery()
 				.idEquals(29631)
 				.result(client)
@@ -503,9 +561,8 @@ public class oneClickZMIPlugin extends Plugin
 
 	}
 
-	private MenuEntry getAltarMES()
-	{
-		GameObject alter = getNearestAltar();
+	private MenuEntry getAltarMES() {
+		GameObject alter = getAltar();
 		return createMenuEntry(
 				29631,
 				MenuAction.GAME_OBJECT_FIRST_OPTION,
@@ -514,8 +571,7 @@ public class oneClickZMIPlugin extends Plugin
 				true);
 	}
 
-	private MenuEntry castTeleport()
-	{
+	private MenuEntry castTeleport() {
 		return createMenuEntry(
 				1,
 				MenuAction.CC_OP,
@@ -524,35 +580,39 @@ public class oneClickZMIPlugin extends Plugin
 				false);
 	}
 
-	private GameObject findLadder()
-	{
+	private boolean AboveLadder() {
+		return new GameObjectQuery()
+				.idEquals(411)
+				.result(client)
+				.nearestTo(client.getLocalPlayer()) != null;
+	}
+
+	private GameObject findLadder() {
+		int LADDER = 29635;
 		return new GameObjectQuery()
 				.idEquals(LADDER)
 				.result(client)
 				.nearestTo(client.getLocalPlayer());
 	}
 
-	private MenuEntry clickLadder()
-	{
+	private MenuEntry clickLadder() {
 		GameObject ladder = findLadder();
 		return createMenuEntry(
-				29635,
+				findLadder().getId(),
 				MenuAction.GAME_OBJECT_FIRST_OPTION,
 				getLocation(ladder).getX(),
 				getLocation(ladder).getY(),
 				true);
 	}
 
-	private NPC getBanker()
-	{
+	private NPC getBanker() {
 		return new NPCQuery()
 				.idEquals(8132)
 				.result(client)
 				.nearestTo(client.getLocalPlayer());
 	}
 
-	private MenuEntry castNpcContact()
-	{
+	private MenuEntry castNpcContact() {
 		return createMenuEntry(
 				2,
 				MenuAction.CC_OP,
@@ -591,8 +651,7 @@ public class oneClickZMIPlugin extends Plugin
 	}
 
 
-	private Point getLocation(TileObject tileObject)
-	{
+	private Point getLocation(TileObject tileObject) {
 		if (tileObject == null)
 		{
 			return new Point(0, 0);
@@ -602,8 +661,7 @@ public class oneClickZMIPlugin extends Plugin
 		return new Point(tileObject.getLocalLocation().getSceneX(), tileObject.getLocalLocation().getSceneY());
 	}
 
-	private WidgetItem getInventoryItem(int id)
-	{
+	private WidgetItem getInventoryItem(int id) {
 		Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
 		if (inventoryWidget != null)
 		{
@@ -619,8 +677,7 @@ public class oneClickZMIPlugin extends Plugin
 		return null;
 	}
 
-	private int getEmptySlots()
-	{
+	private int getEmptySlots() {
 		Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
 		if (inventoryWidget != null)
 		{
@@ -632,17 +689,8 @@ public class oneClickZMIPlugin extends Plugin
 		}
 	}
 
-	public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick)
-	{
+	public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
 		return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
 				.setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
 	}
 }
-
-/*
-
-TODO
-doesnt work if in a bank tab for some reason. maybe unavoidable. not a problem really.
-bank withdraw quantity must be set to one, kinda aids, not sure if theres'a  way to get the type (menu index) of an item
-for some reason can still withdraw items from bank?
-*/
