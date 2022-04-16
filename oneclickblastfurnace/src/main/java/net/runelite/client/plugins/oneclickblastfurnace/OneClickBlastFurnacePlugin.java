@@ -150,7 +150,7 @@ public class OneClickBlastFurnacePlugin extends Plugin{
                 timeout += 1;
                 return;
             }
-            else if (((client.getEnergy() < 80 && !iswearingRingOfEndurance()) || client.getEnergy() < 60) || client.getVar(Varbits.RUN_SLOWED_DEPLETION_ACTIVE) == 0) {
+            else if (((client.getEnergy() < 80 && !iswearingRingOfEndurance()) || client.getEnergy() < 60) || client.getVarbitValue(Varbits.RUN_SLOWED_DEPLETION_ACTIVE) == 0) {
                 if (getEmptySlots() < 1)
                 {
                     event.setMenuEntry(depositAllMES());
@@ -175,7 +175,7 @@ public class OneClickBlastFurnacePlugin extends Plugin{
                 fillCoalBagCooldown += 5;
                 return;
             }
-            int coalDeposited = client.getVarbitValue(Varbits.BLAST_FURNACE_COAL.getId());
+            int coalDeposited = client.getVarbitValue(Varbits.BLAST_FURNACE_COAL);
             OneClickBlastFurnaceTypes Bar = config.barType();
             if (Bar.getCoal() * 28 > coalDeposited && withdrawCoalCooldown == 0) { //this is overkill but can afford to be without any negatives afaik. Need surplus always to prevent iron bars accidentally. Covers with and without coal bag.
                 event.setMenuEntry(withdrawCoalMES());
