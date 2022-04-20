@@ -7,7 +7,6 @@ import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
-import net.runelite.api.kit.KitType;
 import net.runelite.api.queries.BankItemQuery;
 import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.api.widgets.Widget;
@@ -117,7 +116,7 @@ public class OneClickBlastFurnacePlugin extends Plugin{
 
     private void handleClick(MenuOptionClicked event) {
         if (timeout>0) { return;} //returns if waiting on stamina to withdraw
-        System.out.println("shouldWithdrawBars = " + shouldWithdrawBars);
+        //System.out.println("shouldWithdrawBars = " + shouldWithdrawBars);
         if (config.barType() == OneClickBlastFurnaceTypes.GOLD) {
             if (getEmptySlots() != 0 && getInventoryItem(OneClickBlastFurnaceTypes.GOLD.getOreID()) == null && equipIceMES() != null && isBesideBelt() && equipIceGlovesCooldown == 0) { //edge case - if stam is drunk there'll be empty slots
                 event.setMenuEntry(equipIceMES());
@@ -132,7 +131,11 @@ public class OneClickBlastFurnacePlugin extends Plugin{
             return;
         }
         if (bankOpen()) {
-            ImmutableList<Integer> StaminaIds = ImmutableList.of(12625, 12627, 12629, 12631);
+            ImmutableList<Integer> StaminaIds = ImmutableList.of(
+                    ItemID.STAMINA_POTION1,
+                    ItemID.STAMINA_POTION2,
+                    ItemID.STAMINA_POTION3,
+                    ItemID.STAMINA_POTION4);
             for (Integer staminaID : StaminaIds) {
                 if (getInventoryItem(staminaID) != null) {
                     event.setMenuEntry(drinkStamMES(staminaID));
@@ -146,7 +149,6 @@ public class OneClickBlastFurnacePlugin extends Plugin{
                     return;
                 }
                 event.setMenuEntry(withdrawFullStaminaMES());
-                System.out.println("1");
                 timeout += 1;
                 return;
             }
@@ -157,7 +159,6 @@ public class OneClickBlastFurnacePlugin extends Plugin{
                     return;
                 }
                 event.setMenuEntry(withdrawStaminaMES());
-                System.out.println("2");
                 timeout+=1;
                 return;
             }
@@ -165,13 +166,11 @@ public class OneClickBlastFurnacePlugin extends Plugin{
             beltState = BeltState.DEPOSIT_ORE_OR_COAL; //reset belt state
             if (getInventoryItem(config.barType().getBarID()) != null && depositAllCooldown == 0) {
                 event.setMenuEntry(depositAllMES());
-                System.out.println("3");
                 depositAllCooldown += 5;
                 return;
             }
             if (!coalBagFull && fillCoalBagMES() != null && fillCoalBagCooldown == 0) {
                 event.setMenuEntry(fillCoalBagMES());
-                System.out.println("4");
                 fillCoalBagCooldown += 5;
                 return;
             }
@@ -180,13 +179,11 @@ public class OneClickBlastFurnacePlugin extends Plugin{
             if (Bar.getCoal() * 28 > coalDeposited && withdrawCoalCooldown == 0) { //this is overkill but can afford to be without any negatives afaik. Need surplus always to prevent iron bars accidentally. Covers with and without coal bag.
                 event.setMenuEntry(withdrawCoalMES());
                 withdrawCoalCooldown += 5;
-                System.out.println("5");
                 return;
             } else if (withdrawOreCooldown == 0 && withdrawCoalCooldown == 0) { //withdraw coal cooldown somehow needed, think it's due to leaving bank before shits loaded? idfk
                 event.setMenuEntry(withdrawOreMES());
                 withdrawOreCooldown += 5;
                 shouldWithdrawBars = true;
-                System.out.println("6");
                 return;
             }
             event.setMenuEntry(depositOreMES());
@@ -255,7 +252,7 @@ public class OneClickBlastFurnacePlugin extends Plugin{
         if (event.getItemContainer()==client.getItemContainer(InventoryID.INVENTORY))
         {
             if (getInventoryItem(config.barType().getBarID())!=null) {
-                shouldWithdrawBars =false;
+                shouldWithdrawBars = false;
             }
         }
     }
@@ -267,7 +264,7 @@ public class OneClickBlastFurnacePlugin extends Plugin{
 
     private MenuEntry equipGoldGlovesMES() {
         int gloveID = 776;
-        WidgetItem goldGloves = getInventoryItem(gloveID);
+        Widget goldGloves = getInventoryItem(gloveID);
         if (goldGloves != null) {
             return createMenuEntry(goldGloves.getId(), MenuAction.ITEM_SECOND_OPTION, goldGloves.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
@@ -276,7 +273,7 @@ public class OneClickBlastFurnacePlugin extends Plugin{
 
     private MenuEntry equipIceMES() {
         int gloveID = 1580;
-        WidgetItem iceGloves = getInventoryItem(gloveID);
+        Widget iceGloves = getInventoryItem(gloveID);
         if (iceGloves != null) {
             return createMenuEntry(iceGloves.getId(), MenuAction.ITEM_SECOND_OPTION, iceGloves.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
@@ -302,8 +299,8 @@ public class OneClickBlastFurnacePlugin extends Plugin{
     }
 
     private MenuEntry fillCoalBagMES() {
-        WidgetItem closedCoalBag = getInventoryItem(12019);
-        WidgetItem openCoalBag = getInventoryItem(24480);
+        Widget closedCoalBag = getInventoryItem(12019);
+        Widget openCoalBag = getInventoryItem(24480);
         coalBagFull = true;
         if (closedCoalBag!=null) {
             return createMenuEntry(9, MenuAction.CC_OP, closedCoalBag.getIndex(), WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId(), false);
@@ -315,8 +312,8 @@ public class OneClickBlastFurnacePlugin extends Plugin{
     }
 
     private MenuEntry emptyCoalBagMES() {
-        WidgetItem closedCoalBag = getInventoryItem(12019);
-        WidgetItem openCoalBag = getInventoryItem(24480);
+        Widget closedCoalBag = getInventoryItem(12019);
+        Widget openCoalBag = getInventoryItem(24480);
 
         coalBagFull = false;
         if (closedCoalBag!=null) {
@@ -349,7 +346,7 @@ public class OneClickBlastFurnacePlugin extends Plugin{
     }
 
     private MenuEntry drinkStamMES(int id) {
-        WidgetItem staminaDose = getInventoryItem(id);
+        Widget staminaDose = getInventoryItem(id);
         return createMenuEntry(9, MenuAction.CC_OP_LOW_PRIORITY, staminaDose.getIndex(), WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId(), false);
     }
 
@@ -384,23 +381,35 @@ public class OneClickBlastFurnacePlugin extends Plugin{
                 .nearestTo(client.getLocalPlayer());
     }
 
-    private WidgetItem getInventoryItem(int id) {
+    private Widget getInventoryItem(int id) {
         Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            Collection<WidgetItem> items = inventoryWidget.getWidgetItems();
-            for (WidgetItem item : items) {
-                if (item.getId() == id) {
-                    return item;
-                }
+        Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
+        if (inventoryWidget!=null && !inventoryWidget.isHidden())
+        {
+            return getWidgetItem(inventoryWidget,id);
+        }
+        if (bankInventoryWidget!=null && !bankInventoryWidget.isHidden())
+        {
+            return getWidgetItem(bankInventoryWidget,id);
+        }
+        return null;
+    }
+
+    private Widget getWidgetItem(Widget widget,int id) {
+        for (Widget item : widget.getDynamicChildren())
+        {
+            if (item.getItemId() == id)
+            {
+                return item;
             }
         }
         return null;
     }
 
     public int getEmptySlots() {
-        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            return 28 - inventoryWidget.getWidgetItems().size();
+        ItemContainer inventory = client.getItemContainer(InventoryID.INVENTORY);
+        if (inventory != null) {
+            return inventory.getItems().length;
         } else {
             return -1;
         }
@@ -424,5 +433,9 @@ public class OneClickBlastFurnacePlugin extends Plugin{
     public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
         return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
                 .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
+    }
+
+    private void printLineNumber() {
+        System.out.println("LINE - " + Thread.currentThread().getStackTrace()[2].getLineNumber());
     }
 }
