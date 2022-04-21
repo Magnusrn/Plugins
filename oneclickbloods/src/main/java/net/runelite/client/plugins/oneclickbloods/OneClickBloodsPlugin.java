@@ -20,6 +20,7 @@ import net.runelite.rs.api.RSClient;
 import org.pf4j.Extension;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 
@@ -177,9 +178,9 @@ public class OneClickBloodsPlugin extends Plugin {
         {
             if (getEmptySlots()>0)
             {
-                WidgetItem bloodEss= getInventoryItem(ItemID.BLOOD_ESSENCE);
+                Widget bloodEss= getInventoryItem(ItemID.BLOOD_ESSENCE);
                 if(bloodEss!=null) {
-                    WidgetItem activebloodEss = getInventoryItem(ItemID.BLOOD_ESSENCE_ACTIVE);
+                    Widget activebloodEss = getInventoryItem(ItemID.BLOOD_ESSENCE_ACTIVE);
                     if(activebloodEss==null){
                         Print("Activating Blood Essence");
                         event.setMenuEntry(activateBloodEssenceMES(bloodEss.getIndex()));
@@ -292,26 +293,6 @@ public class OneClickBloodsPlugin extends Plugin {
                 .nearestTo(client.getLocalPlayer());
     }
 
-    private GameObject getRockslide()
-    {
-        WorldPoint ROCKSLIDE_SW_POINT = new WorldPoint(1739,3852,0);
-        WorldPoint ROCKSLIDE_NE_POINT = new WorldPoint(1742,3855,0);
-        WorldArea ROCKSLIDE_AREA = new WorldArea(ROCKSLIDE_SW_POINT,ROCKSLIDE_NE_POINT);
-
-        ArrayList<GameObject> list = new GameObjectQuery()
-                .idEquals(11428)
-                .result(client)
-                .list;
-        for (GameObject item:list)
-        {
-            if (item.getWorldLocation().isInArea(ROCKSLIDE_AREA))
-            {
-                return (item);
-            }
-        }
-        return null;
-    }
-
     private MenuEntry runestoneToDarkAltarAreaShortcutMES(){
         return createMenuEntry(
                 RUNESTONE_TO_DARK_ALTAR_SHORTCUT_ID,
@@ -332,22 +313,12 @@ public class OneClickBloodsPlugin extends Plugin {
 
     private MenuEntry useChiselOnBlockMES() {
         return createMenuEntry(
-                DARK_ESSENCE_BLOCK_ID,
-                MenuAction.ITEM_USE_ON_WIDGET_ITEM,
+               0,
+                MenuAction.WIDGET_TARGET_ON_WIDGET,
                 getLastInventoryItem(DARK_ESSENCE_BLOCK_ID).getIndex(),
                 9764864,
                 false);
     }
-
-    private MenuEntry useChiselOnRockSlideMES() {
-        return createMenuEntry(
-                11428,
-                MenuAction.ITEM_USE_ON_GAME_OBJECT,
-                getRockslide().getSceneMinLocation().getX(),
-                getRockslide().getSceneMinLocation().getY(),
-                false);
-    }
-
     private MenuEntry runecraftMES() {
         return createMenuEntry(
                 BLOOD_ALTAR_ID,
@@ -409,36 +380,45 @@ public class OneClickBloodsPlugin extends Plugin {
         }
     }
 
-    private WidgetItem getInventoryItem(int id) {
+    private Widget getInventoryItem(int id) {
         Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            Collection<WidgetItem> items = inventoryWidget.getWidgetItems();
-            for (WidgetItem item : items) {
-                if (item.getId() == id) {
-                    return item;
-                }
+        Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
+        if (inventoryWidget!=null && !inventoryWidget.isHidden())
+        {
+            return getWidgetItem(inventoryWidget,id);
+        }
+        if (bankInventoryWidget!=null && !bankInventoryWidget.isHidden())
+        {
+            return getWidgetItem(bankInventoryWidget,id);
+        }
+        return null;
+    }
+
+    private Widget getWidgetItem(Widget widget,int id) {
+        for (Widget item : widget.getDynamicChildren())
+        {
+            if (item.getItemId() == id)
+            {
+                return item;
             }
         }
         return null;
     }
 
-    private WidgetItem getLastInventoryItem(int id) {
+    private Widget getLastInventoryItem(int id) {
         Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            Collection<WidgetItem> items = inventoryWidget.getWidgetItems();
-            int LastIndex = -1;
-            WidgetItem LastItem = null;
-            for (WidgetItem item : items) {
-                if (item.getId() == id) {
-                    if (item.getIndex()>LastIndex) {
-                        LastIndex = item.getIndex();
-                        LastItem = item;
-                    }
-                }
-            }
-            return LastItem;
+        if (inventoryWidget!=null && !inventoryWidget.isHidden())
+        {
+            return getLastWidgetItem(inventoryWidget,id);
         }
         return null;
+    }
+
+    private Widget getLastWidgetItem(Widget widget,int id) {
+        return Arrays.stream(widget.getDynamicChildren())
+                .filter(item -> item.getItemId()==id)
+                .reduce((first, second) -> second)
+                .orElse(null);
     }
 
     public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
