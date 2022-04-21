@@ -208,11 +208,11 @@ public class OneClickMortMyreFungusPlugin extends Plugin {
     }
 
     private MenuEntry sendToBankMES() {
-        return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, 1, WidgetInfo.DIALOG_OPTION_OPTION1.getId(), false);
+        return createMenuEntry(0, MenuAction.WIDGET_CONTINUE, 1, WidgetInfo.DIALOG_OPTION_OPTION1.getId(), false);
     }
 
     private MenuEntry clickContinueMES() {
-        return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, -1, 15138821, false);
+        return createMenuEntry(0, MenuAction.WIDGET_CONTINUE, -1, 15138821, false);
     }
 
     private GameObject getGameObject(int ID) {
