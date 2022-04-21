@@ -285,13 +285,17 @@ public class OneClickGlassblowingPlugin extends Plugin {
     }
 
     private MenuEntry usePipeOnGlass(){
-        int itemID = ItemID.GLASSBLOWING_PIPE;
-        WidgetItem moltenGlass = getInventoryItem(ItemID.MOLTEN_GLASS);
-        client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
-        client.setSelectedItemSlot(getInventoryItem(itemID).getIndex());
-        client.setSelectedItemID(itemID);
-        if (moltenGlass == null) return null;
-        return createMenuEntry(moltenGlass.getId(), MenuAction.WIDGET_USE_ON_ITEM, moltenGlass.getIndex(), 9764864, true);
+        Widget moltenGlass = getInventoryItem(ItemID.MOLTEN_GLASS);
+        Widget pipe = getInventoryItem(ItemID.GLASSBLOWING_PIPE);
+        if (pipe == null || moltenGlass == null) return null;
+        setSelectedInventoryItem(pipe);
+        return createMenuEntry(0, MenuAction.WIDGET_TARGET_ON_WIDGET, moltenGlass.getIndex(), 9764864, true);
+    }
+
+    private void setSelectedInventoryItem(Widget item) {
+        client.setSelectedSpellWidget(WidgetInfo.INVENTORY.getId());
+        client.setSelectedSpellChildIndex(item.getIndex());
+        client.setSelectedSpellItemId(item.getItemId());
     }
 
     private MenuEntry selectGlassblowingItem(){
@@ -313,14 +317,26 @@ public class OneClickGlassblowingPlugin extends Plugin {
         return bankItem.getWidget().getIndex();
     }
 
-    private WidgetItem getInventoryItem(int id) {
+    private Widget getInventoryItem(int id) {
         Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            Collection<WidgetItem> items = inventoryWidget.getWidgetItems();
-            for (WidgetItem item : items) {
-                if (item.getId() == id) {
-                    return item;
-                }
+        Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
+        if (inventoryWidget!=null && !inventoryWidget.isHidden())
+        {
+            return getWidgetItem(inventoryWidget,id);
+        }
+        if (bankInventoryWidget!=null && !bankInventoryWidget.isHidden())
+        {
+            return getWidgetItem(bankInventoryWidget,id);
+        }
+        return null;
+    }
+
+    private Widget getWidgetItem(Widget widget,int id) {
+        for (Widget item : widget.getDynamicChildren())
+        {
+            if (item.getItemId() == id)
+            {
+                return item;
             }
         }
         return null;

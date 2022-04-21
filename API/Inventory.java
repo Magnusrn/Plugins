@@ -52,7 +52,7 @@ public class Inventory {
 
     private void setSelectedInventoryItem(Widget item) {
         client.setSelectedSpellWidget(WidgetInfo.INVENTORY.getId());
-        client.setSelectedSpellChildIndex(item).getIndex());
-        client.setSelectedSpellItemId(item.getId());
+        client.setSelectedSpellChildIndex(item.getIndex());
+        client.setSelectedSpellItemId(item.getItemId()); //this might be different inside/outside bank? getID works sometimes idfk
     }
 }
