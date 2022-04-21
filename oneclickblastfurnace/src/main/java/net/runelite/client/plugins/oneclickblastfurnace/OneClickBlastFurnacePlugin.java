@@ -266,7 +266,7 @@ public class OneClickBlastFurnacePlugin extends Plugin{
         int gloveID = 776;
         Widget goldGloves = getInventoryItem(gloveID);
         if (goldGloves != null) {
-            return createMenuEntry(goldGloves.getId(), MenuAction.ITEM_SECOND_OPTION, goldGloves.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+            return createMenuEntry(3, MenuAction.CC_OP, goldGloves.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
         return null;
     }
@@ -275,7 +275,7 @@ public class OneClickBlastFurnacePlugin extends Plugin{
         int gloveID = 1580;
         Widget iceGloves = getInventoryItem(gloveID);
         if (iceGloves != null) {
-            return createMenuEntry(iceGloves.getId(), MenuAction.ITEM_SECOND_OPTION, iceGloves.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+            return createMenuEntry(3, MenuAction.CC_OP, iceGloves.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
         return null;
     }
@@ -303,10 +303,10 @@ public class OneClickBlastFurnacePlugin extends Plugin{
         Widget openCoalBag = getInventoryItem(24480);
         coalBagFull = true;
         if (closedCoalBag!=null) {
-            return createMenuEntry(9, MenuAction.CC_OP, closedCoalBag.getIndex(), WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId(), false);
+            return createMenuEntry(9, MenuAction.CC_OP_LOW_PRIORITY, closedCoalBag.getIndex(), WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId(), false);
         }
         if (openCoalBag != null) {
-            return createMenuEntry(9, MenuAction.CC_OP, openCoalBag.getIndex(), WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId(), false);
+            return createMenuEntry(9, MenuAction.CC_OP_LOW_PRIORITY, openCoalBag.getIndex(), WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId(), false);
         }
         return null;
     }
@@ -317,10 +317,10 @@ public class OneClickBlastFurnacePlugin extends Plugin{
 
         coalBagFull = false;
         if (closedCoalBag!=null) {
-            return createMenuEntry(closedCoalBag.getId(), MenuAction.ITEM_FOURTH_OPTION, closedCoalBag.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+            return createMenuEntry(6, MenuAction.CC_OP_LOW_PRIORITY, closedCoalBag.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
         if (openCoalBag != null) {
-            return createMenuEntry(openCoalBag.getId(), MenuAction.ITEM_FOURTH_OPTION, openCoalBag.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+            return createMenuEntry(6, MenuAction.CC_OP_LOW_PRIORITY, openCoalBag.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
         return null;
     }
