@@ -6,14 +6,12 @@ import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.ClientTick;
-import net.runelite.api.events.Menu;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.api.queries.PlayerQuery;
 import net.runelite.api.queries.WallObjectQuery;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -32,12 +30,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class OneClickAmethystPlugin extends Plugin
 {
-
     Set<Integer> GEMS = Set.of(1623,1621,1619,1617);
     Set<Integer> MINING_ANIMATION = Set.of(6752,6758,8344,4481,7282,8345);
     private boolean CHISELING = false;
-    private final int AMETHYST_ID = 21347;
-    int CHISEL_ID = 1755;
 
     @Inject
     private Client client;
@@ -50,7 +45,6 @@ public class OneClickAmethystPlugin extends Plugin
         if (event.getMenuOption().equals("<col=00ff00>One Click Amethyst"))
             handleClick(event);
     }
-
 
     @Provides
     OneClickAmethystConfig provideConfig(ConfigManager configManager)
@@ -69,7 +63,7 @@ public class OneClickAmethystPlugin extends Plugin
     }
 
     private void handleClick(MenuOptionClicked event) throws InterruptedException {
-        if (getInventoryItem(AMETHYST_ID)==null)
+        if (getInventoryItem(ItemID.AMETHYST)==null)
         {
             System.out.println("1");
             CHISELING=false;
@@ -127,7 +121,7 @@ public class OneClickAmethystPlugin extends Plugin
             return;
         }
 
-        if (getInventoryItem(CHISEL_ID)==null)
+        if (getInventoryItem(ItemID.CHISEL)==null)
         {
             event.setMenuEntry(bankMES());
             return;
@@ -178,7 +172,7 @@ public class OneClickAmethystPlugin extends Plugin
                 getLocation(customWallObject).getY(), true);
     }
 
-    private MenuEntry dropGemMES(WidgetItem gem){
+    private MenuEntry dropGemMES(Widget gem){
         return createMenuEntry(
                 gem.getId(),
                 MenuAction.ITEM_FIFTH_OPTION,
@@ -199,13 +193,13 @@ public class OneClickAmethystPlugin extends Plugin
 
     private MenuEntry useChiselOnAmethystMenuEntry()
     {
-        client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
-        client.setSelectedItemSlot(getInventoryItem(CHISEL_ID).getIndex());
-        client.setSelectedItemID(CHISEL_ID);
+        client.setSelectedSpellWidget(WidgetInfo.INVENTORY.getId());
+        client.setSelectedSpellChildIndex(getInventoryItem(ItemID.CHISEL).getIndex());
+        client.setSelectedSpellItemId(ItemID.CHISEL);
         return createMenuEntry(
-                21347,
-                MenuAction.ITEM_USE_ON_WIDGET_ITEM,
-                getInventoryItem(AMETHYST_ID).getIndex(),
+                0,
+                MenuAction.WIDGET_TARGET_ON_WIDGET,
+                getInventoryItem(ItemID.AMETHYST).getIndex(),
                 9764864,
                 true);
     }
@@ -251,22 +245,35 @@ public class OneClickAmethystPlugin extends Plugin
     }
 
     public int getEmptySlots() {
-        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            return 28 - inventoryWidget.getWidgetItems().size();
-        } else {
-            return -1;
+        if (client.getWidget(WidgetInfo.INVENTORY.getId())!=null
+                && client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren()!=null)
+        {
+            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren());
+            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
         }
+        return -1;
     }
 
-    private WidgetItem getInventoryItem(int id) {
+    private Widget getInventoryItem(int id) {
         Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            Collection<WidgetItem> items = inventoryWidget.getWidgetItems();
-            for (WidgetItem item : items) {
-                if (item.getId() == id) {
-                    return item;
-                }
+        Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
+        if (inventoryWidget!=null && !inventoryWidget.isHidden())
+        {
+            return getWidgetItem(inventoryWidget,id);
+        }
+        if (bankInventoryWidget!=null && !bankInventoryWidget.isHidden())
+        {
+            return getWidgetItem(bankInventoryWidget,id);
+        }
+        return null;
+    }
+
+    private Widget getWidgetItem(Widget widget,int id) {
+        for (Widget item : widget.getDynamicChildren())
+        {
+            if (item.getItemId() == id)
+            {
+                return item;
             }
         }
         return null;
