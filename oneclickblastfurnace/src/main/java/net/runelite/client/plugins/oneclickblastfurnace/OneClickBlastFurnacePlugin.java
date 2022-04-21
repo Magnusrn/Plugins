@@ -406,13 +406,14 @@ public class OneClickBlastFurnacePlugin extends Plugin{
         return null;
     }
 
-    public int getEmptySlots() {
-        ItemContainer inventory = client.getItemContainer(InventoryID.INVENTORY);
-        if (inventory != null) {
-            return inventory.getItems().length;
-        } else {
-            return -1;
+    public long getEmptySlots() {
+        if (client.getWidget(WidgetInfo.INVENTORY.getId())!=null
+                && client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren()!=null)
+        {
+            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren());
+            return inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
         }
+        return -1;
     }
 
     private boolean bankOpen() {
