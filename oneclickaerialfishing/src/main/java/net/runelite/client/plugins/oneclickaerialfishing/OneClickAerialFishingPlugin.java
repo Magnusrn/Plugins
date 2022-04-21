@@ -78,9 +78,9 @@ public class OneClickAerialFishingPlugin extends Plugin {
                     event.setMenuEntry(dropFishMenuEntry(getLastInventoryItem(fish)));
                     return;
                 }
-                client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
-                client.setSelectedItemSlot(getLastInventoryItem(ItemID.KNIFE).getIndex());
-                client.setSelectedItemID(ItemID.KNIFE);
+                client.setSelectedSpellWidget(WidgetInfo.INVENTORY.getId()); //idk why the naming but this works :s
+                client.setSelectedSpellChildIndex(getLastInventoryItem(ItemID.KNIFE).getIndex());
+                client.setSelectedSpellItemId(ItemID.KNIFE);
                 event.setMenuEntry(useKnifeOnFishMenuEntry(getLastInventoryItem(fish)));
                 return;
             }
