@@ -262,19 +262,17 @@ public class oneClickKarambwansPlugin extends Plugin {
         return null;
     }
 
-
-
     private MenuEntry useQuestCapeTeleMES() {
         Widget questCape = getInventoryItem(ItemID.QUEST_POINT_CAPE);
         Widget questCapeT = getInventoryItem(ItemID.QUEST_POINT_CAPE_T);
 
         if (questCapeT!=null)
         {
-            return createMenuEntry(questCapeT.getId(), MenuAction.ITEM_THIRD_OPTION, questCapeT.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+            return createMenuEntry(4, MenuAction.CC_OP, questCapeT.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
         if (questCape!=null)
         {
-            return createMenuEntry(questCape.getId(), MenuAction.ITEM_THIRD_OPTION, questCape.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+            return createMenuEntry(4, MenuAction.CC_OP, questCape.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
 
         if (client.getItemContainer(InventoryID.EQUIPMENT)!=null
@@ -294,15 +292,15 @@ public class oneClickKarambwansPlugin extends Plugin {
 
         if (conCape!=null)
         {
-            return createMenuEntry(conCape.getId(), MenuAction.ITEM_FOURTH_OPTION, conCape.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+            return createMenuEntry(6, MenuAction.CC_OP_LOW_PRIORITY, conCape.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
         if (conCapeT!=null)
         {
-            return createMenuEntry(conCapeT.getId(), MenuAction.ITEM_FOURTH_OPTION, conCapeT.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+            return createMenuEntry(6, MenuAction.CC_OP_LOW_PRIORITY, conCapeT.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
         if (tab!=null)
         {
-            return createMenuEntry(tab.getId(), MenuAction.ITEM_FIRST_OPTION, tab.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+            return createMenuEntry(2, MenuAction.CC_OP, tab.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
         if (client.getItemContainer(InventoryID.EQUIPMENT)!=null)
         {
