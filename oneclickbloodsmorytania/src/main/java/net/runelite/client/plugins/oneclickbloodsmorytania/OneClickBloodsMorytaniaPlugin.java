@@ -454,7 +454,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     }
 
     private MenuEntry emptyPouchMES(Widget pouch) {
-        return createMenuEntry(pouch.getId(), MenuAction.ITEM_SECOND_OPTION, pouch.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+        return createMenuEntry(3, MenuAction.CC_OP, pouch.getIndex(), WidgetInfo.INVENTORY.getId(), false);
     }
 
     private MenuEntry teleToBankMES() {
@@ -602,7 +602,10 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                 .idEquals(ID)
                 .result(client)
                 .first();
-        return bankItem.getIndex();
+        if (bankItem != null) {
+            return bankItem.getWidget().getIndex();
+        }
+        return -1;
     }
 
     private GameObject getGameObject(int ID) {
