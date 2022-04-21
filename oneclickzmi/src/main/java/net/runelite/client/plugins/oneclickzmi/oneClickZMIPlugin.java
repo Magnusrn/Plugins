@@ -624,22 +624,22 @@ public class oneClickZMIPlugin extends Plugin
 	private MenuEntry handlePouchRepair() {
 		if (client.getWidget(231,6)!=null && client.getWidget(231, 6).getText().equals("What do you want? Can't you see I'm busy?"))
 		{
-			return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, -1, 15138821, false);
+			return createMenuEntry(0, MenuAction.WIDGET_CONTINUE, -1, 15138821, false);
 		}
 		//if player doesn't have abyssal pouch in bank
 		if (client.getWidget(219,1)!=null && client.getWidget(219,1).getChild(2)!=null && client.getWidget(219,1).getChild(2).getText().equals("Can you repair my pouches?"))
 		{
-			return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, 2, WidgetInfo.DIALOG_OPTION_OPTION1.getId(), false);
+			return createMenuEntry(0, MenuAction.WIDGET_CONTINUE, 2, WidgetInfo.DIALOG_OPTION_OPTION1.getId(), false);
 		}
 		//if player has abyssal pouch in bank
 		if (client.getWidget(219,1)!=null && client.getWidget(219,1).getChild(1)!=null && client.getWidget(219,1).getChild(1).getText().equals("Can you repair my pouches?"))
 		{
-			return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, 1, WidgetInfo.DIALOG_OPTION_OPTION1.getId(), false);
+			return createMenuEntry(0, MenuAction.WIDGET_CONTINUE, 1, WidgetInfo.DIALOG_OPTION_OPTION1.getId(), false);
 		}
 
 		if (client.getWidget(217,6)!=null && client.getWidget(217,6).getText().equals("Can you repair my pouches?"))
 		{
-			return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, -1, 14221317, false);
+			return createMenuEntry(0, MenuAction.WIDGET_CONTINUE, -1, 14221317, false);
 		}
 
 		List<Integer> brokenPouches = Arrays.asList(ItemID.MEDIUM_POUCH_5511,ItemID.LARGE_POUCH_5513,ItemID.GIANT_POUCH_5515,ItemID.COLOSSAL_POUCH_26786);

@@ -110,11 +110,11 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     }
     private void handleClick(MenuOptionClicked event) //billion if statements but unsure of alternative method, can't assign menuentries until visible due to queries
     {
-        WidgetItem smallPouch = getInventoryItem(ItemID.SMALL_POUCH);
-        WidgetItem mediumPouch = getInventoryItem(ItemID.MEDIUM_POUCH);
-        WidgetItem largePouch = getInventoryItem(ItemID.LARGE_POUCH);
-        WidgetItem giantPouch = getInventoryItem(ItemID.GIANT_POUCH);
-        WidgetItem colossalPouch = getInventoryItem(ItemID.COLOSSAL_POUCH);
+        Widget smallPouch = getInventoryItem(ItemID.SMALL_POUCH);
+        Widget mediumPouch = getInventoryItem(ItemID.MEDIUM_POUCH);
+        Widget largePouch = getInventoryItem(ItemID.LARGE_POUCH);
+        Widget giantPouch = getInventoryItem(ItemID.GIANT_POUCH);
+        Widget colossalPouch = getInventoryItem(ItemID.COLOSSAL_POUCH);
 
         if (handlePouchRepair()!=null)
         {
@@ -333,22 +333,22 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     private MenuEntry handlePouchRepair() {
         if (client.getWidget(231,6)!=null && client.getWidget(231, 6).getText().equals("What do you want? Can't you see I'm busy?"))
         {
-            return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, -1, 15138821, false);
+            return createMenuEntry(0, MenuAction.WIDGET_CONTINUE, -1, 15138821, false);
         }
         //if player doesn't have abyssal pouch in bank
         if (client.getWidget(219,1)!=null && client.getWidget(219,1).getChild(2)!=null && client.getWidget(219,1).getChild(2).getText().equals("Can you repair my pouches?"))
         {
-            return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, 2, WidgetInfo.DIALOG_OPTION_OPTION1.getId(), false);
+            return createMenuEntry(0, MenuAction.WIDGET_CONTINUE, 2, WidgetInfo.DIALOG_OPTION_OPTION1.getId(), false);
         }
         //if player has abyssal pouch in bank
         if (client.getWidget(219,1)!=null && client.getWidget(219,1).getChild(1)!=null && client.getWidget(219,1).getChild(1).getText().equals("Can you repair my pouches?"))
         {
-            return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, 1, WidgetInfo.DIALOG_OPTION_OPTION1.getId(), false);
+            return createMenuEntry(0, MenuAction.WIDGET_CONTINUE, 1, WidgetInfo.DIALOG_OPTION_OPTION1.getId(), false);
         }
 
         if (client.getWidget(217,6)!=null && client.getWidget(217,6).getText().equals("Can you repair my pouches?"))
         {
-            return createMenuEntry(0, MenuAction.WIDGET_TYPE_6, -1, 14221317, false);
+            return createMenuEntry(0, MenuAction.WIDGET_CONTINUE, -1, 14221317, false);
         }
         return null;
     }
@@ -427,21 +427,25 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         GameObject altar = getGameObject(25380);
         if (getInventoryItem(ItemID.CATALYTIC_TALISMAN)!=null)
         {
-            return useItemOnAltarMES(altar, ItemID.CATALYTIC_TALISMAN);
+            return useItemOnAltarMES(altar, getInventoryItem(ItemID.CATALYTIC_TALISMAN));
         }
         if (getInventoryItem(ItemID.BLOOD_TALISMAN)!=null)
         {
-            return useItemOnAltarMES(altar, ItemID.BLOOD_TALISMAN);
+            return useItemOnAltarMES(altar, getInventoryItem(ItemID.BLOOD_TALISMAN));
         }
         //else assume something is worn giving access to altar
         return createMenuEntry(altar.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(altar).getX(), getLocation(altar).getY(), false);
     }
 
-    private MenuEntry useItemOnAltarMES(GameObject altar,int itemID) {
-        client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
-        client.setSelectedItemSlot(getInventoryItem(itemID).getIndex());
-        client.setSelectedItemID(itemID);
+    private MenuEntry useItemOnAltarMES(GameObject altar,Widget item) {
+        setSelectedInventoryItem(item);
         return createMenuEntry(altar.getId(), MenuAction.ITEM_USE_ON_GAME_OBJECT, getLocation(altar).getX(), getLocation(altar).getY(), false);
+    }
+
+    private void setSelectedInventoryItem(Widget item) {
+        client.setSelectedSpellWidget(WidgetInfo.INVENTORY.getId());
+        client.setSelectedSpellChildIndex(item.getIndex());
+        client.setSelectedSpellItemId(item.getId());
     }
 
     private MenuEntry craftRunesMES() {
@@ -449,7 +453,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return createMenuEntry(altar.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(altar).getX(), getLocation(altar).getY(), true);
     }
 
-    private MenuEntry emptyPouchMES(WidgetItem pouch) {
+    private MenuEntry emptyPouchMES(Widget pouch) {
         return createMenuEntry(pouch.getId(), MenuAction.ITEM_SECOND_OPTION, pouch.getIndex(), WidgetInfo.INVENTORY.getId(), false);
     }
 
@@ -463,8 +467,8 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
             return createMenuEntry(3, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
         }
 
-        WidgetItem craftingCape = getInventoryItem(ItemID.CRAFTING_CAPE);
-        WidgetItem craftingCapeT = getInventoryItem(ItemID.CRAFTING_CAPET);
+        Widget craftingCape = getInventoryItem(ItemID.CRAFTING_CAPE);
+        Widget craftingCapeT = getInventoryItem(ItemID.CRAFTING_CAPET);
         if (craftingCape!=null)
         {
             return createMenuEntry(craftingCape.getId(), MenuAction.ITEM_THIRD_OPTION, craftingCape.getIndex(), WidgetInfo.INVENTORY.getId(), false);
@@ -508,14 +512,14 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return createMenuEntry(7, MenuAction.CC_OP_LOW_PRIORITY, getBankIndex(essence), WidgetInfo.BANK_ITEM_CONTAINER.getId(), false);
     }
 
-    private MenuEntry fillPouchMES(WidgetItem pouch) {
+    private MenuEntry fillPouchMES(Widget pouch) {
         return createMenuEntry(9, MenuAction.CC_OP_LOW_PRIORITY, pouch.getIndex(), WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId(), false);
     }
 
     private MenuEntry teleToPOHMES() {
-        WidgetItem tab = getInventoryItem(ItemID.TELEPORT_TO_HOUSE);
-        WidgetItem conCape = getInventoryItem(ItemID.CONSTRUCT_CAPE);
-        WidgetItem conCapeT = getInventoryItem(ItemID.CONSTRUCT_CAPET);
+        Widget tab = getInventoryItem(ItemID.TELEPORT_TO_HOUSE);
+        Widget conCape = getInventoryItem(ItemID.CONSTRUCT_CAPE);
+        Widget conCapeT = getInventoryItem(ItemID.CONSTRUCT_CAPET);
 
         if (conCape!=null)
         {
@@ -598,7 +602,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                 .idEquals(ID)
                 .result(client)
                 .first();
-        return bankItem.getWidget().getIndex();
+        return bankItem.getIndex();
     }
 
     private GameObject getGameObject(int ID) {
@@ -618,26 +622,39 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return new Point(tileObject.getLocalLocation().getSceneX(), tileObject.getLocalLocation().getSceneY());
     }
 
-    private WidgetItem getInventoryItem(int id) {
+    private Widget getInventoryItem(int id) {
         Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            Collection<WidgetItem> items = inventoryWidget.getWidgetItems();
-            for (WidgetItem item : items) {
-                if (item.getId() == id) {
-                    return item;
-                }
+        Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
+        if (inventoryWidget!=null && !inventoryWidget.isHidden())
+        {
+            return getWidgetItem(inventoryWidget,id);
+        }
+        if (bankInventoryWidget!=null && !bankInventoryWidget.isHidden())
+        {
+            return getWidgetItem(bankInventoryWidget,id);
+        }
+        return null;
+    }
+
+    private Widget getWidgetItem(Widget widget,int id) {
+        for (Widget item : widget.getDynamicChildren())
+        {
+            if (item.getItemId() == id)
+            {
+                return item;
             }
         }
         return null;
     }
 
     public int getEmptySlots() {
-        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            return 28 - inventoryWidget.getWidgetItems().size();
-        } else {
-            return -1;
+        if (client.getWidget(WidgetInfo.INVENTORY.getId())!=null
+                && client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren()!=null)
+        {
+            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren());
+            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
         }
+        return -1;
     }
 
     private MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {

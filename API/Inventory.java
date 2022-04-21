@@ -39,4 +39,20 @@ public class Inventory {
         return null;
     }
 
+    private Widget getWidgetItem(Widget widget,int id) {
+        for (Widget item : widget.getDynamicChildren())
+        {
+            if (item.getItemId() == id)
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    private void setSelectedInventoryItem(Widget item) {
+        client.setSelectedSpellWidget(WidgetInfo.INVENTORY.getId());
+        client.setSelectedSpellChildIndex(item).getIndex());
+        client.setSelectedSpellItemId(item.getId());
+    }
 }
