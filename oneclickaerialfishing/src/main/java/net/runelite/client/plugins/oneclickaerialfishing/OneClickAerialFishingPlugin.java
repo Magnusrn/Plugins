@@ -104,12 +104,22 @@ public class OneClickAerialFishingPlugin extends Plugin {
                 .orElse(null);
     }
 
-    public long getEmptySlots() {
-        if (client.getWidget(WidgetInfo.INVENTORY.getId())!=null
-                && client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren()!=null)
+    private int getEmptySlots() {
+        Widget inventory = client.getWidget(WidgetInfo.INVENTORY.getId());
+        Widget bankInventory = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId());
+
+        if (inventory!=null && !inventory.isHidden()
+                && inventory.getDynamicChildren()!=null)
         {
             List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren());
-            return inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
+            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
+        }
+
+        if (bankInventory!=null && !bankInventory.isHidden()
+                && bankInventory.getDynamicChildren()!=null)
+        {
+            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId()).getDynamicChildren());
+            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
         }
         return -1;
     }

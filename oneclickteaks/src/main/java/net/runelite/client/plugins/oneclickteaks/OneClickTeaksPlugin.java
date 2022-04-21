@@ -17,6 +17,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import org.pf4j.Extension;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -71,6 +72,7 @@ public class OneClickTeaksPlugin extends Plugin {
     }
 
     private void handleClick(MenuOptionClicked event) {
+        System.out.println(getEmptySlots());
         if (isSouthOfShortcut())
         {
             if (getEmptySlots()==0)
@@ -119,12 +121,23 @@ public class OneClickTeaksPlugin extends Plugin {
     }
 
     public int getEmptySlots() {
-        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            return 28 - inventoryWidget.getWidgetItems().size();
-        } else {
-            return -1;
+        Widget inventory = client.getWidget(WidgetInfo.INVENTORY.getId());
+        Widget bankInventory = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId());
+
+        if (inventory!=null && !inventory.isHidden()
+                && inventory.getDynamicChildren()!=null)
+        {
+            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren());
+            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
         }
+
+        if (bankInventory!=null && !bankInventory.isHidden()
+                && bankInventory.getDynamicChildren()!=null)
+        {
+            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId()).getDynamicChildren());
+            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
+        }
+        return -1;
     }
 
     private GameObject getGameObject(int ID) {
@@ -140,7 +153,6 @@ public class OneClickTeaksPlugin extends Plugin {
         Trees.put(30481,4957); //
         Trees.put(30480,4955);
         Trees.put(30482,4953);
-        System.out.println("hi");
 
         List<Integer> ChoppableTrees = new ArrayList<>();
 
@@ -150,7 +162,6 @@ public class OneClickTeaksPlugin extends Plugin {
                 ChoppableTrees.add(gameObjectID);
             }
         }
-        System.out.println(ChoppableTrees.size());
 
         return new GameObjectQuery()
                 .idEquals(ChoppableTrees)

@@ -499,7 +499,7 @@ public class oneClickZMIPlugin extends Plugin
 	}
 
 	private MenuEntry fillColossalPouch() {
-		WidgetItem pouch = getInventoryItem(ItemID.COLOSSAL_POUCH);
+		Widget pouch = getInventoryItem(ItemID.COLOSSAL_POUCH);
 		if (getInventoryItem(ItemID.COLOSSAL_POUCH_26786)!=null)
 		{
 			pouch = getInventoryItem(ItemID.COLOSSAL_POUCH_26786);
@@ -512,45 +512,31 @@ public class oneClickZMIPlugin extends Plugin
 				true);
 	}
 
+	private MenuEntry emptyPouchMES(Widget pouch) {
+		return createMenuEntry(3, MenuAction.CC_OP, pouch.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+	}
 	private MenuEntry emptyMedPouch() {
-		return createMenuEntry(
-				5510,
-				MenuAction.ITEM_SECOND_OPTION,
-				getInventoryItem(ItemID.MEDIUM_POUCH).getIndex(),
-				9764864,
-				true);
+		Widget pouch = getInventoryItem(ItemID.MEDIUM_POUCH);
+		return emptyPouchMES(pouch);
 	}
 
 	private MenuEntry emptyLargePouch() {
-		return createMenuEntry(
-				5512,
-				MenuAction.ITEM_SECOND_OPTION,
-				getInventoryItem(ItemID.LARGE_POUCH).getIndex(),
-				9764864,
-				true);
+		Widget pouch = getInventoryItem(ItemID.LARGE_POUCH);
+		return emptyPouchMES(pouch);
 	}
 
 	private MenuEntry emptyGiantPouch() {
-		return createMenuEntry(
-				5514,
-				MenuAction.ITEM_SECOND_OPTION,
-				getInventoryItem(ItemID.GIANT_POUCH).getIndex(),
-				9764864,
-				false);
+		Widget pouch = getInventoryItem(ItemID.GIANT_POUCH);
+		return emptyPouchMES(pouch);
 	}
 
 	private MenuEntry emptyColossalPouch() {
-		WidgetItem pouch = getInventoryItem(ItemID.COLOSSAL_POUCH);
+		Widget pouch = getInventoryItem(ItemID.COLOSSAL_POUCH);
 		if (getInventoryItem(ItemID.COLOSSAL_POUCH_26786)!=null)
 		{
 			pouch = getInventoryItem(ItemID.COLOSSAL_POUCH_26786);
 		}
-		return createMenuEntry(
-				pouch.getId(),
-				MenuAction.ITEM_SECOND_OPTION,
-				pouch.getIndex(),
-				9764864,
-				true);
+		return emptyPouchMES(pouch);
 	}
 
 	private GameObject getAltar() {
@@ -558,7 +544,6 @@ public class oneClickZMIPlugin extends Plugin
 				.idEquals(29631)
 				.result(client)
 				.nearestTo(client.getLocalPlayer());
-
 	}
 
 	private MenuEntry getAltarMES() {
@@ -661,32 +646,49 @@ public class oneClickZMIPlugin extends Plugin
 		return new Point(tileObject.getLocalLocation().getSceneX(), tileObject.getLocalLocation().getSceneY());
 	}
 
-	private WidgetItem getInventoryItem(int id) {
+	private Widget getInventoryItem(int id) {
 		Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-		if (inventoryWidget != null)
+		Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
+		if (inventoryWidget!=null && !inventoryWidget.isHidden())
 		{
-			Collection<WidgetItem> items = inventoryWidget.getWidgetItems();
-			for (WidgetItem item : items)
+			return getWidgetItem(inventoryWidget,id);
+		}
+		if (bankInventoryWidget!=null && !bankInventoryWidget.isHidden())
+		{
+			return getWidgetItem(bankInventoryWidget,id);
+		}
+		return null;
+	}
+
+	private Widget getWidgetItem(Widget widget,int id) {
+		for (Widget item : widget.getDynamicChildren())
+		{
+			if (item.getItemId() == id)
 			{
-				if (item.getId() == id)
-				{
-					return item;
-				}
+				return item;
 			}
 		}
 		return null;
 	}
 
 	private int getEmptySlots() {
-		Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-		if (inventoryWidget != null)
+		Widget inventory = client.getWidget(WidgetInfo.INVENTORY.getId());
+		Widget bankInventory = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId());
+
+		if (inventory!=null && !inventory.isHidden()
+				&& inventory.getDynamicChildren()!=null)
 		{
-			return 28 - inventoryWidget.getWidgetItems().size();
+			List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren());
+			return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
 		}
-		else
+
+		if (bankInventory!=null && !bankInventory.isHidden()
+				&& bankInventory.getDynamicChildren()!=null)
 		{
-			return -1;
+			List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId()).getDynamicChildren());
+			return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
 		}
+		return -1;
 	}
 
 	public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
