@@ -87,21 +87,26 @@ public class oneClickCustomPlugin extends Plugin{
     @Subscribe
     private void onMenuEntryAdded(MenuEntryAdded event)
     {
+        //this broke also cba
         if (config.oneClickType()!=oneClickCustomTypes.Use_Item_On_X)
         {
             return;
         }
 
+        //shits broken cant get id from menuentry kms
+
         if (event.getType()!= MenuAction.EXAMINE_ITEM.getId())
         {
+            System.out.println("hi1");
             return;
         }
-
         if (getItemOnNPCsHashMap().get(event.getIdentifier())!=null) //if inventory item exists in config list
         {
+            System.out.println("hi3");
             NPC nearestnpc = getNpc(getItemOnNPCsHashMap().get(event.getIdentifier())); //gets nearest npc from key and checks if visible
             if (nearestnpc!=null)
             {
+                System.out.println("hi2");
                 insertInventoryMenu(event);
             }
         }
@@ -172,7 +177,7 @@ public class oneClickCustomPlugin extends Plugin{
             return;
         }
 
-        if (getInventQuantity(client)==28 && config.InventoryFull() && config.oneClickType()!=oneClickCustomTypes.Attack)
+        if (getEmptySlots()==0 && config.InventoryFull() && config.oneClickType()!=oneClickCustomTypes.Attack)
         {
             //System.out.println("full invent");
             return;
@@ -197,7 +202,7 @@ public class oneClickCustomPlugin extends Plugin{
 
     private void handleClick(MenuOptionClicked event)
     {
-        if (getInventQuantity(client)==28 && config.InventoryFull())
+        if (getEmptySlots()==0 && config.InventoryFull())
         {
             return;
         }
@@ -205,10 +210,7 @@ public class oneClickCustomPlugin extends Plugin{
     }
 
     private void handleInventoryItemClicked(MenuOptionClicked event) { //hella copy paste code fix this dumb shit. Maybe rework whole plugin tbh kinda bodged.
-        client.setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
-        client.setSelectedItemSlot(getInventoryItem(event.getId()).getIndex());
-        client.setSelectedItemID(event.getId());
-
+        setSelectedInventoryItem(getInventoryItem(event.getId()));
         if (getItemOnNPCsHashMap().get(event.getId())!=null)
         {
             NPC nearestnpc = getNpc(getItemOnNPCsHashMap().get(event.getId()));
@@ -485,54 +487,45 @@ public class oneClickCustomPlugin extends Plugin{
         return closestTileItem;
     }
 
-    @Nullable
-    public static Collection<WidgetItem> getInventoryItems(Client client) {
-        Widget inventory = client.getWidget(WidgetInfo.INVENTORY);
-
-        if (inventory == null) {
-            return null;
-        }
-        return new ArrayList<>(inventory.getWidgetItems());
-    }
-
-
-    public static int getInventQuantity(Client client) {
-        Collection<WidgetItem> inventoryItems = getInventoryItems(client);
-
-        if (inventoryItems == null) {
-            return 0;
-        }
-
-        int count = 0;
-
-        for (WidgetItem inventoryItem : inventoryItems) {
-            if (!(String.valueOf(inventoryItem).contains("id=-1"))){
-                count += 1;
-            }
-        }
-        return count;
-    }
-
-    private WidgetItem getInventoryItem(int id) {
+    private Widget getInventoryItem(int id) {
         Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            Collection<WidgetItem> items = inventoryWidget.getWidgetItems();
-            for (WidgetItem item : items) {
-                if (item.getId() == id) {
-                    return item;
-                }
+        Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
+        if (inventoryWidget!=null && !inventoryWidget.isHidden())
+        {
+            return getWidgetItem(inventoryWidget,id);
+        }
+        if (bankInventoryWidget!=null && !bankInventoryWidget.isHidden())
+        {
+            return getWidgetItem(bankInventoryWidget,id);
+        }
+        return null;
+    }
+
+    private Widget getWidgetItem(Widget widget,int id) {
+        for (Widget item : widget.getDynamicChildren())
+        {
+            if (item.getItemId() == id)
+            {
+                return item;
             }
         }
         return null;
     }
 
+    private void setSelectedInventoryItem(Widget item) {
+        client.setSelectedSpellWidget(WidgetInfo.INVENTORY.getId());
+        client.setSelectedSpellChildIndex(item.getIndex());
+        client.setSelectedSpellItemId(item.getId());
+    }
+
     public int getEmptySlots() {
-        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            return 28 - inventoryWidget.getWidgetItems().size();
-        } else {
-            return -1;
+        if (client.getWidget(WidgetInfo.INVENTORY.getId())!=null
+                && client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren()!=null)
+        {
+            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren());
+            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
         }
+        return -1;
     }
 
     private boolean bankOpen() {
