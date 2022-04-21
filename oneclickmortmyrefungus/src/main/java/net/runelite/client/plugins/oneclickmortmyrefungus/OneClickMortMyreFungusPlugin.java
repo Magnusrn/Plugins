@@ -58,22 +58,17 @@ public class OneClickMortMyreFungusPlugin extends Plugin {
         }
     }
 
-    private void handleClick(MenuOptionClicked event)
-    {
-        if (isInSwamp())
-        {
-            if (getEmptySlots()==0)
-            {
+    private void handleClick(MenuOptionClicked event) {
+        if (isInSwamp()) {
+            if (getEmptySlots() == 0) {
                 event.setMenuEntry(teleportToHouseMES());
                 return;
             }
-            if (gatherFungusMES()!=null)
-            {
+            if (gatherFungusMES() != null) {
                 event.setMenuEntry(gatherFungusMES());
                 return;
             }
-            if (shouldCastBloom())
-            {
+            if (shouldCastBloom()) {
                 event.setMenuEntry(castBloomMES());
                 return;
             }
@@ -83,34 +78,29 @@ public class OneClickMortMyreFungusPlugin extends Plugin {
 
         if (isInPOH())
         {
+            if (client.getWidget(219, 1) != null && client.getWidget(219, 1).getChild(1).getText().contains("Take to bank")) {
+                event.setMenuEntry(sendToBankMES());
+                return;
+            }
+
+            if (client.getWidget(231, 5) != null) {
+                event.setMenuEntry(clickContinueMES());
+                return;
+            }
+
+            if (client.getWidget(370, 19) != null && client.getWidget(370, 19).getChild(3) != null) {
+                event.setMenuEntry(callButlerMES());
+                return;
+            }
             if (getEmptySlots()==0)
             {
-                if (client.getWidget(219,1)!=null && client.getWidget(219,1).getChild(1).getText().contains("Take to bank"))
-                {
-                    event.setMenuEntry(sendToBankMES());
-                    return;
-                }
-
-                if (client.getWidget(231,5)!=null)
-                {
-                    event.setMenuEntry(clickContinueMES());
-                    return;
-                }
-
-                if (client.getWidget(370,19)!=null && client.getWidget(370,19).getChild(3)!=null)
-                {
-                    event.setMenuEntry(callButlerMES());
-                    return;
-                }
-
                 if (client.getWidget(116,8)!=null)
                 {
                     event.setMenuEntry(houseOptionsMES());
                     return;
                 }
             }
-            if (client.getBoostedSkillLevel(Skill.PRAYER)<40)
-            {
+            if (client.getBoostedSkillLevel(Skill.PRAYER) < 40) {
                 event.setMenuEntry(drinkFromPoolMES());
                 return;
             }
