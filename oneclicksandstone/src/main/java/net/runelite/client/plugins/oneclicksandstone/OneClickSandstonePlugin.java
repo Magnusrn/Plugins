@@ -25,9 +25,7 @@
  */
 package net.runelite.client.plugins.oneclicksandstone;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
@@ -103,7 +101,7 @@ public class OneClickSandstonePlugin extends Plugin {
         {
             event.consume();
         }
-        if (getInventQuantity(this.client) == 28)
+        if (getEmptySlots() == 0)
             event.setMenuEntry(depositGrinderMenuEntry());
         else if(shouldCastHumidify(waterSkins))
             event.setMenuEntry(createHumidifyMenuEntry());
@@ -149,31 +147,24 @@ public class OneClickSandstonePlugin extends Plugin {
                 .nearestTo(client.getLocalPlayer());
     }
 
-    @Nullable
-    public static Collection<WidgetItem> getInventoryItems(Client client) {
-        Widget inventory = client.getWidget(WidgetInfo.INVENTORY);
+    private int getEmptySlots() {
+        Widget inventory = client.getWidget(WidgetInfo.INVENTORY.getId());
+        Widget bankInventory = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId());
 
-        if (inventory == null) {
-            return null;
+        if (inventory!=null && !inventory.isHidden()
+                && inventory.getDynamicChildren()!=null)
+        {
+            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren());
+            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
         }
 
-        return new ArrayList<>(inventory.getWidgetItems());
-    }
-    public static int getInventQuantity(Client client) {
-        Collection<WidgetItem> inventoryItems = getInventoryItems(client);
-
-        if (inventoryItems == null) {
-            return 0;
+        if (bankInventory!=null && !bankInventory.isHidden()
+                && bankInventory.getDynamicChildren()!=null)
+        {
+            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId()).getDynamicChildren());
+            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
         }
-
-        int count = 0;
-
-        for (WidgetItem inventoryItem : inventoryItems) {
-            if (!(String.valueOf(inventoryItem).contains("id=-1"))){
-                count += 1;
-            }
-        }
-        return count;
+        return -1;
     }
 
     private MenuEntry mineSandStone() {
