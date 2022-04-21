@@ -291,7 +291,7 @@ public class OneClickGlassblowingPlugin extends Plugin {
         client.setSelectedItemSlot(getInventoryItem(itemID).getIndex());
         client.setSelectedItemID(itemID);
         if (moltenGlass == null) return null;
-        return createMenuEntry(moltenGlass.getId(), MenuAction.ITEM_USE_ON_WIDGET_ITEM, moltenGlass.getIndex(), 9764864, true);
+        return createMenuEntry(moltenGlass.getId(), MenuAction.WIDGET_USE_ON_ITEM, moltenGlass.getIndex(), 9764864, true);
     }
 
     private MenuEntry selectGlassblowingItem(){
