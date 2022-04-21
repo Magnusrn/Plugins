@@ -18,10 +18,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import org.pf4j.Extension;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
 @Extension
 @PluginDescriptor(
@@ -87,7 +84,7 @@ public class oneClickKarambwansPlugin extends Plugin {
         }
         System.out.println("1");
 
-        if (getInventQuantity(ItemID.RAW_KARAMBWANJI) == 0 || getInventQuantity(ItemID.KARAMBWAN_VESSEL_3159) == 0) {
+        if (getInventoryItem(ItemID.RAW_KARAMBWANJI)== null || getInventoryItem(ItemID.KARAMBWAN_VESSEL_3159) == null) {
             System.out.println("Consume event because no karambwanji or vessel");
             event.consume();
             return;
@@ -106,7 +103,7 @@ public class oneClickKarambwansPlugin extends Plugin {
             }
         }
 
-        if (getInventQuantity(ItemID.RAW_KARAMBWAN) == 0 && getGameObject(FAIRY_RING_KARAMJA_ID) == null)
+        if (getInventoryItem(ItemID.RAW_KARAMBWAN) == null && getGameObject(FAIRY_RING_KARAMJA_ID) == null)
         {
             if (useFairyRingMES()!=null)
             {
@@ -172,8 +169,8 @@ public class oneClickKarambwansPlugin extends Plugin {
             return createMenuEntry(3, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
         }
 
-        WidgetItem craftingCape = getInventoryItem(ItemID.CRAFTING_CAPE);
-        WidgetItem craftingCapeT = getInventoryItem(ItemID.CRAFTING_CAPET);
+        Widget craftingCape = getInventoryItem(ItemID.CRAFTING_CAPE);
+        Widget craftingCapeT = getInventoryItem(ItemID.CRAFTING_CAPET);
         if (craftingCape!=null)
         {
             return createMenuEntry(craftingCape.getId(), MenuAction.ITEM_THIRD_OPTION, craftingCape.getIndex(), WidgetInfo.INVENTORY.getId(), false);
@@ -268,8 +265,8 @@ public class oneClickKarambwansPlugin extends Plugin {
 
 
     private MenuEntry useQuestCapeTeleMES() {
-        WidgetItem questCape = getInventoryItem(ItemID.QUEST_POINT_CAPE);
-        WidgetItem questCapeT = getInventoryItem(ItemID.QUEST_POINT_CAPE_T);
+        Widget questCape = getInventoryItem(ItemID.QUEST_POINT_CAPE);
+        Widget questCapeT = getInventoryItem(ItemID.QUEST_POINT_CAPE_T);
 
         if (questCapeT!=null)
         {
@@ -291,9 +288,9 @@ public class oneClickKarambwansPlugin extends Plugin {
 
 
     private MenuEntry teleToPOHMES() {
-        WidgetItem tab = getInventoryItem(ItemID.TELEPORT_TO_HOUSE);
-        WidgetItem conCape = getInventoryItem(ItemID.CONSTRUCT_CAPE);
-        WidgetItem conCapeT = getInventoryItem(ItemID.CONSTRUCT_CAPET);
+        Widget tab = getInventoryItem(ItemID.TELEPORT_TO_HOUSE);
+        Widget conCape = getInventoryItem(ItemID.CONSTRUCT_CAPE);
+        Widget conCapeT = getInventoryItem(ItemID.CONSTRUCT_CAPET);
 
         if (conCape!=null)
         {
@@ -351,49 +348,39 @@ public class oneClickKarambwansPlugin extends Plugin {
         return client.getItemContainer(InventoryID.BANK) != null;
     }
 
-    private WidgetItem getInventoryItem(int id) {
+    private Widget getInventoryItem(int id) {
         Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            Collection<WidgetItem> items = inventoryWidget.getWidgetItems();
-            for (WidgetItem item : items) {
-                if (item.getId() == id) {
-                    return item;
-                }
+        Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
+        if (inventoryWidget!=null && !inventoryWidget.isHidden())
+        {
+            return getWidgetItem(inventoryWidget,id);
+        }
+        if (bankInventoryWidget!=null && !bankInventoryWidget.isHidden())
+        {
+            return getWidgetItem(bankInventoryWidget,id);
+        }
+        return null;
+    }
+
+    private Widget getWidgetItem(Widget widget,int id) {
+        for (Widget item : widget.getDynamicChildren())
+        {
+            if (item.getItemId() == id)
+            {
+                return item;
             }
         }
         return null;
     }
 
-    @Nullable
-    private Collection<WidgetItem> getInventoryItems() {
-        Widget inventory = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventory == null) {
-            return null;
-        }
-        return new ArrayList<>(inventory.getWidgetItems());
-    }
-
-    public int getInventQuantity(Integer itemId) {
-        Collection<WidgetItem> inventoryItems = getInventoryItems();
-        if (inventoryItems == null) {
-            return 0;
-        }
-        int count = 0;
-        for (WidgetItem inventoryItem : inventoryItems) {
-            if (inventoryItem.getId() == itemId) {
-                count += 1;
-            }
-        }
-        return count;
-    }
-
     public int getEmptySlots() {
-        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            return 28 - inventoryWidget.getWidgetItems().size();
-        } else {
-            return -1;
+        if (client.getWidget(WidgetInfo.INVENTORY.getId())!=null
+                && client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren()!=null)
+        {
+            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren());
+            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
         }
+        return -1;
     }
 
     private GameObject getGameObject(int ID) {
