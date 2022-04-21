@@ -139,8 +139,8 @@ public class OneClickMortMyreFungusPlugin extends Plugin {
         {
             if (getInventoryItem(itemID)!=null)
             {
-                WidgetItem sickle = getInventoryItem(itemID);
-                return createMenuEntry(sickle.getId(), MenuAction.ITEM_THIRD_OPTION, sickle.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+                Widget sickle = getInventoryItem(itemID);
+                return createMenuEntry(4, MenuAction.CC_OP, sickle.getIndex(), WidgetInfo.INVENTORY.getId(), false);
             }
         }
         return null;
@@ -235,26 +235,39 @@ public class OneClickMortMyreFungusPlugin extends Plugin {
         }
     }
 
-    private WidgetItem getInventoryItem(int id) {
+    private Widget getInventoryItem(int id) {
         Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            Collection<WidgetItem> items = inventoryWidget.getWidgetItems();
-            for (WidgetItem item : items) {
-                if (item.getId() == id) {
-                    return item;
-                }
+        Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
+        if (inventoryWidget!=null && !inventoryWidget.isHidden())
+        {
+            return getWidgetItem(inventoryWidget,id);
+        }
+        if (bankInventoryWidget!=null && !bankInventoryWidget.isHidden())
+        {
+            return getWidgetItem(bankInventoryWidget,id);
+        }
+        return null;
+    }
+
+    private Widget getWidgetItem(Widget widget,int id) {
+        for (Widget item : widget.getDynamicChildren())
+        {
+            if (item.getItemId() == id)
+            {
+                return item;
             }
         }
         return null;
     }
 
     public int getEmptySlots() {
-        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            return 28 - inventoryWidget.getWidgetItems().size();
-        } else {
-            return -1;
+        if (client.getWidget(WidgetInfo.INVENTORY.getId())!=null
+                && client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren()!=null)
+        {
+            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren());
+            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
         }
+        return -1;
     }
 
     public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
