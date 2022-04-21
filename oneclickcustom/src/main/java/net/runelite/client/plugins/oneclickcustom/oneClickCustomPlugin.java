@@ -8,18 +8,18 @@ import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.api.queries.NPCQuery;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.config.ConfigManager;
 import org.pf4j.Extension;
-import javax.annotation.Nullable;
+
 import javax.inject.Inject;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Extension
 @PluginDescriptor(
@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 )
 @Slf4j
 public class oneClickCustomPlugin extends Plugin{
+    /*TODO Switch to caching*/
 
     List<TileItem> GroundItems = new ArrayList<>();
 
@@ -87,41 +88,39 @@ public class oneClickCustomPlugin extends Plugin{
     @Subscribe
     private void onMenuEntryAdded(MenuEntryAdded event)
     {
-        //this broke also cba
         if (config.oneClickType()!=oneClickCustomTypes.Use_Item_On_X)
         {
             return;
         }
 
-        //shits broken cant get id from menuentry kms
+        if (0 <= event.getActionParam0() && event.getActionParam0()<= 27
+                && event.getOption().equals("Use"))
+        {
+            Widget item = getItemByInventoryIndex(event.getActionParam0());
 
-        if (event.getType()!= MenuAction.EXAMINE_ITEM.getId())
-        {
-            System.out.println("hi1");
-            return;
-        }
-        if (getItemOnNPCsHashMap().get(event.getIdentifier())!=null) //if inventory item exists in config list
-        {
-            System.out.println("hi3");
-            NPC nearestnpc = getNpc(getItemOnNPCsHashMap().get(event.getIdentifier())); //gets nearest npc from key and checks if visible
-            if (nearestnpc!=null)
+            if (getItemOnNPCsHashMap().get(item.getItemId())!=null) //if inventory item exists in config list
             {
-                System.out.println("hi2");
-                insertInventoryMenu(event);
+                NPC nearestnpc = getNpc(getItemOnNPCsHashMap().get(item.getItemId())); //gets nearest npc from key and checks if visible
+                if (nearestnpc!=null)
+                {
+                    insertInventoryMenu(event, item.getItemId());
+                }
+            }
+
+            if (getItemOnGameObjectsHashMap().get(item.getItemId())!=null) //if inventory item exists in config list
+            {
+                GameObject nearestGameObject = getGameObject(getItemOnGameObjectsHashMap().get(item.getItemId())); //gets nearest gameObject from key and checks if visible
+                if (nearestGameObject!=null)
+                {
+                    insertInventoryMenu(event, item.getItemId());
+                }
             }
         }
 
-        if (getItemOnGameObjectsHashMap().get(event.getIdentifier())!=null) //if inventory item exists in config list
-        {
-            GameObject nearestGameObject = getGameObject(getItemOnGameObjectsHashMap().get(event.getIdentifier())); //gets nearest gameObject from key and checks if visible
-            if (nearestGameObject!=null)
-            {
-                insertInventoryMenu(event);
-            }
-        }
+
     }
 
-    private void insertInventoryMenu(MenuEntryAdded event) {
+    private void insertInventoryMenu(MenuEntryAdded event,int ID) {
         client.insertMenuItem(
                 "One Click Custom",
                 "",
@@ -161,25 +160,21 @@ public class oneClickCustomPlugin extends Plugin{
 
         if (config.oneClickType()==oneClickCustomTypes.Gather && getGameObject(getConfigIds())==null)
         {
-            //System.out.println("oneclick set to gather, gameobject is null.");
             return;
         }
 
         if ((GroundItems.size()==0 || getNearestTileItem(GroundItems)==null) && config.oneClickType() == oneClickCustomTypes.Pick_Up)
         {
-            //System.out.println("ground item check null");
             return;
         }
 
         if (getNpc(getConfigIds())==null &!(config.oneClickType()==oneClickCustomTypes.Gather) &! (config.oneClickType() == oneClickCustomTypes.Pick_Up))
         {
-            //System.out.println("npcobject check null");
             return;
         }
 
         if (getEmptySlots()==0 && config.InventoryFull() && config.oneClickType()!=oneClickCustomTypes.Attack)
         {
-            //System.out.println("full invent");
             return;
         }
 
@@ -210,24 +205,33 @@ public class oneClickCustomPlugin extends Plugin{
     }
 
     private void handleInventoryItemClicked(MenuOptionClicked event) { //hella copy paste code fix this dumb shit. Maybe rework whole plugin tbh kinda bodged.
-        setSelectedInventoryItem(getInventoryItem(event.getId()));
-        if (getItemOnNPCsHashMap().get(event.getId())!=null)
+        int itemID = event.getWidget().getItemId();
+        setSelectedInventoryItem(getInventoryItem(itemID));
+        if (getItemOnNPCsHashMap().get(itemID)!=null)
         {
-            NPC nearestnpc = getNpc(getItemOnNPCsHashMap().get(event.getId()));
+            NPC nearestnpc = getNpc(getItemOnNPCsHashMap().get(itemID));
             if (nearestnpc!=null)
             {
-                event.setMenuEntry(createMenuEntry(nearestnpc.getIndex(),MenuAction.ITEM_USE_ON_NPC, getNPCLocation(nearestnpc).getX(), getNPCLocation(nearestnpc).getY(), false));
+                event.setMenuEntry(createMenuEntry(nearestnpc.getIndex(),
+                        MenuAction.WIDGET_TARGET_ON_NPC,
+                        getNPCLocation(nearestnpc).getX(),
+                        getNPCLocation(nearestnpc).getY(),
+                        false));
                 return;
             }
         }
 
-        if (getItemOnGameObjectsHashMap().get(event.getId())!=null)
+        if (getItemOnGameObjectsHashMap().get(itemID)!=null)
         {
-            GameObject nearestGameObject = getGameObject(getItemOnGameObjectsHashMap().get(event.getId()));
+            GameObject nearestGameObject = getGameObject(getItemOnGameObjectsHashMap().get(itemID));
 
             if (nearestGameObject!=null)
             {
-                event.setMenuEntry(createMenuEntry(nearestGameObject.getId(),MenuAction.ITEM_USE_ON_GAME_OBJECT, getLocation(nearestGameObject).getX(), getLocation(nearestGameObject).getY(), false));
+                event.setMenuEntry(createMenuEntry(nearestGameObject.getId(),
+                        MenuAction.WIDGET_TARGET_ON_GAME_OBJECT,
+                        getLocation(nearestGameObject).getX(),
+                        getLocation(nearestGameObject).getY(),
+                        false));
             }
         }
     }
@@ -301,7 +305,6 @@ public class oneClickCustomPlugin extends Plugin{
 
         if (config.oneClickType()==oneClickCustomTypes.Gather)
         {
-            //System.out.println("Should be returning Gather MES");
             MenuAction action =MenuAction.GAME_OBJECT_FIRST_OPTION ;
             switch(config.opcode()){
                 case 1:
@@ -352,7 +355,6 @@ public class oneClickCustomPlugin extends Plugin{
                     break;
             }
 
-            //System.out.println("Should be returning Fish MES");
             return createMenuEntry(
                     customNPCObject.getIndex(),
                     action,
@@ -363,8 +365,6 @@ public class oneClickCustomPlugin extends Plugin{
 
         if (config.oneClickType()==oneClickCustomTypes.Attack)
         {
-            //System.out.println("Should be returning Attack MES");
-
             ArrayList<NPC> npcs = new NPCQuery()
                     .idEquals(getConfigIds())
                     .result(client)
@@ -398,7 +398,6 @@ public class oneClickCustomPlugin extends Plugin{
 
         if(config.oneClickType()==oneClickCustomTypes.Pickpocket)
         {
-            //System.out.println("Should be returning Pickpocket MES");
             return createMenuEntry(
                     customNPCObject.getIndex(),
                     MenuAction.NPC_THIRD_OPTION,
@@ -487,6 +486,17 @@ public class oneClickCustomPlugin extends Plugin{
         return closestTileItem;
     }
 
+    private Widget getItemByInventoryIndex(int index) {
+        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
+        if (inventoryWidget!=null && !inventoryWidget.isHidden())
+        {
+            return Arrays.stream(inventoryWidget.getDynamicChildren())
+                    .filter(item -> item.getIndex() == index)
+                    .findAny().orElse(null);
+        }
+        return null;
+    }
+
     private Widget getInventoryItem(int id) {
         Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
         Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
@@ -515,7 +525,7 @@ public class oneClickCustomPlugin extends Plugin{
     private void setSelectedInventoryItem(Widget item) {
         client.setSelectedSpellWidget(WidgetInfo.INVENTORY.getId());
         client.setSelectedSpellChildIndex(item.getIndex());
-        client.setSelectedSpellItemId(item.getId());
+        client.setSelectedSpellItemId(item.getItemId());
     }
 
     public int getEmptySlots() {
