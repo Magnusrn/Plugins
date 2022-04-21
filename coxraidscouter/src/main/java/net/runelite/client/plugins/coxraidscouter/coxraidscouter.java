@@ -185,7 +185,7 @@ public class coxraidscouter extends Plugin
 					{
 						if (client.getWidget(229, 1).getText().startsWith("You have been logged in for a very long time"))
 						{
-							client.invokeMenuAction("Continue", "", 0, MenuAction.WIDGET_TYPE_6.getId(), -1, 15007746);
+							client.invokeMenuAction("Continue", "", 0, MenuAction.WIDGET_CONTINUE.getId(), -1, 15007746);
 							return;
 						}
 					}
@@ -194,7 +194,7 @@ public class coxraidscouter extends Plugin
 					{
 						if (client.getWidget(219, 1).getChild(1).getText().startsWith("Yes, and don't ask again in this session"))
 						{
-							client.invokeMenuAction("Continue", "", 0, MenuAction.WIDGET_TYPE_6.getId(), 1, 14352385);
+							client.invokeMenuAction("Continue", "", 0, MenuAction.WIDGET_CONTINUE.getId(), 1, 14352385);
 							return;
 						}
 					}
@@ -262,7 +262,7 @@ public class coxraidscouter extends Plugin
 				break;
 			case "continue":
 				if (client.getWidget(219, 1) != null) {
-					client.invokeMenuAction("Continue", "", 0, MenuAction.WIDGET_TYPE_6.getId(), 1, 14352385);
+					client.invokeMenuAction("Continue", "", 0, MenuAction.WIDGET_CONTINUE.getId(), 1, 14352385);
 					state = "climb";
 				}
 				break;
@@ -278,7 +278,7 @@ public class coxraidscouter extends Plugin
 				break;
 			case "leave raid":
 				if (client.getWidget(219, 1) != null) {
-					client.invokeMenuAction("Continue", "", 0, MenuAction.WIDGET_TYPE_6.getId(), 1, 14352385);
+					client.invokeMenuAction("Continue", "", 0, MenuAction.WIDGET_CONTINUE.getId(), 1, 14352385);
 					state = "read";
 				}
 				break;
