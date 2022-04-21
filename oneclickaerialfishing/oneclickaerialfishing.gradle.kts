@@ -25,7 +25,7 @@ import ProjectVersions.openosrsVersion
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "1.0.1"
+version = "1.0.2"
 
 project.extra["PluginName"] = "One Click Aerial Fishing" // This is the name that is used in the external plugin manager panel
 project.extra["PluginDescription"] = "One click Molch aerial fishing, cuts or drops depending on whether you have a knife." // This is the description that is used in the external plugin manager panel
