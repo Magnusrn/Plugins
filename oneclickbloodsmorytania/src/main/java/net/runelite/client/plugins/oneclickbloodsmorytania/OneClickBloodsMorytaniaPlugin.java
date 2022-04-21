@@ -471,11 +471,11 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         Widget craftingCapeT = getInventoryItem(ItemID.CRAFTING_CAPET);
         if (craftingCape!=null)
         {
-            return createMenuEntry(craftingCape.getId(), MenuAction.ITEM_THIRD_OPTION, craftingCape.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+            return createMenuEntry(4, MenuAction.CC_OP, craftingCape.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
         if (craftingCapeT!=null)
         {
-            return createMenuEntry(craftingCapeT.getId(), MenuAction.ITEM_THIRD_OPTION, craftingCapeT.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+            return createMenuEntry(4, MenuAction.CC_OP, craftingCapeT.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
         if (client.getVarbitValue(4070)==0) //if on standard spellbook
         {
@@ -523,15 +523,15 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
 
         if (conCape!=null)
         {
-            return createMenuEntry(conCape.getId(), MenuAction.ITEM_FOURTH_OPTION, conCape.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+            return createMenuEntry(6, MenuAction.CC_OP_LOW_PRIORITY, conCape.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
         if (conCapeT!=null)
         {
-            return createMenuEntry(conCapeT.getId(), MenuAction.ITEM_FOURTH_OPTION, conCapeT.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+            return createMenuEntry(6, MenuAction.CC_OP_LOW_PRIORITY, conCapeT.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
         if (tab!=null)
         {
-            return createMenuEntry(tab.getId(), MenuAction.ITEM_FIRST_OPTION, tab.getIndex(), WidgetInfo.INVENTORY.getId(), false);
+            return createMenuEntry(2, MenuAction.CC_OP, tab.getIndex(), WidgetInfo.INVENTORY.getId(), false);
         }
         if (client.getItemContainer(InventoryID.EQUIPMENT)!=null)
         {
