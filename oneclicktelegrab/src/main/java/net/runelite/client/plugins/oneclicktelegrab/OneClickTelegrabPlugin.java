@@ -98,7 +98,7 @@ public class OneClickTelegrabPlugin extends Plugin {
             TileItem tileItem = getNearestTileItem(GroundItems);
             return createMenuEntry(
                     getWineID(),
-                    MenuAction.SPELL_CAST_ON_GROUND_ITEM,
+                    MenuAction.WIDGET_TARGET_ON_GROUND_ITEM,
                     tileItem.getTile().getSceneLocation().getX(),
                     tileItem.getTile().getSceneLocation().getY(),
                     false);
