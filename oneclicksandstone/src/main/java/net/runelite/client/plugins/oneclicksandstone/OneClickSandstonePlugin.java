@@ -59,7 +59,6 @@ public class OneClickSandstonePlugin extends Plugin {
     final static WorldPoint SW = new WorldPoint(3164,2913,0);
     final static WorldPoint NE = new WorldPoint(3168,2916,0);
     final static WorldArea AREA = new WorldArea(SW,NE);
-    final static Set<Integer> waterSkins = Set.of(1825,1827,1829,1823);
 
     @Inject
     private Client client;
@@ -103,7 +102,7 @@ public class OneClickSandstonePlugin extends Plugin {
         }
         if (getEmptySlots() == 0)
             event.setMenuEntry(depositGrinderMenuEntry());
-        else if(shouldCastHumidify(waterSkins))
+        else if(shouldCastHumidify())
             event.setMenuEntry(createHumidifyMenuEntry());
         else {
             event.setMenuEntry(mineSandStone());
@@ -194,17 +193,41 @@ public class OneClickSandstonePlugin extends Plugin {
                 getLocation(checkForDepositGrinder()).getY(),true);
     }
 
-    private boolean shouldCastHumidify(Collection<Integer> ids) {
-        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null) {
-            Collection<WidgetItem> items = inventoryWidget.getWidgetItems();
-            for (WidgetItem item : items) {
-                if (ids.contains(item.getId())) {
-                    return false;
-                }
+    private boolean shouldCastHumidify() {
+        Set<Integer> waterskins = Set.of(ItemID.WATERSKIN4,ItemID.WATERSKIN3,ItemID.WATERSKIN2,ItemID.WATERSKIN1);
+        for (Integer waterskin : waterskins)
+        {
+            if (getInventoryItem(waterskin)!=null)
+            {
+                return false;
             }
         }
         return true;
+    }
+
+    private Widget getInventoryItem(int id) {
+        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
+        Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
+        if (inventoryWidget!=null && !inventoryWidget.isHidden())
+        {
+            return getWidgetItem(inventoryWidget,id);
+        }
+        if (bankInventoryWidget!=null && !bankInventoryWidget.isHidden())
+        {
+            return getWidgetItem(bankInventoryWidget,id);
+        }
+        return null;
+    }
+
+    private Widget getWidgetItem(Widget widget,int id) {
+        for (Widget item : widget.getDynamicChildren())
+        {
+            if (item.getItemId() == id)
+            {
+                return item;
+            }
+        }
+        return null;
     }
 
     public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
