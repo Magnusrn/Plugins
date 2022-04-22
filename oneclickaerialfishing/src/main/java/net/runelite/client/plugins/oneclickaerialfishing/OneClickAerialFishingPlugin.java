@@ -135,8 +135,8 @@ public class OneClickAerialFishingPlugin extends Plugin {
 
     private MenuEntry dropFishMenuEntry(Widget Fish){
         return createMenuEntry(
-                Fish.getId(),
-                MenuAction.ITEM_FIFTH_OPTION,
+                7,
+                MenuAction.CC_OP_LOW_PRIORITY,
                 Fish.getIndex(),
                 9764864,
                 false);
