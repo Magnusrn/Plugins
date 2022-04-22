@@ -62,6 +62,13 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         {
             cachedXP = client.getSkillExperience(Skill.RUNECRAFT);
         }
+
+        //this is a patch i have no clue why the widget is triggering, some logic bug which i need to find but this is temporary solution.
+        Widget widget = client.getWidget(229,1);
+        if (config.noEssencePatch() && widget!=null && widget.getText().equals("You do not have any pure essences to bind."))
+        {
+            craftedRunes = true;
+        }
     }
 
     private void reset() {
@@ -90,7 +97,6 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
             craftedRunes = true ;
         }
     }
-
 
     @Subscribe
     private void onClientTick(ClientTick event)
@@ -581,11 +587,11 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     }
 
     private boolean isinMorytaniaHideout5HighAgilityShortcut() {
-        return client.getLocalPlayer().getWorldLocation().isInArea(new WorldArea(new WorldPoint(3532,9764,0),new WorldPoint(3542,9781,0)));
+        return client.getLocalPlayer().getWorldLocation().isInArea(new WorldArea(new WorldPoint(3532,9764,0),new WorldPoint(3541,9781,0)));
     }
 
     private boolean isInBloodAltarArea() {
-        return client.getLocalPlayer().getWorldLocation().isInArea(new WorldArea(new WorldPoint(3543,9764,0),new WorldPoint(3570,9784,0)));
+        return client.getLocalPlayer().getWorldLocation().isInArea(new WorldArea(new WorldPoint(3542,9764,0),new WorldPoint(3570,9784,0)));
     }
 
     private boolean isInBloodAltar() {

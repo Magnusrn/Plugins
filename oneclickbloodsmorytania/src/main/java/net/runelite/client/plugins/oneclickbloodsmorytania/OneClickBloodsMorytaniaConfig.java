@@ -38,4 +38,15 @@ public interface OneClickBloodsMorytaniaConfig extends Config
     default EssenceType essenceType() {
         return EssenceType.PURE_ESSENCE;
     }
+
+    @ConfigItem(
+            position = 4,
+            keyName = "noEssencePatch",
+            name = "No Essence Bug Patch",
+            description = "Enable this if you have the 'No esence to be crafted bug'"
+    )
+    default boolean noEssencePatch()
+    {
+        return true;
+    }
 }
