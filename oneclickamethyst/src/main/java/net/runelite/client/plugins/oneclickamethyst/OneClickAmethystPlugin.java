@@ -174,10 +174,10 @@ public class OneClickAmethystPlugin extends Plugin
 
     private MenuEntry dropGemMES(Widget gem){
         return createMenuEntry(
-                gem.getId(),
-                MenuAction.ITEM_FIFTH_OPTION,
+                7,
+                MenuAction.CC_OP_LOW_PRIORITY,
                 gem.getIndex(),
-                9764864,
+                WidgetInfo.INVENTORY.getId(),
                 false);
     }
 
