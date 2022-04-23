@@ -206,7 +206,7 @@ public class oneClickCustomPlugin extends Plugin{
 
     private void handleInventoryItemClicked(MenuOptionClicked event) { //hella copy paste code fix this dumb shit. Maybe rework whole plugin tbh kinda bodged.
         int itemID = event.getWidget().getItemId();
-        setSelectedInventoryItem(getInventoryItem(itemID));
+        setSelectedInventoryItem(getLastInventoryItem(itemID));
         if (getItemOnNPCsHashMap().get(itemID)!=null)
         {
             NPC nearestnpc = getNpc(getItemOnNPCsHashMap().get(itemID));
@@ -497,31 +497,6 @@ public class oneClickCustomPlugin extends Plugin{
         return null;
     }
 
-    private Widget getInventoryItem(int id) {
-        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
-        if (inventoryWidget!=null && !inventoryWidget.isHidden())
-        {
-            return getWidgetItem(inventoryWidget,id);
-        }
-        if (bankInventoryWidget!=null && !bankInventoryWidget.isHidden())
-        {
-            return getWidgetItem(bankInventoryWidget,id);
-        }
-        return null;
-    }
-
-    private Widget getWidgetItem(Widget widget,int id) {
-        for (Widget item : widget.getDynamicChildren())
-        {
-            if (item.getItemId() == id)
-            {
-                return item;
-            }
-        }
-        return null;
-    }
-
     private void setSelectedInventoryItem(Widget item) {
         client.setSelectedSpellWidget(WidgetInfo.INVENTORY.getId());
         client.setSelectedSpellChildIndex(item.getIndex());
@@ -599,5 +574,21 @@ public class oneClickCustomPlugin extends Plugin{
             }
         }
         return IDs;
+    }
+
+    private Widget getLastInventoryItem(int id) {
+        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
+        if (inventoryWidget!=null && !inventoryWidget.isHidden())
+        {
+            return getLastWidgetItem(inventoryWidget,id);
+        }
+        return null;
+    }
+
+    private Widget getLastWidgetItem(Widget widget,int id) {
+        return Arrays.stream(widget.getDynamicChildren())
+                .filter(item -> item.getItemId()==id)
+                .reduce((first, second) -> second)
+                .orElse(null);
     }
 }
