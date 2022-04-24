@@ -129,6 +129,9 @@ public class oneClickCustomPlugin extends Plugin{
                 event.getActionParam0(),
                 event.getActionParam1(),
                 true);
+        client.setTempMenuEntry(Arrays.stream(client.getMenuEntries())
+                .filter(x->x.getOption().equals("One Click Custom"))
+                .findFirst().orElse(null));
     }
 
     @Subscribe
@@ -178,21 +181,12 @@ public class oneClickCustomPlugin extends Plugin{
             return;
         }
 
-
         if(client.getLocalPlayer() == null || client.getGameState() != GameState.LOGGED_IN) return;
-        String text;
-        {
-            text =  "<col=00ff00>One Click Custom";
-        }
-
-        client.insertMenuItem(
-                text,
-                "",
-                MenuAction.UNKNOWN.getId(),
-                0,
-                0,
-                0,
-                true);
+        String text =  "<col=00ff00>One Click Custom";
+        client.insertMenuItem(text,"", MenuAction.UNKNOWN.getId(), 0, 0, 0, true);
+        client.setTempMenuEntry(Arrays.stream(client.getMenuEntries())
+                .filter(x->x.getOption().equals("<col=00ff00>One Click Custom"))
+                .findFirst().orElse(null));
     }
 
     private void handleClick(MenuOptionClicked event)
