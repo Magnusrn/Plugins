@@ -27,6 +27,7 @@ rootProject.name = "Kitsch Plugins"
 
 include(":birdhouseinfobox")
 include(":coxraidscouter")
+include(":ktheatreofblood")
 include(":objecthider")
 include(":oneclickamethyst")
 include(":oneclickblastfurnace")
