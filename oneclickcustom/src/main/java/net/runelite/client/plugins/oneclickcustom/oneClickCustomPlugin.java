@@ -556,7 +556,7 @@ public class oneClickCustomPlugin extends Plugin{
                 Pattern pattern = Pattern.compile("^(\\d*,)*\\d*$"); //regex to allow for commenting, skips line if not correct format.
                 Matcher matcher = pattern.matcher(line);
                 boolean matchFound = matcher.find();
-                if (!matchFound) continue;
+                if (!matchFound || line.equals("")) continue; //idk why this needs the empty line check why doesn't empty line fail the regex
 
                 List<Integer> lineIDs = new ArrayList<>();
                 for(String id : line.split(",")) {
