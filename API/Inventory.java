@@ -3,20 +3,24 @@ public class Inventory {
         Widget inventory = client.getWidget(WidgetInfo.INVENTORY.getId());
         Widget bankInventory = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId());
 
-        if (inventory!=null && !inventory.isHidden()
-                && inventory.getDynamicChildren()!=null)
-        {
-            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren());
-            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
-        }
-
         if (bankInventory!=null && !bankInventory.isHidden()
                 && bankInventory.getDynamicChildren()!=null)
         {
-            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId()).getDynamicChildren());
-            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
+            return getEmptySlots(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
         }
+
+        if (inventory!=null && inventory.getDynamicChildren()!=null)
+        {
+            return getEmptySlots(WidgetInfo.INVENTORY);
+        }
+
         return -1;
+    }
+
+    private int getEmptySlots(WidgetInfo widgetInfo) {
+        client.runScript(6009, 9764864, 28, 1, -1);
+        List<Widget> inventoryItems = Arrays.asList(client.getWidget(widgetInfo.getId()).getDynamicChildren());
+        return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
     }
 
     private Widget getLastInventoryItem(int id) {
