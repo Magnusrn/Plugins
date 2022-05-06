@@ -33,7 +33,7 @@ import java.util.Set;
 @Extension
 @PluginDescriptor(
         name = "One Click Anglerfish",
-        description = "Aaron very sexy",
+        description = "Catches Anglerfish and banks",
         tags = {"angler","anglerfish","one","click","oneclick"}
 )
 public class OneClickAnglerfishPlugin extends Plugin {
