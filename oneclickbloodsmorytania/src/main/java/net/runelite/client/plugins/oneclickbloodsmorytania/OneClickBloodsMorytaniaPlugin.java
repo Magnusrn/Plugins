@@ -49,6 +49,8 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     private int bankingState = 0;
     private int cachedXP = 0;
     private boolean craftedRunes = false;
+    private int bankTeleportTimeout = 0;
+    private int POHTeleportTimeout = 0;
 
     @Override
     protected void startUp() throws Exception {
@@ -69,6 +71,8 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         {
             craftedRunes = true;
         }
+        if (bankTeleportTimeout>0) bankTeleportTimeout --;
+        if (POHTeleportTimeout>0) POHTeleportTimeout --;
     }
 
     private void reset() {
@@ -204,7 +208,11 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                     craftedRunes = false;
                     runecraftingState = 7;
                 case 7:
-                    event.setMenuEntry(teleToBankMES());
+                    if (teleToBankMES() != null)
+                    {
+                        event.setMenuEntry(teleToBankMES());
+                        bankTeleportTimeout = 4;
+                    }
                     return;
             }
         }
@@ -266,7 +274,11 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                     bankingState = 7;
                     return;
                 case 7:
-                    event.setMenuEntry(teleToPOHMES());
+                    if (teleToPOHMES()!=null)
+                    {
+                        event.setMenuEntry(teleToPOHMES());
+                        POHTeleportTimeout = 4;
+                    }
                     return;
             }
         }
@@ -330,10 +342,18 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         }
         if (getEmptySlots()!=0)
         {
-            event.setMenuEntry(teleToBankMES());
+            if (teleToBankMES() != null)
+            {
+                event.setMenuEntry(teleToBankMES());
+                bankTeleportTimeout = 4;
+            }
             return;
         }
-        event.setMenuEntry(teleToPOHMES());
+        if (teleToPOHMES()!=null)
+        {
+            event.setMenuEntry(teleToPOHMES());
+            POHTeleportTimeout = 4;
+        }
     }
 
     private MenuEntry handlePouchRepair() {
@@ -464,6 +484,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     }
 
     private MenuEntry teleToBankMES() {
+        if (bankTeleportTimeout>0) return null;
         if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE) || client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE_13342))
         {
             return createMenuEntry(4, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_CAPE.getId(), false);
@@ -523,6 +544,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     }
 
     private MenuEntry teleToPOHMES() {
+        if (POHTeleportTimeout>0) return null;
         Widget tab = getInventoryItem(ItemID.TELEPORT_TO_HOUSE);
         Widget conCape = getInventoryItem(ItemID.CONSTRUCT_CAPE);
         Widget conCapeT = getInventoryItem(ItemID.CONSTRUCT_CAPET);
@@ -632,15 +654,16 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     }
 
     private Widget getInventoryItem(int id) {
+        client.runScript(6009, 9764864, 28, 1, -1); //rebuild inventory ty pajeet
         Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
         Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
-        if (inventoryWidget!=null && !inventoryWidget.isHidden())
-        {
-            return getWidgetItem(inventoryWidget,id);
-        }
         if (bankInventoryWidget!=null && !bankInventoryWidget.isHidden())
         {
             return getWidgetItem(bankInventoryWidget,id);
+        }
+        if (inventoryWidget!=null) //if hidden check exists then you can't access inventory from any tab except inventory
+        {
+            return getWidgetItem(inventoryWidget,id);
         }
         return null;
     }
@@ -660,20 +683,24 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         Widget inventory = client.getWidget(WidgetInfo.INVENTORY.getId());
         Widget bankInventory = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId());
 
-        if (inventory!=null && !inventory.isHidden()
-                && inventory.getDynamicChildren()!=null)
-        {
-            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren());
-            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
-        }
-
         if (bankInventory!=null && !bankInventory.isHidden()
                 && bankInventory.getDynamicChildren()!=null)
         {
-            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId()).getDynamicChildren());
-            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
+            return getEmptySlots(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
         }
+
+        if (inventory!=null && inventory.getDynamicChildren()!=null)
+        {
+            return getEmptySlots(WidgetInfo.INVENTORY);
+        }
+
         return -1;
+    }
+
+    private int getEmptySlots(WidgetInfo widgetInfo) {
+        client.runScript(6009, 9764864, 28, 1, -1);
+        List<Widget> inventoryItems = Arrays.asList(client.getWidget(widgetInfo.getId()).getDynamicChildren());
+        return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
     }
 
     private MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
