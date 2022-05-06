@@ -36,15 +36,16 @@ public class Inventory {
     }
 
     private Widget getInventoryItem(int id) {
+        client.runScript(6009, 9764864, 28, 1, -1); //rebuild inventory ty pajeet
         Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
         Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
-        if (inventoryWidget!=null && !inventoryWidget.isHidden())
-        {
-            return getWidgetItem(inventoryWidget,id);
-        }
         if (bankInventoryWidget!=null && !bankInventoryWidget.isHidden())
         {
             return getWidgetItem(bankInventoryWidget,id);
+        }
+        if (inventoryWidget!=null) //if hidden check exists then you can't access inventory from any tab except inventory
+        {
+            return getWidgetItem(inventoryWidget,id);
         }
         return null;
     }
