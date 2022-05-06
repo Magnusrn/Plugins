@@ -5,6 +5,8 @@ import javax.inject.Inject;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
+import net.runelite.api.coords.WorldArea;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.queries.GameObjectQuery;
@@ -75,8 +77,9 @@ public class OneClickAmethystPlugin extends Plugin
             return;
         }
         System.out.println("3");
-        if(client.getLocalPlayer().isMoving() ||client.getLocalPlayer().getPoseAnimation()
-                != client.getLocalPlayer().getIdlePoseAnimation())
+        if(config.consumeClicks() &&
+                (client.getLocalPlayer().isMoving() ||
+                 client.getLocalPlayer().getPoseAnimation() != client.getLocalPlayer().getIdlePoseAnimation()))
         {
             event.consume();
         }
@@ -157,6 +160,16 @@ public class OneClickAmethystPlugin extends Plugin
                 .stream()
                 .filter(wallObject -> players.stream().noneMatch(p -> p.getWorldLocation().distanceTo(wallObject.getWorldLocation())<2))
                 .collect(Collectors.toList());
+
+
+        if (client.getVarbitValue(Varbits.DIARY_FALADOR_ELITE)==0) //filter veins only accessible for people without diary
+        {
+            WorldArea nonDiaryArea = new WorldArea(new WorldPoint(3015,9696,0),new WorldPoint(3033,9712,0));
+            wallObjects = wallObjects
+                    .stream()
+                    .filter(wallObject -> wallObject.getWorldLocation().isInArea(nonDiaryArea))
+                    .collect(Collectors.toList());
+        }
 
         return wallObjects.stream()
                 .min(Comparator.comparing(entityType -> entityType.getLocalLocation().distanceTo(client.getLocalPlayer().getLocalLocation())))
@@ -248,32 +261,37 @@ public class OneClickAmethystPlugin extends Plugin
         Widget inventory = client.getWidget(WidgetInfo.INVENTORY.getId());
         Widget bankInventory = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId());
 
-        if (inventory!=null && !inventory.isHidden()
-                && inventory.getDynamicChildren()!=null)
-        {
-            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren());
-            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
-        }
-
         if (bankInventory!=null && !bankInventory.isHidden()
                 && bankInventory.getDynamicChildren()!=null)
         {
-            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId()).getDynamicChildren());
-            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
+            return getEmptySlots(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
         }
+
+        if (inventory!=null && inventory.getDynamicChildren()!=null)
+        {
+            return getEmptySlots(WidgetInfo.INVENTORY);
+        }
+
         return -1;
     }
 
+    private int getEmptySlots(WidgetInfo widgetInfo) {
+        client.runScript(6009, 9764864, 28, 1, -1);
+        List<Widget> inventoryItems = Arrays.asList(client.getWidget(widgetInfo.getId()).getDynamicChildren());
+        return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
+    }
+
     private Widget getInventoryItem(int id) {
+        client.runScript(6009, 9764864, 28, 1, -1);
         Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
         Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
-        if (inventoryWidget!=null && !inventoryWidget.isHidden())
-        {
-            return getWidgetItem(inventoryWidget,id);
-        }
         if (bankInventoryWidget!=null && !bankInventoryWidget.isHidden())
         {
             return getWidgetItem(bankInventoryWidget,id);
+        }
+        if (inventoryWidget!=null) //if hidden check exists then you can't access inventory from any tab except inventory
+        {
+            return getWidgetItem(inventoryWidget,id);
         }
         return null;
     }

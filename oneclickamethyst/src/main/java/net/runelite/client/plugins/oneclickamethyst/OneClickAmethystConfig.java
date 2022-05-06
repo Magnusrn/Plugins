@@ -25,10 +25,18 @@ public interface OneClickAmethystConfig extends Config
     default boolean useSpec(){return false;}
 
     @ConfigItem(
-            position = 1,
+            position = 2,
             keyName = "dropGems",
             name = "Drop Gems",
             description = "Drops gems if enabled "
     )
     default boolean dropGems(){return false;}
+
+    @ConfigItem(
+            position = 3,
+            keyName = "consumeClicks",
+            name = "Consume Clicks",
+            description = "Consumes clicks while moving"
+    )
+    default boolean consumeClicks(){return true;}
 }
