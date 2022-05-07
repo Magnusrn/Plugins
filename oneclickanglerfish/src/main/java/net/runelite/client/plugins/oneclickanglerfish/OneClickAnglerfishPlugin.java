@@ -25,10 +25,7 @@ import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 @Extension
 @PluginDescriptor(
@@ -40,13 +37,21 @@ public class OneClickAnglerfishPlugin extends Plugin {
 
     private String state = "BARREL";
 
+    @Inject
+    private Client client;
+
+    @Inject
+    private OneClickAnglerfishConfig config;
+
+    @Provides
+    OneClickAnglerfishConfig provideConfig(ConfigManager configManager) {
+        return (OneClickAnglerfishConfig)configManager.getConfig(OneClickAnglerfishConfig.class);
+    }
+
     @Override
     protected void startUp() throws Exception {
         state = "BARREL";
     }
-
-    @Inject
-    private Client client;
 
     @Subscribe
     private void onClientTick(ClientTick event) {
@@ -64,6 +69,21 @@ public class OneClickAnglerfishPlugin extends Plugin {
     }
 
     private void handleClick(MenuOptionClicked event) {
+        List<Integer> fishingAnimations = Arrays.asList(622,633);
+        if (fishingAnimations.stream().anyMatch(animation -> animation == client.getLocalPlayer().getAnimation()))
+        {
+            System.out.println("consume event as fishing");
+            event.consume();
+            return;
+        }
+        if (config.consumeClicks() &&
+                (client.getLocalPlayer().isMoving() || client.getLocalPlayer().getPoseAnimation() != client.getLocalPlayer().getIdlePoseAnimation()) && !bankOpen())
+        {
+            System.out.println("Consume event because not idle?");
+            event.consume();
+            return;
+        }
+
         if (getEmptySlots()>0 && getFishingSpot()!=null)
         {
             event.setMenuEntry(catchFishMES());
