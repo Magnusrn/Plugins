@@ -1,14 +1,19 @@
 package net.runelite.client.plugins.ktheatreofblood.rooms.Maiden;
+import com.google.inject.Provides;
 import net.runelite.api.*;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.callback.ClientThread;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.ktheatreofblood.KTheatreOfBloodConfig;
 import net.runelite.client.plugins.ktheatreofblood.Room;
 import net.runelite.client.plugins.ktheatreofblood.KTheatreOfBloodPlugin;
+import net.runelite.client.util.HotkeyListener;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -16,16 +21,47 @@ import java.util.HashMap;
 public class Maiden extends Room {
     @Inject
     private Client client;
-    HashMap<NPC,String> crabs = new HashMap<>();
+
+    @Inject
+    private ClientThread clientThread;
+
+    @Inject
+    private KTheatreOfBloodConfig config;
+
+    @Inject
+    private KeyManager keyManager;
+
+    @Provides
+    KTheatreOfBloodConfig provideConfig(ConfigManager configManager) {
+        return (KTheatreOfBloodConfig) configManager.getConfig(KTheatreOfBloodConfig.class);
+    }
 
     @Inject
     protected Maiden(KTheatreOfBloodPlugin plugin, KTheatreOfBloodConfig config) {
         super(plugin, config);
     }
 
+    HashMap<NPC,String> crabs = new HashMap<>();
+    private boolean hotkeyHeld = false;
+
+    private final HotkeyListener hotkeyListener = new HotkeyListener(() -> config.maidenKeybind()) {
+        @Override
+        public void hotkeyPressed() {
+            hotkeyHeld = true;
+        }
+
+        @Override
+        public void hotkeyReleased() {
+            hotkeyHeld = false;
+        }
+    };
+
+    protected void startUp() throws Exception {
+        keyManager.registerKeyListener(hotkeyListener);
+    }
+
     @Subscribe
-    public void onNpcSpawned(NpcSpawned npcSpawned)
-    {
+    public void onNpcSpawned(NpcSpawned npcSpawned) {
         String position = "??";
         NPC npc = npcSpawned.getNpc();
         int x = npc.getWorldLocation().getRegionX();
@@ -93,7 +129,7 @@ public class Maiden extends Room {
     @Subscribe
     public void onMenuOptionClicked(MenuOptionClicked event)
     {
-        if (event.getMenuTarget().contains("Maiden") && crabs.size()!=0)
+        if (event.getMenuTarget().contains("Maiden") && crabs.size()!=0 && hotkeyHeld)
         {
             NPC npc = getOptimalCrab();
             if (npc==null) return;
