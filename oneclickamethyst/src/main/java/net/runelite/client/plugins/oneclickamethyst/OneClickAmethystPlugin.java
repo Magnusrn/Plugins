@@ -76,6 +76,12 @@ public class OneClickAmethystPlugin extends Plugin
             event.consume();
             return;
         }
+        if(config.useSpec() && !bankOpen()) {
+            if (client.getVar(VarPlayer.SPECIAL_ATTACK_PERCENT) == 1000) {
+                event.setMenuEntry(specAtk());
+                return;
+            }
+        }
         System.out.println("3");
         if(config.consumeClicks() &&
                 (client.getLocalPlayer().isMoving() ||
@@ -101,13 +107,6 @@ public class OneClickAmethystPlugin extends Plugin
                     event.setMenuEntry(dropGemMES(getInventoryItem(gem)));
                     return;
                 }
-            }
-        }
-
-        if(config.useSpec() && !bankOpen()) {
-            if (client.getVar(VarPlayer.SPECIAL_ATTACK_PERCENT) == 1000) {
-                event.setMenuEntry(specAtk());
-                return;
             }
         }
 

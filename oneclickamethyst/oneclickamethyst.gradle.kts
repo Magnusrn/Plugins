@@ -25,7 +25,7 @@ import ProjectVersions.openosrsVersion
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "2.1.8"
+version = "2.1.9"
 
 project.extra["PluginName"] = "One Click Amethyst" // This is the name that is used in the external plugin manager panel
 project.extra["PluginDescription"] = "One Click Amethyst mining and crafting." // This is the description that is used in the external plugin manager panel
