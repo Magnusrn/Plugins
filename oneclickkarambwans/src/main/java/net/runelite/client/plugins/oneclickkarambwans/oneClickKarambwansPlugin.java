@@ -41,8 +41,7 @@ public class oneClickKarambwansPlugin extends Plugin {
     private oneClickKarambwansConfig config;
 
     @Provides
-    oneClickKarambwansConfig provideConfig(ConfigManager configManager)
-    {
+    oneClickKarambwansConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(oneClickKarambwansConfig.class);
     }
 
@@ -59,12 +58,10 @@ public class oneClickKarambwansPlugin extends Plugin {
     }
 
     @Subscribe
-    private void onClientTick(ClientTick event)
-    {
+    private void onClientTick(ClientTick event) {
         if (this.client.getLocalPlayer() == null || this.client.getGameState() != GameState.LOGGED_IN) return;
         String text = "<col=00ff00>One Click Karambwans";
         client.insertMenuItem(text, "", MenuAction.UNKNOWN.getId(), 0, 0, 0, true);
-        //Ethan Vann the goat. Allows for left clicking anywhere when bank open instead of withdraw/deposit taking priority
         client.setTempMenuEntry(Arrays.stream(client.getMenuEntries()).filter(x->x.getOption().equals(text)).findFirst().orElse(null));
     }
 
@@ -78,20 +75,21 @@ public class oneClickKarambwansPlugin extends Plugin {
                 || client.getLocalPlayer().getAnimation() == FAIRY_RING_ANIMATION1
                 || client.getLocalPlayer().getAnimation() == FAIRY_RING_ANIMATION2)
                 & !bankOpen()) {
-            System.out.println("Consume event because not idle?");
+            print("Consume event because not idle?");
             event.consume();
             return;
         }
-        System.out.println("1");
 
-        if (getInventoryItem(ItemID.RAW_KARAMBWANJI)== null || getInventoryItem(ItemID.KARAMBWAN_VESSEL_3159) == null) {
-            System.out.println("Consume event because no karambwanji or vessel");
+        if (getInventoryItem(ItemID.RAW_KARAMBWANJI)== null ||
+                (getInventoryItem(ItemID.KARAMBWAN_VESSEL_3159) == null && getInventoryItem(ItemID.KARAMBWAN_VESSEL) == null))
+        {
+            print("Consume event because no karambwanji or vessel");
             event.consume();
             return;
         }
-        System.out.println("2");
 
         if (getEmptySlots() == 0) {
+            print("Trying to tele to bank");
             if (getGameObject(FAIRY_RING_KARAMJA_ID) != null) {
                 event.setMenuEntry(teleToBankMES());
                 return;
@@ -105,6 +103,7 @@ public class oneClickKarambwansPlugin extends Plugin {
 
         if (getInventoryItem(ItemID.RAW_KARAMBWAN) == null && getGameObject(FAIRY_RING_KARAMJA_ID) == null)
         {
+            print("trying to access/tele to fairy ring");
             if (useFairyRingMES()!=null)
             {
                 event.setMenuEntry(useFairyRingMES());
@@ -144,6 +143,7 @@ public class oneClickKarambwansPlugin extends Plugin {
         }
 
         if (getGameObject(FAIRY_RING_KARAMJA_ID) != null) {
+            print("Trying to fish ");
             event.setMenuEntry(fishingSpotMES());
         }
     }
@@ -424,5 +424,12 @@ public class oneClickKarambwansPlugin extends Plugin {
     public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
         return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
                 .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
+    }
+
+    private void print(String msg) {
+        if (config.debug())
+        {
+            client.addChatMessage(ChatMessageType.GAMEMESSAGE,"",msg,"");
+        }
     }
 }

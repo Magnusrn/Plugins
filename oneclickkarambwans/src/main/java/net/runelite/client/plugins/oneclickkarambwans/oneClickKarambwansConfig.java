@@ -28,4 +28,15 @@ public interface oneClickKarambwansConfig extends Config {
     {
         return true;
     }
+
+    @ConfigItem(
+            position= 3,
+            keyName = "debug",
+            name = "Debug",
+            description = "Posts debug message to chat if having problems"
+    )
+    default boolean debug()
+    {
+        return true;
+    }
 }
