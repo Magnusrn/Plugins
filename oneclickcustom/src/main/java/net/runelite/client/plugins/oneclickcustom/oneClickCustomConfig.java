@@ -152,7 +152,7 @@ public interface oneClickCustomConfig extends Config {
             position = 9,
             keyName = "withinTiles",
             name = "Distance Radius",
-            description = "Search for objects wtihin how many tiles"
+            description = "Search for objects within how many tiles"
     )
     default int withinTiles()
     {

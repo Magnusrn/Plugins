@@ -1,7 +1,7 @@
 package net.runelite.client.plugins.oneclickcustom;
 
 public class oneClickCustomTypes {
-    enum methods
+    public enum methods
     {
         Gather,
         Fish,
@@ -10,7 +10,7 @@ public class oneClickCustomTypes {
         Pick_Up,
         Use_Item_On_X
     }
-    enum bankTypes {
+    public enum bankTypes {
         NPC,
         Booth,
         Chest

@@ -20,7 +20,7 @@ public class GetObjects {
 
     public <T extends Locatable> Object getNearestObject(Stream<T> stream) {
         return stream.filter(x -> x.getWorldLocation().distanceTo(client.getLocalPlayer().getWorldLocation())<config.withinTiles())
-                .min(Comparator.comparing(x -> x.getLocalLocation().distanceTo(client.getLocalPlayer().getLocalLocation())))
+                .min(Comparator.comparing(x -> x.getWorldLocation().distanceTo(client.getLocalPlayer().getWorldLocation())))
                 .orElse(null);
     }
 
@@ -63,7 +63,7 @@ public class GetObjects {
         if (tileItems.size()==0 || tileItems.get(0) == null) return null;
         return tileItems.stream()
                 .filter(tileItem -> tileItem.getTile().getWorldLocation().distanceTo(client.getLocalPlayer().getWorldLocation())<config.withinTiles())
-                .min(Comparator.comparing(tileItem -> tileItem.getTile().getLocalLocation().distanceTo(client.getLocalPlayer().getLocalLocation())))
+                .min(Comparator.comparing(tileItem -> tileItem.getTile().getWorldLocation().distanceTo(client.getLocalPlayer().getWorldLocation())))
                 .orElse(null);
     }
 }
