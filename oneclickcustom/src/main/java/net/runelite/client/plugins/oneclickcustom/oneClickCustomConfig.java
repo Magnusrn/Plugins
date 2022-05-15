@@ -147,4 +147,15 @@ public interface oneClickCustomConfig extends Config {
     {
         return 0;
     }
+
+    @ConfigItem(
+            position = 9,
+            keyName = "withinTiles",
+            name = "Distance Radius",
+            description = "Search for objects wtihin how many tiles"
+    )
+    default int withinTiles()
+    {
+        return 100;
+    }
 }

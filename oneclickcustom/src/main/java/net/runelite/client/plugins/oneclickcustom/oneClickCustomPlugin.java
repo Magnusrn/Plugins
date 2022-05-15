@@ -90,10 +90,7 @@ public class oneClickCustomPlugin extends Plugin{
     @Subscribe
     private void onMenuEntryAdded(MenuEntryAdded event)
     {
-        if (config.oneClickType()!=oneClickCustomTypes.methods.Use_Item_On_X)
-        {
-            return;
-        }
+        if (config.oneClickType()!=oneClickCustomTypes.methods.Use_Item_On_X) return;
 
         if (0 <= event.getActionParam0() && event.getActionParam0()<= 27
                 && event.getOption().equals("Use"))
@@ -302,7 +299,6 @@ public class oneClickCustomPlugin extends Plugin{
         if (config.oneClickType()==oneClickCustomTypes.methods.Attack)
         {
             NPC nearestAliveNPC = objects.getNearestAliveNPC(getConfigIds());
-
             return createMenuEntry(
                     nearestAliveNPC.getIndex(),
                     MenuAction.NPC_SECOND_OPTION,
@@ -326,31 +322,22 @@ public class oneClickCustomPlugin extends Plugin{
     private MenuAction getMenuAction() {
         MenuAction npcMenuAction = MenuAction.NPC_FIRST_OPTION;
         MenuAction objectMenuAction = MenuAction.GAME_OBJECT_FIRST_OPTION ;
-        switch(config.opcode()){
+        switch(config.opcode())
+        {
             case 2:
                 objectMenuAction = MenuAction.GAME_OBJECT_SECOND_OPTION;
-                break;
-            case 3:
-                objectMenuAction = MenuAction.GAME_OBJECT_THIRD_OPTION;
-                break;
-            case 4:
-                objectMenuAction = MenuAction.GAME_OBJECT_FOURTH_OPTION;
-                break;
-            case 5:
-                objectMenuAction = MenuAction.GAME_OBJECT_FIFTH_OPTION;
-                break;
-        }
-        switch(config.opcode()){
-            case 2:
                 npcMenuAction = MenuAction.NPC_SECOND_OPTION;
                 break;
             case 3:
+                objectMenuAction = MenuAction.GAME_OBJECT_THIRD_OPTION;
                 npcMenuAction = MenuAction.NPC_THIRD_OPTION;
                 break;
             case 4:
+                objectMenuAction = MenuAction.GAME_OBJECT_FOURTH_OPTION;
                 npcMenuAction = MenuAction.NPC_FOURTH_OPTION;
                 break;
             case 5:
+                objectMenuAction = MenuAction.GAME_OBJECT_FIFTH_OPTION;
                 npcMenuAction = MenuAction.NPC_FIFTH_OPTION;
                 break;
         }
