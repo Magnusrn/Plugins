@@ -4,7 +4,7 @@ import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
-import net.runelite.api.queries.GameObjectQuery;
+import net.runelite.client.plugins.oneclickcustom.utils.GetObjects;
 import net.runelite.api.queries.NPCQuery;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -12,6 +12,7 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.plugins.oneclickcustom.utils.Inventory;
 import org.pf4j.Extension;
 
 import javax.inject.Inject;
@@ -19,7 +20,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Extension
 @PluginDescriptor(
@@ -36,10 +36,12 @@ public class oneClickCustomPlugin extends Plugin{
 
     @Inject
     private Client client;
-
+    @Inject
+    private GetObjects objects;
+    @Inject
+    private Inventory inventory;
     @Inject
     private oneClickCustomConfig config;
-
     @Inject
     private ConfigManager configManager;
 
@@ -96,11 +98,11 @@ public class oneClickCustomPlugin extends Plugin{
         if (0 <= event.getActionParam0() && event.getActionParam0()<= 27
                 && event.getOption().equals("Use"))
         {
-            Widget item = getItemByInventoryIndex(event.getActionParam0());
+            Widget item = inventory.getItemByInventoryIndex(event.getActionParam0());
 
             if (getItemOnNPCsHashMap().get(item.getItemId())!=null) //if inventory item exists in config list
             {
-                NPC nearestnpc = getNpc(getItemOnNPCsHashMap().get(item.getItemId())); //gets nearest npc from key and checks if visible
+                NPC nearestnpc = objects.getNpc(getItemOnNPCsHashMap().get(item.getItemId())); //gets nearest npc from key and checks if visible
                 if (nearestnpc!=null)
                 {
                     insertInventoryMenu(event, item.getItemId());
@@ -109,15 +111,13 @@ public class oneClickCustomPlugin extends Plugin{
 
             if (getItemOnGameObjectsHashMap().get(item.getItemId())!=null) //if inventory item exists in config list
             {
-                GameObject nearestGameObject = getGameObject(getItemOnGameObjectsHashMap().get(item.getItemId())); //gets nearest gameObject from key and checks if visible
+                GameObject nearestGameObject = objects.getGameObject(getItemOnGameObjectsHashMap().get(item.getItemId())); //gets nearest gameObject from key and checks if visible
                 if (nearestGameObject!=null)
                 {
                     insertInventoryMenu(event, item.getItemId());
                 }
             }
         }
-
-
     }
 
     private void insertInventoryMenu(MenuEntryAdded event,int ID) {
@@ -152,32 +152,16 @@ public class oneClickCustomPlugin extends Plugin{
     }
 
     @Subscribe
-    private void onClientTick(ClientTick event) //fix this baloney
-    {
-        if (config.oneClickType()==oneClickCustomTypes.methods.Use_Item_On_X)
-        {
-            return;
-        }
+    private void onClientTick(ClientTick event) {
+        if (config.oneClickType()==oneClickCustomTypes.methods.Use_Item_On_X) return;
 
-        if (config.oneClickType()==oneClickCustomTypes.methods.Gather && getGameObject(getConfigIds())==null)
-        {
-            return;
-        }
+        if (config.oneClickType()==oneClickCustomTypes.methods.Gather && objects.getGameObject(getConfigIds())==null) return;
 
-        if ((GroundItems.size()==0 || getNearestTileItem(GroundItems)==null) && config.oneClickType() == oneClickCustomTypes.methods.Pick_Up)
-        {
-            return;
-        }
+        if ((GroundItems.size()==0 || objects.getNearestTileItem(GroundItems)==null) && config.oneClickType() == oneClickCustomTypes.methods.Pick_Up) return;
 
-        if (getNpc(getConfigIds())==null &!(config.oneClickType()==oneClickCustomTypes.methods.Gather) &! (config.oneClickType() == oneClickCustomTypes.methods.Pick_Up))
-        {
-            return;
-        }
+        if (objects.getNpc(getConfigIds())==null &!(config.oneClickType()==oneClickCustomTypes.methods.Gather) &! (config.oneClickType() == oneClickCustomTypes.methods.Pick_Up)) return;
 
-        if (getEmptySlots()==0 && config.InventoryFull() && config.oneClickType()!=oneClickCustomTypes.methods.Attack)
-        {
-            return;
-        }
+        if (inventory.getEmptySlots()==0 && config.InventoryFull() && config.oneClickType()!=oneClickCustomTypes.methods.Attack) return;
 
         if(client.getLocalPlayer() == null || client.getGameState() != GameState.LOGGED_IN) return;
         String text =  "<col=00ff00>One Click Custom";
@@ -187,27 +171,23 @@ public class oneClickCustomPlugin extends Plugin{
                 .findFirst().orElse(null));
     }
 
-    private void handleClick(MenuOptionClicked event)
-    {
-        if (getEmptySlots()==0 && config.InventoryFull())
-        {
-            return;
-        }
+    private void handleClick(MenuOptionClicked event) {
+        if (inventory.getEmptySlots()==0 && config.InventoryFull()) return;
         event.setMenuEntry(setCustomMenuEntry());
     }
 
     private void handleInventoryItemClicked(MenuOptionClicked event) { //hella copy paste code fix this dumb shit. Maybe rework whole plugin tbh kinda bodged.
         int itemID = event.getWidget().getItemId();
-        setSelectedInventoryItem(getLastInventoryItem(itemID));
+        inventory.setSelectedInventoryItem(inventory.getLastInventoryItem(itemID));
         if (getItemOnNPCsHashMap().get(itemID)!=null)
         {
-            NPC nearestnpc = getNpc(getItemOnNPCsHashMap().get(itemID));
+            NPC nearestnpc = objects.getNpc(getItemOnNPCsHashMap().get(itemID));
             if (nearestnpc!=null)
             {
                 event.setMenuEntry(createMenuEntry(nearestnpc.getIndex(),
                         MenuAction.WIDGET_TARGET_ON_NPC,
-                        getNPCLocation(nearestnpc).getX(),
-                        getNPCLocation(nearestnpc).getY(),
+                        getLocation(nearestnpc).getX(),
+                        getLocation(nearestnpc).getY(),
                         false));
                 return;
             }
@@ -215,7 +195,7 @@ public class oneClickCustomPlugin extends Plugin{
 
         if (getItemOnGameObjectsHashMap().get(itemID)!=null)
         {
-            GameObject nearestGameObject = getGameObject(getItemOnGameObjectsHashMap().get(itemID));
+            GameObject nearestGameObject = objects.getGameObject(getItemOnGameObjectsHashMap().get(itemID));
 
             if (nearestGameObject!=null)
             {
@@ -228,14 +208,13 @@ public class oneClickCustomPlugin extends Plugin{
         }
     }
 
-    private MenuEntry setCustomMenuEntry()
-    {
+    private MenuEntry setCustomMenuEntry() {
         if (config.Bank()&&(config.oneClickType()==oneClickCustomTypes.methods.Fish ||
                 config.oneClickType()==oneClickCustomTypes.methods.Gather||
                 config.oneClickType()==oneClickCustomTypes.methods.Pickpocket||
                 config.oneClickType()==oneClickCustomTypes.methods.Pick_Up))
         {
-            if (getEmptySlots()==0)
+            if (inventory.getEmptySlots()==0)
             {
                 if (depositBoxOpen())
                 { //deposit all
@@ -246,10 +225,9 @@ public class oneClickCustomPlugin extends Plugin{
                     return createMenuEntry(1, MenuAction.CC_OP, -1, WidgetInfo.BANK_DEPOSIT_INVENTORY.getId(), false);
                 }
 
-
                 if (bankVisible()) {
                     if (config.bankType() == oneClickCustomTypes.bankTypes.Booth) {
-                        GameObject gameObject = getGameObject(config.bankID());
+                        GameObject gameObject = objects.getGameObject(config.bankID());
                         return createMenuEntry(
                                 gameObject.getId(),
                                 MenuAction.GAME_OBJECT_SECOND_OPTION,
@@ -259,7 +237,7 @@ public class oneClickCustomPlugin extends Plugin{
                     }
 
                     if (config.bankType() == oneClickCustomTypes.bankTypes.Chest) {
-                        GameObject gameObject = getGameObject(config.bankID());
+                        GameObject gameObject = objects.getGameObject(config.bankID());
                         return createMenuEntry(
                                 gameObject.getId(),
                                 MenuAction.GAME_OBJECT_FIRST_OPTION,
@@ -269,12 +247,12 @@ public class oneClickCustomPlugin extends Plugin{
                     }
 
                     if (config.bankType() == oneClickCustomTypes.bankTypes.NPC) {
-                        NPC npc = getNpc(config.bankID());
+                        NPC npc = objects.getNpc(config.bankID());
                         return createMenuEntry(
                                 npc.getIndex(),
                                 MenuAction.NPC_THIRD_OPTION,
-                                getNPCLocation(npc).getX(),
-                                getNPCLocation(npc).getY(),
+                                getLocation(npc).getX(),
+                                getLocation(npc).getY(),
                                 false);
                     }
                 }
@@ -284,9 +262,9 @@ public class oneClickCustomPlugin extends Plugin{
         if (config.oneClickType()==oneClickCustomTypes.methods.Pick_Up)
         {
             if (!GroundItems.isEmpty()) {
-                TileItem tileItem = getNearestTileItem(GroundItems);
+                TileItem tileItem = objects.getNearestTileItem(GroundItems);
                 return createMenuEntry(
-                        getNearestTileItem(GroundItems).getId(),
+                        objects.getNearestTileItem(GroundItems).getId(),
                         MenuAction.GROUND_ITEM_THIRD_OPTION,
                         tileItem.getTile().getSceneLocation().getX(),
                         tileItem.getTile().getSceneLocation().getY(),
@@ -297,25 +275,9 @@ public class oneClickCustomPlugin extends Plugin{
 
         if (config.oneClickType()==oneClickCustomTypes.methods.Gather)
         {
-            MenuAction action =MenuAction.GAME_OBJECT_FIRST_OPTION ;
-            switch(config.opcode()){
-                case 1:
-                    action = MenuAction.GAME_OBJECT_FIRST_OPTION;
-                    break;
-                case 2:
-                    action = MenuAction.GAME_OBJECT_SECOND_OPTION;
-                    break;
-                case 3:
-                    action = MenuAction.GAME_OBJECT_THIRD_OPTION;
-                    break;
-                case 4:
-                    action = MenuAction.GAME_OBJECT_FOURTH_OPTION;
-                    break;
-                case 5:
-                    action = MenuAction.GAME_OBJECT_FIFTH_OPTION;
-                    break;
-            }
-            GameObject customGameObject = getGameObject(getConfigIds());
+            MenuAction action = getMenuAction();
+
+            GameObject customGameObject = objects.getGameObject(getConfigIds());
             return createMenuEntry(
                     customGameObject.getId(),
                     action,
@@ -324,67 +286,28 @@ public class oneClickCustomPlugin extends Plugin{
                     true);
         }
 
-        NPC customNPCObject = getNpc(getConfigIds());
+        NPC customNPCObject = objects.getNpc(getConfigIds());
 
         if(config.oneClickType()==oneClickCustomTypes.methods.Fish)
         {
-            MenuAction action = MenuAction.NPC_FIRST_OPTION;
-            switch(config.opcode()){
-                case 1:
-                    action = MenuAction.NPC_FIRST_OPTION;
-                    break;
-                case 2:
-                    action = MenuAction.NPC_SECOND_OPTION;
-                    break;
-                case 3:
-                    action = MenuAction.NPC_THIRD_OPTION;
-                    break;
-                case 4:
-                    action = MenuAction.NPC_FOURTH_OPTION;
-                    break;
-                case 5:
-                    action = MenuAction.NPC_FIFTH_OPTION;
-                    break;
-            }
-
+            MenuAction action = getMenuAction();
             return createMenuEntry(
                     customNPCObject.getIndex(),
                     action,
-                    getNPCLocation(customNPCObject).getX(),
-                    getNPCLocation(customNPCObject).getY(),
+                    getLocation(customNPCObject).getX(),
+                    getLocation(customNPCObject).getY(),
                     true);
         }
 
         if (config.oneClickType()==oneClickCustomTypes.methods.Attack)
         {
-            ArrayList<NPC> npcs = new NPCQuery()
-                    .idEquals(getConfigIds())
-                    .result(client)
-                    .list;
-            NPC nearestAliveNPC = null;
-
-            for (NPC npc : npcs)
-            {
-                if (npc.getHealthRatio()==0)
-                {
-                    continue;
-                }
-                if (nearestAliveNPC==null)
-                {
-                    nearestAliveNPC=npc;
-                }
-
-                if (client.getLocalPlayer().getWorldLocation().distanceTo(npc.getWorldLocation())<client.getLocalPlayer().getWorldLocation().distanceTo(nearestAliveNPC.getWorldLocation()))
-                {
-                    nearestAliveNPC = npc;
-                }
-            }
+            NPC nearestAliveNPC = objects.getNearestAliveNPC(getConfigIds());
 
             return createMenuEntry(
                     nearestAliveNPC.getIndex(),
                     MenuAction.NPC_SECOND_OPTION,
-                    getNPCLocation(nearestAliveNPC).getX(),
-                    getNPCLocation(nearestAliveNPC).getY(),
+                    getLocation(nearestAliveNPC).getX(),
+                    getLocation(nearestAliveNPC).getY(),
                     true);
         }
 
@@ -393,126 +316,62 @@ public class oneClickCustomPlugin extends Plugin{
             return createMenuEntry(
                     customNPCObject.getIndex(),
                     MenuAction.NPC_THIRD_OPTION,
-                    getNPCLocation(customNPCObject).getX(),
-                    getNPCLocation(customNPCObject).getY(),
+                    getLocation(customNPCObject).getX(),
+                    getLocation(customNPCObject).getY(),
                     true);
         }
         return null;
     }
 
-    private Point getLocation(TileObject tileObject)
-    {
-        if (tileObject instanceof GameObject)
-        {
-
-            return ((GameObject) tileObject).getSceneMinLocation();
+    private MenuAction getMenuAction() {
+        MenuAction npcMenuAction = MenuAction.NPC_FIRST_OPTION;
+        MenuAction objectMenuAction = MenuAction.GAME_OBJECT_FIRST_OPTION ;
+        switch(config.opcode()){
+            case 2:
+                objectMenuAction = MenuAction.GAME_OBJECT_SECOND_OPTION;
+                break;
+            case 3:
+                objectMenuAction = MenuAction.GAME_OBJECT_THIRD_OPTION;
+                break;
+            case 4:
+                objectMenuAction = MenuAction.GAME_OBJECT_FOURTH_OPTION;
+                break;
+            case 5:
+                objectMenuAction = MenuAction.GAME_OBJECT_FIFTH_OPTION;
+                break;
         }
-        else
-        {
-            return new Point(tileObject.getLocalLocation().getSceneX(), tileObject.getLocalLocation().getSceneY());
+        switch(config.opcode()){
+            case 2:
+                npcMenuAction = MenuAction.NPC_SECOND_OPTION;
+                break;
+            case 3:
+                npcMenuAction = MenuAction.NPC_THIRD_OPTION;
+                break;
+            case 4:
+                npcMenuAction = MenuAction.NPC_FOURTH_OPTION;
+                break;
+            case 5:
+                npcMenuAction = MenuAction.NPC_FIFTH_OPTION;
+                break;
         }
+        return config.oneClickType()==oneClickCustomTypes.methods.Fish ? npcMenuAction : objectMenuAction;
     }
 
-    private Point getNPCLocation(NPC npc)
-    {
+    private Point getLocation(TileObject tileObject) {
+        if (tileObject instanceof GameObject) return ((GameObject) tileObject).getSceneMinLocation();
+        return new Point(tileObject.getLocalLocation().getSceneX(), tileObject.getLocalLocation().getSceneY());
+    }
+
+    private Point getLocation(NPC npc) {
         return new Point(npc.getLocalLocation().getSceneX(),npc.getLocalLocation().getSceneY());
-    }
-
-    private NPC getNpc(List<Integer> ids)
-    {
-        return new NPCQuery()
-                .idEquals(ids)
-                .result(client)
-                .nearestTo(client.getLocalPlayer());
-    }
-
-    private NPC getNpc(int... id)
-    {
-        return new NPCQuery()
-                .idEquals(id)
-                .result(client)
-                .nearestTo(client.getLocalPlayer());
-    }
-
-    private GameObject getGameObject(List<Integer> ids)
-    {
-        return new GameObjectQuery()
-                .idEquals(ids)
-                .result(client)
-                .nearestTo(client.getLocalPlayer());
-    }
-    private GameObject getGameObject(int id)
-    {
-        return new GameObjectQuery()
-                .idEquals(id)
-                .result(client)
-                .nearestTo(client.getLocalPlayer());
     }
 
     private boolean bankVisible(){
         if (config.bankType() == oneClickCustomTypes.bankTypes.Booth || config.bankType() == oneClickCustomTypes.bankTypes.Chest)
         {
-            return getGameObject(config.bankID())!=null;
+            return objects.getGameObject(config.bankID())!=null;
         }
-        return getNpc(config.bankID())!=null;
-    }
-
-    private TileItem getNearestTileItem(List<TileItem> tileItems)
-    {
-        int currentDistance;
-        if (tileItems.size()==0 || tileItems.get(0) == null)
-        {
-            return null;
-        }
-        TileItem closestTileItem = tileItems.get(0);
-        int closestDistance = closestTileItem.getTile().getWorldLocation().distanceTo(client.getLocalPlayer().getWorldLocation());
-        for (TileItem tileItem : tileItems)
-        {
-            currentDistance = tileItem.getTile().getWorldLocation().distanceTo(client.getLocalPlayer().getWorldLocation());
-            if (currentDistance < closestDistance)
-            {
-                closestTileItem = tileItem;
-                closestDistance = currentDistance;
-            }
-        }
-        return closestTileItem;
-    }
-
-    private Widget getItemByInventoryIndex(int index) {
-        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget!=null && !inventoryWidget.isHidden())
-        {
-            return Arrays.stream(inventoryWidget.getDynamicChildren())
-                    .filter(item -> item.getIndex() == index)
-                    .findAny().orElse(null);
-        }
-        return null;
-    }
-
-    private void setSelectedInventoryItem(Widget item) {
-        client.setSelectedSpellWidget(WidgetInfo.INVENTORY.getId());
-        client.setSelectedSpellChildIndex(item.getIndex());
-        client.setSelectedSpellItemId(item.getItemId());
-    }
-
-    public int getEmptySlots() {
-        Widget inventory = client.getWidget(WidgetInfo.INVENTORY.getId());
-        Widget bankInventory = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId());
-
-        if (inventory!=null && !inventory.isHidden()
-                && inventory.getDynamicChildren()!=null)
-        {
-            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.INVENTORY.getId()).getDynamicChildren());
-            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
-        }
-
-        if (bankInventory!=null && !bankInventory.isHidden()
-                && bankInventory.getDynamicChildren()!=null)
-        {
-            List<Widget> inventoryItems = Arrays.asList(client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId()).getDynamicChildren());
-            return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
-        }
-        return -1;
+        return objects.getNpc(config.bankID())!=null;
     }
 
     private boolean bankOpen() {
@@ -566,21 +425,5 @@ public class oneClickCustomPlugin extends Plugin{
             }
         }
         return IDs;
-    }
-
-    private Widget getLastInventoryItem(int id) {
-        Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget!=null && !inventoryWidget.isHidden())
-        {
-            return getLastWidgetItem(inventoryWidget,id);
-        }
-        return null;
-    }
-
-    private Widget getLastWidgetItem(Widget widget,int id) {
-        return Arrays.stream(widget.getDynamicChildren())
-                .filter(item -> item.getItemId()==id)
-                .reduce((first, second) -> second)
-                .orElse(null);
     }
 }

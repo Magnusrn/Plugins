@@ -1,6 +1,6 @@
 package net.runelite.client.plugins.oneclickcustom;
 
-public enum oneClickCustomTypes {
+public class oneClickCustomTypes {
     enum methods
     {
         Gather,
@@ -15,5 +15,4 @@ public enum oneClickCustomTypes {
         Booth,
         Chest
     }
-
 }
