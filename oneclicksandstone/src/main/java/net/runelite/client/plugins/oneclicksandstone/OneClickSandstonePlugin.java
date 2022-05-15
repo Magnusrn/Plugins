@@ -56,15 +56,8 @@ import org.pf4j.Extension;
 @Slf4j
 public class OneClickSandstonePlugin extends Plugin {
 
-    final static WorldPoint SW = new WorldPoint(3164,2913,0);
-    final static WorldPoint NE = new WorldPoint(3168,2916,0);
-    final static WorldArea AREA = new WorldArea(SW,NE);
-
     @Inject
     private Client client;
-
-    @Inject
-    GameEventManager gameEventManager;
 
     @Inject
     private OneClickSandstoneConfig config;
@@ -101,12 +94,18 @@ public class OneClickSandstonePlugin extends Plugin {
             event.consume();
         }
         if (getEmptySlots() == 0)
+        {
             event.setMenuEntry(depositGrinderMenuEntry());
-        else if(shouldCastHumidify())
-            event.setMenuEntry(createHumidifyMenuEntry());
-        else {
-            event.setMenuEntry(mineSandStone());
+            return;
         }
+
+        if (shouldCastHumidify())
+        {
+            event.setMenuEntry(createHumidifyMenuEntry());
+            return;
+        }
+        event.setMenuEntry(mineSandStone());
+
     }
 
     private Point getLocation(TileObject tileObject) {
@@ -115,8 +114,10 @@ public class OneClickSandstonePlugin extends Plugin {
         return new Point(tileObject.getLocalLocation().getSceneX(), tileObject.getLocalLocation().getSceneY());
     }
 
-    private GameObject checkforGameObject()
-    {
+    private GameObject checkforGameObject() {
+        WorldPoint SW = new WorldPoint(3164,2913,0);
+        WorldPoint NE = new WorldPoint(3168,2916,0);
+        WorldArea AREA = new WorldArea(SW,NE);
         if (config.forceMineNorth())
         {
             ArrayList<GameObject> list = new GameObjectQuery()
@@ -138,8 +139,7 @@ public class OneClickSandstonePlugin extends Plugin {
     }
 
 
-    private GameObject checkForDepositGrinder()
-    {
+    private GameObject checkForDepositGrinder() {
         return new GameObjectQuery()
                 .idEquals(26199)
                 .result(client)
@@ -194,6 +194,7 @@ public class OneClickSandstonePlugin extends Plugin {
     }
 
     private boolean shouldCastHumidify() {
+        if (!config.humidify()) return false;
         Set<Integer> waterskins = Set.of(ItemID.WATERSKIN4,ItemID.WATERSKIN3,ItemID.WATERSKIN2,ItemID.WATERSKIN1);
         for (Integer waterskin : waterskins)
         {

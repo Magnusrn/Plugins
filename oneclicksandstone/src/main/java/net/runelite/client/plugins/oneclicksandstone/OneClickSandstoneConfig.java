@@ -17,4 +17,14 @@ public interface OneClickSandstoneConfig extends Config {
     default boolean forceMineNorth() {
         return true;
     }
+
+    @ConfigItem(
+            position = 1,
+            keyName = "humidify",
+            name = "Cast Humidify",
+            description = "Cast Humidify"
+    )
+    default boolean humidify() {
+        return true;
+    }
 }
