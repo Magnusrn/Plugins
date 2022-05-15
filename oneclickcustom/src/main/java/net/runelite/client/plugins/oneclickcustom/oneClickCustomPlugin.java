@@ -88,7 +88,7 @@ public class oneClickCustomPlugin extends Plugin{
     @Subscribe
     private void onMenuEntryAdded(MenuEntryAdded event)
     {
-        if (config.oneClickType()!=oneClickCustomTypes.Use_Item_On_X)
+        if (config.oneClickType()!=oneClickCustomTypes.methods.Use_Item_On_X)
         {
             return;
         }
@@ -135,12 +135,10 @@ public class oneClickCustomPlugin extends Plugin{
     }
 
     @Subscribe
-    public void onMenuOptionClicked(MenuOptionClicked event)
-    {
-
+    public void onMenuOptionClicked(MenuOptionClicked event) {
         if(event.getMenuOption().equals("<col=00ff00>One Click Custom"))
         {
-            if((client.getLocalPlayer().getAnimation()!=-1|| client.getLocalPlayer().isMoving()) && config.consumeClick() && config.oneClickType()!=oneClickCustomTypes.Pickpocket)
+            if((client.getLocalPlayer().getAnimation()!=-1|| client.getLocalPlayer().isMoving()) && config.consumeClick() && config.oneClickType()!=oneClickCustomTypes.methods.Pickpocket)
             {
                 event.consume();
             }
@@ -156,27 +154,27 @@ public class oneClickCustomPlugin extends Plugin{
     @Subscribe
     private void onClientTick(ClientTick event) //fix this baloney
     {
-        if (config.oneClickType()==oneClickCustomTypes.Use_Item_On_X)
+        if (config.oneClickType()==oneClickCustomTypes.methods.Use_Item_On_X)
         {
             return;
         }
 
-        if (config.oneClickType()==oneClickCustomTypes.Gather && getGameObject(getConfigIds())==null)
+        if (config.oneClickType()==oneClickCustomTypes.methods.Gather && getGameObject(getConfigIds())==null)
         {
             return;
         }
 
-        if ((GroundItems.size()==0 || getNearestTileItem(GroundItems)==null) && config.oneClickType() == oneClickCustomTypes.Pick_Up)
+        if ((GroundItems.size()==0 || getNearestTileItem(GroundItems)==null) && config.oneClickType() == oneClickCustomTypes.methods.Pick_Up)
         {
             return;
         }
 
-        if (getNpc(getConfigIds())==null &!(config.oneClickType()==oneClickCustomTypes.Gather) &! (config.oneClickType() == oneClickCustomTypes.Pick_Up))
+        if (getNpc(getConfigIds())==null &!(config.oneClickType()==oneClickCustomTypes.methods.Gather) &! (config.oneClickType() == oneClickCustomTypes.methods.Pick_Up))
         {
             return;
         }
 
-        if (getEmptySlots()==0 && config.InventoryFull() && config.oneClickType()!=oneClickCustomTypes.Attack)
+        if (getEmptySlots()==0 && config.InventoryFull() && config.oneClickType()!=oneClickCustomTypes.methods.Attack)
         {
             return;
         }
@@ -232,10 +230,10 @@ public class oneClickCustomPlugin extends Plugin{
 
     private MenuEntry setCustomMenuEntry()
     {
-        if (config.Bank()&&(config.oneClickType()==oneClickCustomTypes.Fish ||
-                config.oneClickType()==oneClickCustomTypes.Gather||
-                config.oneClickType()==oneClickCustomTypes.Pickpocket||
-                config.oneClickType()==oneClickCustomTypes.Pick_Up))
+        if (config.Bank()&&(config.oneClickType()==oneClickCustomTypes.methods.Fish ||
+                config.oneClickType()==oneClickCustomTypes.methods.Gather||
+                config.oneClickType()==oneClickCustomTypes.methods.Pickpocket||
+                config.oneClickType()==oneClickCustomTypes.methods.Pick_Up))
         {
             if (getEmptySlots()==0)
             {
@@ -250,7 +248,7 @@ public class oneClickCustomPlugin extends Plugin{
 
 
                 if (bankVisible()) {
-                    if (config.bankType() == oneClickCustomBankTypes.Booth) {
+                    if (config.bankType() == oneClickCustomTypes.bankTypes.Booth) {
                         GameObject gameObject = getGameObject(config.bankID());
                         return createMenuEntry(
                                 gameObject.getId(),
@@ -260,7 +258,7 @@ public class oneClickCustomPlugin extends Plugin{
                                 false);
                     }
 
-                    if (config.bankType() == oneClickCustomBankTypes.Chest) {
+                    if (config.bankType() == oneClickCustomTypes.bankTypes.Chest) {
                         GameObject gameObject = getGameObject(config.bankID());
                         return createMenuEntry(
                                 gameObject.getId(),
@@ -270,7 +268,7 @@ public class oneClickCustomPlugin extends Plugin{
                                 false);
                     }
 
-                    if (config.bankType() == oneClickCustomBankTypes.NPC) {
+                    if (config.bankType() == oneClickCustomTypes.bankTypes.NPC) {
                         NPC npc = getNpc(config.bankID());
                         return createMenuEntry(
                                 npc.getIndex(),
@@ -283,7 +281,7 @@ public class oneClickCustomPlugin extends Plugin{
             }
         }
 
-        if (config.oneClickType()==oneClickCustomTypes.Pick_Up)
+        if (config.oneClickType()==oneClickCustomTypes.methods.Pick_Up)
         {
             if (!GroundItems.isEmpty()) {
                 TileItem tileItem = getNearestTileItem(GroundItems);
@@ -297,7 +295,7 @@ public class oneClickCustomPlugin extends Plugin{
             return null;
         }
 
-        if (config.oneClickType()==oneClickCustomTypes.Gather)
+        if (config.oneClickType()==oneClickCustomTypes.methods.Gather)
         {
             MenuAction action =MenuAction.GAME_OBJECT_FIRST_OPTION ;
             switch(config.opcode()){
@@ -328,7 +326,7 @@ public class oneClickCustomPlugin extends Plugin{
 
         NPC customNPCObject = getNpc(getConfigIds());
 
-        if(config.oneClickType()==oneClickCustomTypes.Fish)
+        if(config.oneClickType()==oneClickCustomTypes.methods.Fish)
         {
             MenuAction action = MenuAction.NPC_FIRST_OPTION;
             switch(config.opcode()){
@@ -357,7 +355,7 @@ public class oneClickCustomPlugin extends Plugin{
                     true);
         }
 
-        if (config.oneClickType()==oneClickCustomTypes.Attack)
+        if (config.oneClickType()==oneClickCustomTypes.methods.Attack)
         {
             ArrayList<NPC> npcs = new NPCQuery()
                     .idEquals(getConfigIds())
@@ -390,7 +388,7 @@ public class oneClickCustomPlugin extends Plugin{
                     true);
         }
 
-        if(config.oneClickType()==oneClickCustomTypes.Pickpocket)
+        if(config.oneClickType()==oneClickCustomTypes.methods.Pickpocket)
         {
             return createMenuEntry(
                     customNPCObject.getIndex(),
@@ -452,7 +450,7 @@ public class oneClickCustomPlugin extends Plugin{
     }
 
     private boolean bankVisible(){
-        if (config.bankType() == oneClickCustomBankTypes.Booth || config.bankType() == oneClickCustomBankTypes.Chest)
+        if (config.bankType() == oneClickCustomTypes.bankTypes.Booth || config.bankType() == oneClickCustomTypes.bankTypes.Chest)
         {
             return getGameObject(config.bankID())!=null;
         }

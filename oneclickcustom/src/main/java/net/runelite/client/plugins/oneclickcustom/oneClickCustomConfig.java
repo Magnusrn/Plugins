@@ -18,9 +18,9 @@ public interface oneClickCustomConfig extends Config {
             name = "One Click Type",
             description = "Gather is for woodcutting mining etc."
     )
-    default oneClickCustomTypes oneClickType()
+    default oneClickCustomTypes.methods oneClickType()
     {
-        return oneClickCustomTypes.Gather;
+        return oneClickCustomTypes.methods.Gather;
     }
 
     @ConfigItem(
@@ -131,7 +131,7 @@ public interface oneClickCustomConfig extends Config {
             unhide = "oneClickType",
             unhideValue = "Gather||Fish||PickPocket||Pick_Up"
     )
-    default oneClickCustomBankTypes bankType() { return oneClickCustomBankTypes.NPC; }
+    default oneClickCustomTypes.bankTypes bankType() { return oneClickCustomTypes.bankTypes.NPC; }
 
     @ConfigItem(
             position = 8,
