@@ -219,6 +219,12 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
 
         if (bankOpen())
         {
+            //set bank quantity to 1
+            if (client.getVarbitValue(6590)!=0)
+            {
+                event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, -1, 786460, false));
+                return;
+            }
             switch (bankingState)
             {
                 case 0:
