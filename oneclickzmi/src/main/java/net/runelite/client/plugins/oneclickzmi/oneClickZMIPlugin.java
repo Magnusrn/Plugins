@@ -145,6 +145,13 @@ public class oneClickZMIPlugin extends Plugin
 			return;
 		}
 
+		//set bank quantity to 1
+		if (bankOpen() && client.getVarbitValue(6590)!=0)
+		{
+			event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, -1, 786460, false));
+			return;
+		}
+
 		if ((client.getEnergy() < 80 || client.getVarbitValue(Varbits.RUN_SLOWED_DEPLETION_ACTIVE) == 0) //if run energy below threshold or stamina not active
 				&& config.drinkStamina() && bankOpen()
 				&& (getEmptySlots() > 0 || getInventoryItem(ItemID.STAMINA_POTION1) != null))
