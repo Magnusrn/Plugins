@@ -151,6 +151,12 @@ public class oneClickZMIPlugin extends Plugin
 			event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, -1, 786460, false));
 			return;
 		}
+		//set bank tab to main tab
+		if (client.getVarbitValue(Varbits.CURRENT_BANK_TAB)!=0)
+		{
+			event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, 10, WidgetInfo.BANK_TAB_CONTAINER.getId(), false));
+			return;
+		}
 
 		if ((client.getEnergy() < 80 || client.getVarbitValue(Varbits.RUN_SLOWED_DEPLETION_ACTIVE) == 0) //if run energy below threshold or stamina not active
 				&& config.drinkStamina() && bankOpen()

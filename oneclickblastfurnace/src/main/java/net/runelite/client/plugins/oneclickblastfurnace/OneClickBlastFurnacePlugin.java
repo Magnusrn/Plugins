@@ -137,6 +137,12 @@ public class OneClickBlastFurnacePlugin extends Plugin{
                 event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, -1, 786460, false));
                 return;
             }
+            //set bank tab to main tab
+            if (client.getVarbitValue(Varbits.CURRENT_BANK_TAB)!=0)
+            {
+                event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, 10, WidgetInfo.BANK_TAB_CONTAINER.getId(), false));
+                return;
+            }
             ImmutableList<Integer> StaminaIds = ImmutableList.of(
                     ItemID.STAMINA_POTION1,
                     ItemID.STAMINA_POTION2,

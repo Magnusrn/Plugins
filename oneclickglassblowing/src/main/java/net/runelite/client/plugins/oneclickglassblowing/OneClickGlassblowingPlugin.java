@@ -105,6 +105,12 @@ public class OneClickGlassblowingPlugin extends Plugin {
             event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, -1, 786460, false));
             return;
         }
+        //set bank tab to main tab
+        if (client.getVarbitValue(Varbits.CURRENT_BANK_TAB)!=0)
+        {
+            event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, 10, WidgetInfo.BANK_TAB_CONTAINER.getId(), false));
+            return;
+        }
         switch (glassblowingStage)
         {
             case 1:
@@ -148,6 +154,12 @@ public class OneClickGlassblowingPlugin extends Plugin {
         if (bankOpen() && client.getVarbitValue(6590)!=0)
         {
             event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, -1, 786460, false));
+            return;
+        }
+        //set bank tab to main tab
+        if (client.getVarbitValue(Varbits.CURRENT_BANK_TAB)!=0)
+        {
+            event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, 10, WidgetInfo.BANK_TAB_CONTAINER.getId(), false));
             return;
         }
 
