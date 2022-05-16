@@ -69,7 +69,7 @@ public class OneClickAnglerfishPlugin extends Plugin {
     }
 
     private void handleClick(MenuOptionClicked event) {
-        List<Integer> fishingAnimations = Arrays.asList(622,633);
+        List<Integer> fishingAnimations = Arrays.asList(622,623);
         if (fishingAnimations.stream().anyMatch(animation -> animation == client.getLocalPlayer().getAnimation()))
         {
             System.out.println("consume event as fishing");
