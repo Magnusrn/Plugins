@@ -100,6 +100,11 @@ public class OneClickGlassblowingPlugin extends Plugin {
 
     private void blowGlassHandler(MenuOptionClicked event){
         System.out.println("glassblowingStage = " + glassblowingStage + " timeout = " + timeout);
+        if (bankOpen() && client.getVarbitValue(6590)!=0)
+        {
+            event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, -1, 786460, false));
+            return;
+        }
         switch (glassblowingStage)
         {
             case 1:
@@ -140,6 +145,11 @@ public class OneClickGlassblowingPlugin extends Plugin {
     private void superGlassMakeHandler(MenuOptionClicked event){
         if (timeout>0) return;
         System.out.println("superglassMakeStage = " + superglassMakeStage);
+        if (bankOpen() && client.getVarbitValue(6590)!=0)
+        {
+            event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, -1, 786460, false));
+            return;
+        }
 
         switch (superglassMakeStage)
         {
