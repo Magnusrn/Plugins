@@ -22,6 +22,7 @@ import net.runelite.rs.api.RSClient;
 import org.pf4j.Extension;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Extension
 @PluginDescriptor(
@@ -34,6 +35,7 @@ public class OneClickCorpSpecPlugin extends Plugin {
     private boolean gamesNeckEquipped = false;
     private boolean tortureEquipped = false;
     private boolean hasTeledToPool = false;
+    private boolean hasTeledToCorp = false;
     private boolean pluginPaused = true;
     //prevent double entering the lair
     private boolean enteredCorpArea = false;
@@ -63,6 +65,7 @@ public class OneClickCorpSpecPlugin extends Plugin {
 
     private void reset() {
         hasTeledToPool = false;
+        hasTeledToCorp = false;
         enteredCorpArea = false;
         hammerHits = 0;
         arclightHits = 0;
@@ -103,27 +106,20 @@ public class OneClickCorpSpecPlugin extends Plugin {
             return;
         }
 
-        if (isAtPoolAltar())
+        if (hasTeledToCorp)
         {
-            if (usePool()!=null)
-            {
-                setMenuEntry(event,usePool());
-                return;
-            }
-            if (equipGamesNeck()!=null)
-            {
-                setMenuEntry(event,equipGamesNeck());
-                gamesNeckEquipped = true;
-                tortureEquipped = false;
-                return;
-            }
-            setMenuEntry(event,teleToCorp());
-            return;
+            if (!isInCorpEntrance()) return;
+            hasTeledToCorp = false;
+        }
+
+        if (hasTeledToPool)
+        {
+            if (!isAtPoolAltar()) return;
+            hasTeledToPool = false;
         }
 
         if (isInCorpEntrance())
         {
-            hasTeledToPool = false;
             if (equipTorture()!=null)
             {
                 setMenuEntry(event,equipTorture());
@@ -138,6 +134,28 @@ public class OneClickCorpSpecPlugin extends Plugin {
             }
             setMenuEntry(event,enterCorp());
             return;
+        }
+
+        if (isAtPoolAltar())
+        {
+            if (usePool()!=null)
+            {
+                setMenuEntry(event,usePool());
+                return;
+            }
+            if (equipGamesNeck()!=null)
+            {
+                setMenuEntry(event,equipGamesNeck());
+                gamesNeckEquipped = true;
+                tortureEquipped = false;
+                return;
+            }
+            if (teleToCorp()!=null)
+            {
+                setMenuEntry(event,teleToCorp());
+                hasTeledToCorp = true;
+                return;
+            }
         }
 
         if (isInCorpsLair())
@@ -192,17 +210,18 @@ public class OneClickCorpSpecPlugin extends Plugin {
     }
 
     private MenuEntry usePool() {
+        GameObject pool;
         if (client.getVar(VarPlayer.SPECIAL_ATTACK_PERCENT) == 1000) return null;
-        if (isAtPoolAltar())
+        pool = getGameObject(ObjectID.ORNATE_POOL_OF_REJUVENATION);
+        if (pool==null)
         {
-            GameObject altar = getGameObject(10389);
-            return createMenuEntry(altar.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(altar).getX(), getLocation(altar).getY(), false);
+            pool = getGameObject(10389);
         }
-        GameObject pool = getGameObject(ObjectID.ORNATE_POOL_OF_REJUVENATION);
         return createMenuEntry(pool.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(pool).getX(), getLocation(pool).getY(), false);
     }
 
     private MenuEntry useGamesNecklace() {
+        if (!gamesNeckEquipped) return null;
         return createMenuEntry(4, MenuAction.CC_OP, -1, WidgetInfo.EQUIPMENT_AMULET.getId(), false);
     }
 
@@ -233,16 +252,17 @@ public class OneClickCorpSpecPlugin extends Plugin {
     }
 
     private MenuEntry teleToCorp() {
+        System.out.println("teleing to corp");
         enteredCorpArea = false;
         return useGamesNecklace()!=null? useGamesNecklace() : useJewelleryBox();
     }
 
     private MenuEntry teleToPoolAltar() {
+        hasTeledToPool = true;
         Widget amulet = getInventoryItem(ItemID.DESERT_AMULET_4);
         Widget tab = getInventoryItem(ItemID.TELEPORT_TO_HOUSE);
         Widget conCape = getInventoryItem(ItemID.CONSTRUCT_CAPE);
         Widget conCapeT = getInventoryItem(ItemID.CONSTRUCT_CAPET);
-        hasTeledToPool = true;
         if (conCape!=null)
         {
             return createMenuEntry(6, MenuAction.CC_OP_LOW_PRIORITY, conCape.getIndex(), WidgetInfo.INVENTORY.getId(), false);
@@ -331,10 +351,21 @@ public class OneClickCorpSpecPlugin extends Plugin {
         gamesNecks.put(ItemID.GAMES_NECKLACE6,6);
         gamesNecks.put(ItemID.GAMES_NECKLACE7,7);
         gamesNecks.put(ItemID.GAMES_NECKLACE8,8);
-        int gamesNeck = gamesNecks.keySet().stream()
-                .filter(necklace -> getInventoryItem(necklace) !=null)
-                .min(Comparator.comparing(necklace -> gamesNecks.get(necklace)))
-                .orElse(null);
+        List<Integer> gamesNeckList = gamesNecks.keySet().stream()
+                .filter(necklace -> getInventoryItem(necklace) != null)
+                .collect(Collectors.toList());
+
+        //method to get the lowest charge necklace if it exists in inventory
+        int gamesNeck = 0;
+        if (gamesNeckList.size()>0)
+        {
+            gamesNeck = gamesNeckList
+                    .stream()
+                    .min(Comparator.comparing(gamesNecks::get))
+                    .orElse(null);
+        }
+        if (gamesNeck == 0 ) return null;
+
         Widget necklace = getInventoryItem(gamesNeck);
         if (necklace== null) return null;
         return createMenuEntry(3, MenuAction.CC_OP, necklace.getIndex(), WidgetInfo.INVENTORY.getId(), false);
@@ -439,5 +470,3 @@ public class OneClickCorpSpecPlugin extends Plugin {
         }
     }
 }
-//dont reset on startup, just when reset is pressed?
-//if you tele as it hits 400 it tries to spam specs
