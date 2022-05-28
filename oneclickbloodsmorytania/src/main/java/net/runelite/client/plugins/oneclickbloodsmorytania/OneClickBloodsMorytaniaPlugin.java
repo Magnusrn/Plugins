@@ -58,8 +58,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     }
 
     @Subscribe
-    private void onGameTick(GameTick event)
-    {
+    private void onGameTick(GameTick event) {
         if (cachedXP == 0)
         {
             cachedXP = client.getSkillExperience(Skill.RUNECRAFT);
@@ -93,8 +92,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onChatMessage(ChatMessage event)
-    {
+    public void onChatMessage(ChatMessage event) {
         if (event.getMessage().contains("There are no essences in this pouch."))
         {
             //not perfect but it works, prevents spam crafting if pouch is empty due to broken pouches previously
@@ -103,8 +101,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     }
 
     @Subscribe
-    private void onClientTick(ClientTick event)
-    {
+    private void onClientTick(ClientTick event) {
         if (this.client.getLocalPlayer() == null || this.client.getGameState() != GameState.LOGGED_IN) return;
         String text = "<col=00ff00>One Click Bloods Morytania";
         client.insertMenuItem(text, "", MenuAction.UNKNOWN.getId(), 0, 0, 0, true);
@@ -113,13 +110,14 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onMenuOptionClicked(MenuOptionClicked event) throws InterruptedException
-    {
+    public void onMenuOptionClicked(MenuOptionClicked event) throws InterruptedException {
         if (event.getMenuOption().equals("<col=00ff00>One Click Bloods Morytania"))
             handleClick(event);
     }
     private void handleClick(MenuOptionClicked event) //billion if statements but unsure of alternative method, can't assign menuentries until visible due to queries
     {
+        if (client.getLocalPlayer().getAnimation()==2796) return; //prevents going through the shortcut twice!
+
         Widget smallPouch = getInventoryItem(ItemID.SMALL_POUCH);
         Widget mediumPouch = getInventoryItem(ItemID.MEDIUM_POUCH);
         Widget largePouch = getInventoryItem(ItemID.LARGE_POUCH);
@@ -128,14 +126,27 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
 
         if (handlePouchRepair()!=null)
         {
-            event.setMenuEntry(handlePouchRepair());
+            setMenuEntry(event,handlePouchRepair());
             return;
+        }
+
+        if (getEmptySlots()>0 && !bankOpen())
+        {
+            Widget bloodEss = getInventoryItem(ItemID.BLOOD_ESSENCE);
+            if (bloodEss != null) {
+                Widget activebloodEss = getInventoryItem(ItemID.BLOOD_ESSENCE_ACTIVE);
+                if (activebloodEss == null)
+                {
+                    setMenuEntry(event, activateBloodEssenceMES(bloodEss.getIndex()));
+                    return;
+                }
+            }
         }
 
         List<Integer> brokenPouches = Arrays.asList(ItemID.MEDIUM_POUCH_5511,ItemID.LARGE_POUCH_5513,ItemID.GIANT_POUCH_5515,ItemID.COLOSSAL_POUCH_26786);
         if (brokenPouches.stream().anyMatch(pouch -> client.getItemContainer(InventoryID.INVENTORY).contains(pouch)))
         {
-            event.setMenuEntry(repairPouchesSpellMES());
+            setMenuEntry(event,repairPouchesSpellMES());
             return;
         }
 
@@ -144,7 +155,8 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
             switch (runecraftingState)
             {
                 case 0:
-                    event.setMenuEntry(craftRunesMES());
+                    setMenuEntry(event,craftRunesMES());
+                    setMenuEntry(event,craftRunesMES());
                     if (!craftedRunes)
                     {
                         return;
@@ -154,25 +166,25 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                 case 1:
                     if (colossalPouch!=null)
                     {
-                        event.setMenuEntry(emptyPouchMES(colossalPouch));
+                        setMenuEntry(event,emptyPouchMES(colossalPouch));
                         runecraftingState = 3;
                         return;
                     }
                     if (giantPouch!=null)
                     {
-                        event.setMenuEntry(emptyPouchMES(giantPouch));
+                        setMenuEntry(event,emptyPouchMES(giantPouch));
                         runecraftingState = 2;
                         return;
                     }
                 case 2:
                     if (largePouch!=null)
                     {
-                        event.setMenuEntry(emptyPouchMES(largePouch));
+                        setMenuEntry(event,emptyPouchMES(largePouch));
                         runecraftingState = 3;
                         return;
                     }
                 case 3:
-                    event.setMenuEntry(craftRunesMES());
+                    setMenuEntry(event,craftRunesMES());
                     if (!craftedRunes)
                     {
                         return;
@@ -182,25 +194,25 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                 case 4:
                     if (colossalPouch!=null)
                     {
-                        event.setMenuEntry(emptyPouchMES(colossalPouch));
+                        setMenuEntry(event,emptyPouchMES(colossalPouch));
                         runecraftingState = 6;
                         return;
                     }
                     if (mediumPouch!=null)
                     {
-                        event.setMenuEntry(emptyPouchMES(mediumPouch));
+                        setMenuEntry(event,emptyPouchMES(mediumPouch));
                         runecraftingState = 5;
                         return;
                     }
                 case 5:
                     if (smallPouch!=null)
                     {
-                        event.setMenuEntry(emptyPouchMES(smallPouch));
+                        setMenuEntry(event,emptyPouchMES(smallPouch));
                         runecraftingState = 6;
                         return;
                     }
                 case 6:
-                    event.setMenuEntry(craftRunesMES());
+                    setMenuEntry(event,craftRunesMES());
                     if (!craftedRunes)
                     {
                         return;
@@ -210,7 +222,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                 case 7:
                     if (teleToBankMES() != null)
                     {
-                        event.setMenuEntry(teleToBankMES());
+                        setMenuEntry(event,teleToBankMES());
                         bankTeleportTimeout = 4;
                     }
                     return;
@@ -222,73 +234,73 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
             //set bank quantity to 1
             if (client.getVarbitValue(6590)!=0)
             {
-                event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, -1, 786460, false));
+                setMenuEntry(event,createMenuEntry(1, MenuAction.CC_OP, -1, 786460, false));
                 return;
             }
             //set bank tab to main tab
             if (client.getVarbitValue(Varbits.CURRENT_BANK_TAB)!=0)
             {
-                event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, 10, WidgetInfo.BANK_TAB_CONTAINER.getId(), false));
+                setMenuEntry(event,createMenuEntry(1, MenuAction.CC_OP, 10, WidgetInfo.BANK_TAB_CONTAINER.getId(), false));
                 return;
             }
             switch (bankingState)
             {
                 case 0:
-                    event.setMenuEntry(withdrawEssence());
+                    setMenuEntry(event,withdrawEssence());
                     bankingState = 1;
                     return;
                 case 1:
                     if (colossalPouch!=null)
                     {
-                        event.setMenuEntry(fillPouchMES(colossalPouch));
+                        setMenuEntry(event,fillPouchMES(colossalPouch));
                         bankingState = 3;
                         return;
                     }
                     if (giantPouch!=null)
                     {
-                        event.setMenuEntry(fillPouchMES(giantPouch));
+                        setMenuEntry(event,fillPouchMES(giantPouch));
                         bankingState = 2;
                         return;
                     }
                 case 2:
                     if (largePouch!=null)
                     {
-                        event.setMenuEntry(fillPouchMES(largePouch));
+                        setMenuEntry(event,fillPouchMES(largePouch));
                         bankingState = 3;
                         return;
                     }
                 case 3:
-                    event.setMenuEntry(withdrawEssence());
+                    setMenuEntry(event,withdrawEssence());
                     bankingState = 4;
                     return;
                 case 4:
                     if (colossalPouch!=null)
                     {
-                        event.setMenuEntry(fillPouchMES(colossalPouch));
+                        setMenuEntry(event,fillPouchMES(colossalPouch));
                         bankingState = 6;
                         return;
                     }
                     if (mediumPouch!=null)
                     {
-                        event.setMenuEntry(fillPouchMES(mediumPouch));
+                        setMenuEntry(event,fillPouchMES(mediumPouch));
                         bankingState = 5;
                         return;
                     }
                 case 5:
                     if (smallPouch!=null)
                     {
-                        event.setMenuEntry(fillPouchMES(smallPouch));
+                        setMenuEntry(event,fillPouchMES(smallPouch));
                         bankingState = 6;
                         return;
                     }
                 case 6:
-                    event.setMenuEntry(withdrawEssence());
+                    setMenuEntry(event,withdrawEssence());
                     bankingState = 7;
                     return;
                 case 7:
                     if (teleToPOHMES()!=null)
                     {
-                        event.setMenuEntry(teleToPOHMES());
+                        setMenuEntry(event,teleToPOHMES());
                         POHTeleportTimeout = 4;
                     }
                     return;
@@ -297,7 +309,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
 
         if (isInBloodAltarArea())
         {
-            event.setMenuEntry(enterAltarMES());
+            setMenuEntry(event,enterAltarMES());
             return;
         }
 
@@ -305,65 +317,65 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         {
             if (client.getEnergy()<config.runEnergy())
             {
-                event.setMenuEntry(drinkFromPoolMES());
+                setMenuEntry(event,drinkFromPoolMES());
                 return;
             }
-            event.setMenuEntry(useFairyRingMES());
+            setMenuEntry(event,useFairyRingMES());
             return;
         }
         if (isInMorytaniaHideout1())
         {
-            event.setMenuEntry(leaveMorytaniaHideout1MES());
+            setMenuEntry(event,leaveMorytaniaHideout1MES());
             return;
         }
         if (isInMorytaniaHideout2())
         {
-            event.setMenuEntry(leaveMorytaniaHideout2MES());
+            setMenuEntry(event,leaveMorytaniaHideout2MES());
             return;
         }
         if (isInMorytaniaHideout3())
         {
-            event.setMenuEntry(leaveMorytaniaHideout3MES());
+            setMenuEntry(event,leaveMorytaniaHideout3MES());
             return;
         }
         if (isinMorytaniaHideout4LowAgility())
         {
-            event.setMenuEntry(leaveMorytaniaHideout4LowAgilityMES());
+            setMenuEntry(event,leaveMorytaniaHideout4LowAgilityMES());
             return;
         }
         if (isinMorytaniaHideout5LowAgility())
         {
-            event.setMenuEntry(useLowAgilityShortcut1MES());
+            setMenuEntry(event,useLowAgilityShortcut1MES());
             return;
         }
         if (isinMorytaniaHideout5LowAgilityShortcut())
         {
-            event.setMenuEntry(useLowAgilityShortcut2MES());
+            setMenuEntry(event,useLowAgilityShortcut2MES());
             return;
         }
 
         if (isinMorytaniaHideout5HighAgilityShortcut())
         {
-            event.setMenuEntry(useHighAgilityShortcut2MES());
+            setMenuEntry(event,useHighAgilityShortcut2MES());
             return;
         }
         if (getEmptySlots()>0 && bankMES()!=null)
         {
-            event.setMenuEntry(bankMES());
+            setMenuEntry(event,bankMES());
             return;
         }
         if (getEmptySlots()!=0)
         {
             if (teleToBankMES() != null)
             {
-                event.setMenuEntry(teleToBankMES());
+                setMenuEntry(event,teleToBankMES());
                 bankTeleportTimeout = 4;
             }
             return;
         }
         if (teleToPOHMES()!=null)
         {
-            event.setMenuEntry(teleToPOHMES());
+            setMenuEntry(event,teleToPOHMES());
             POHTeleportTimeout = 4;
         }
     }
@@ -591,6 +603,15 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return createMenuEntry(2, MenuAction.CC_OP, -1, WidgetInfo.SPELL_NPC_CONTACT.getId(), false);
     }
 
+    private MenuEntry activateBloodEssenceMES(int slot){
+        return createMenuEntry(
+                2,
+                MenuAction.CC_OP,
+                slot,
+                WidgetInfo.INVENTORY.getId(),
+                false);
+    }
+
     private boolean isInPOH() {
         reset();
         return getGameObject(4525)!=null; //checks for portal, p sure this is same for everyone if not need to do alternative check.
@@ -713,6 +734,13 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         client.runScript(6009, 9764864, 28, 1, -1);
         List<Widget> inventoryItems = Arrays.asList(client.getWidget(widgetInfo.getId()).getDynamicChildren());
         return (int) inventoryItems.stream().filter(item -> item.getItemId() == 6512).count();
+    }
+
+    private void setMenuEntry(MenuOptionClicked event, MenuEntry menuEntry){
+        event.setId(menuEntry.getIdentifier());
+        event.setMenuAction(menuEntry.getType());
+        event.setParam0(menuEntry.getParam0());
+        event.setParam1(menuEntry.getParam1());
     }
 
     private MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
