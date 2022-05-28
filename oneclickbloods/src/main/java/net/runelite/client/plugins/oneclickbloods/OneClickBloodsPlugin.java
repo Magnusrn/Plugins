@@ -353,8 +353,8 @@ public class OneClickBloodsPlugin extends Plugin {
 
     private MenuEntry activateBloodEssenceMES(int slot){
         return createMenuEntry(
-                ItemID.BLOOD_ESSENCE,
-                MenuAction.ITEM_FIRST_OPTION,
+                2,
+                MenuAction.CC_OP,
                 slot,
                 WidgetInfo.INVENTORY.getId(),
                 false);
@@ -385,15 +385,11 @@ public class OneClickBloodsPlugin extends Plugin {
     }
 
     private Widget getInventoryItem(int id) {
+        client.runScript(6009, 9764864, 28, 1, -1); //rebuild inventory
         Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
         if (inventoryWidget!=null && !inventoryWidget.isHidden())
         {
             return getWidgetItem(inventoryWidget,id);
-        }
-        if (bankInventoryWidget!=null && !bankInventoryWidget.isHidden())
-        {
-            return getWidgetItem(bankInventoryWidget,id);
         }
         return null;
     }
