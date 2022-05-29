@@ -9,4 +9,8 @@ public class Banking {
         }
         return -1;
     }
+
+    private boolean bankOpen() {
+        return client.getItemContainer(InventoryID.BANK) != null;
+    }
 }
