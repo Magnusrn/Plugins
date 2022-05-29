@@ -1,5 +1,7 @@
+import ProjectVersions.openosrsVersion
+
 /*
- * Copyright (c) 2019 Owain van Brakel <https:github.com/Owain94>
+ * Copyright (c) 2019 Owain van Brakel <https://github.com/Owain94>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,37 +25,34 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-rootProject.name = "Kitsch Plugins"
+version = "1.0.1"
 
-include(":birdhouseinfobox")
-include(":coxraidscouter")
-include(":objecthider")
-include(":oneclickamethyst")
-include(":oneclickanglerfish")
-include(":oneclickblastfurnace")
-include(":oneclickbloods")
-include(":oneclickbloodsmorytania")
-include(":oneclickchins")
-include(":oneclickcorpspec")
-include(":oneclickcustom")
-include(":oneclickglassblowing")
-include(":oneclickkarambwans")
-include(":oneclickminnows")
-include(":oneclickmortmyrefungus")
-include(":oneclicksandstone")
-include(":oneclickteaks")
-include(":oneclicktelegrab")
-include(":oneclickaerialfishing")
-include(":oneclickzmi")
-include(":scheduledlogout")
-include(":tabswitcher")
+project.extra["PluginName"] = "One Click Minnows" // This is the name that is used in the external plugin manager panel
+project.extra["PluginDescription"] = "Simple plugin, catches minnows." // This is the description that is used in the external plugin manager panel
 
-for (project in rootProject.children) {
-    project.apply {
-        projectDir = file(name)
-        buildFileName = "$name.gradle.kts"
+dependencies {
+    annotationProcessor(Libraries.lombok)
+    annotationProcessor(Libraries.pf4j)
 
-        require(projectDir.isDirectory) { "Project '${project.path} must have a $projectDir directory" }
-        require(buildFile.isFile) { "Project '${project.path} must have a $buildFile build script" }
+    compileOnly("com.openosrs:runelite-api:$openosrsVersion+")
+    compileOnly("com.openosrs:runelite-client:$openosrsVersion+")
+
+    compileOnly(Libraries.guice)
+    compileOnly(Libraries.javax)
+    compileOnly(Libraries.lombok)
+    compileOnly(Libraries.pf4j)
+}
+
+tasks {
+    jar {
+        manifest {
+            attributes(mapOf(
+                    "Plugin-Version" to project.version,
+                    "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
+                    "Plugin-Provider" to project.extra["PluginProvider"],
+                    "Plugin-Description" to project.extra["PluginDescription"],
+                    "Plugin-License" to project.extra["PluginLicense"]
+            ))
+        }
     }
 }
