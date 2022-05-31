@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
+import net.runelite.api.Point;
 import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.InteractingChanged;
@@ -21,6 +22,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import org.pf4j.Extension;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -114,6 +116,12 @@ public class OneClickFurnacePlugin extends Plugin {
                 case 1:
                     if (getInventoryItem(config.method().product)!=null)
                     {
+                        if (config.method()==CraftingMethods.Molten_Glass)
+                        {
+                            setMenuEntry(event,depositAll());
+                            bankingState = 2;
+                            return;
+                        }
                         setMenuEntry(event,depositProduct());
                         bankingState = 2;
                         return;
@@ -193,6 +201,10 @@ public class OneClickFurnacePlugin extends Plugin {
     private MenuEntry depositProduct() {
         Widget item = getInventoryItem(config.method().product);
         return createMenuEntry(8, MenuAction.CC_OP_LOW_PRIORITY, item.getIndex(), WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId(), false);
+    }
+
+    private MenuEntry depositAll() {
+        return createMenuEntry(1, MenuAction.CC_OP, -1, WidgetInfo.BANK_DEPOSIT_INVENTORY.getId(), false);
     }
 
     private MenuEntry withdrawX() {
