@@ -76,6 +76,22 @@ public class OneClickGlassblowingPlugin extends Plugin {
             event.consume();
             return;
         }
+        if (bankOpen())
+        {
+            //set withdraw quantity to 1
+            if (client.getVarbitValue(6590)!=0)
+            {
+                setMenuEntry(event,createMenuEntry(1, MenuAction.CC_OP, -1, 786460, false));
+                return;
+            }
+            //set bank tab to main tab
+            if (client.getVarbitValue(Varbits.CURRENT_BANK_TAB)!=0)
+            {
+                setMenuEntry(event,createMenuEntry(1, MenuAction.CC_OP, 10, WidgetInfo.BANK_TAB_CONTAINER.getId(), false));
+                return;
+            }
+        }
+
         if (event.getMenuOption().equals("<col=00ff00>One Click Molten Glass"))
         {
             if (config.mode()== Types.Mode.GLASSBLOWING)
@@ -100,73 +116,52 @@ public class OneClickGlassblowingPlugin extends Plugin {
 
     private void blowGlassHandler(MenuOptionClicked event){
         System.out.println("glassblowingStage = " + glassblowingStage + " timeout = " + timeout);
-        if (bankOpen() && client.getVarbitValue(6590)!=0)
-        {
-            event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, -1, 786460, false));
-            return;
-        }
-        //set bank tab to main tab
-        if (client.getVarbitValue(Varbits.CURRENT_BANK_TAB)!=0)
-        {
-            event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, 10, WidgetInfo.BANK_TAB_CONTAINER.getId(), false));
-            return;
-        }
         switch (glassblowingStage)
         {
             case 1:
-                event.setMenuEntry(openBank());
+                setMenuEntry(event,openBank());
                 if (!bankOpen())
                 {
                     return;
                 }
                 glassblowingStage = 2;
             case 2:
-                event.setMenuEntry(depositItems());
+                setMenuEntry(event,depositItems());
                 glassblowingStage = 3;
                 return;
             case 3:
-                event.setMenuEntry(withdrawAllMoltenGlass());
+                setMenuEntry(event,withdrawAllMoltenGlass());
+                timeout = 1;
                 glassblowingStage = 4;
                 return;
             case 4:
-                if (usePipeOnGlass()==null)
+                if (client.getWidget(270,1)!=null)
                 {
+                    setMenuEntry(event,selectGlassblowingItem());
+                    timeout = 4;
                     return;
                 }
-                event.setMenuEntry(usePipeOnGlass());
-                glassblowingStage = 5;
-                return;
-            case 5:
-                event.setMenuEntry(selectGlassblowingItem());
-                if (getInventoryItem(ItemID.MOLTEN_GLASS)!=null)
+                if (usePipeOnGlass()!=null)
                 {
+                    setMenuEntry(event,usePipeOnGlass());
                     return;
                 }
-                event.setMenuEntry(openBank());
-                timeout = 1;
-                glassblowingStage = 1;
+                if (getInventoryItem(ItemID.MOLTEN_GLASS)==null)
+                {
+                    setMenuEntry(event,openBank());
+                    timeout = 1;
+                    glassblowingStage = 1;
+                }
         }
     }
 
     private void superGlassMakeHandler(MenuOptionClicked event){
         if (timeout>0) return;
         System.out.println("superglassMakeStage = " + superglassMakeStage);
-        if (bankOpen() && client.getVarbitValue(6590)!=0)
-        {
-            event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, -1, 786460, false));
-            return;
-        }
-        //set bank tab to main tab
-        if (client.getVarbitValue(Varbits.CURRENT_BANK_TAB)!=0)
-        {
-            event.setMenuEntry(createMenuEntry(1, MenuAction.CC_OP, 10, WidgetInfo.BANK_TAB_CONTAINER.getId(), false));
-            return;
-        }
-
         switch (superglassMakeStage)
         {
             case 1:
-                event.setMenuEntry(openBank());
+                setMenuEntry(event,openBank());
                 seaweedCount = 0;
                 timeout = 1;
                 if (!bankOpen())
@@ -175,7 +170,7 @@ public class OneClickGlassblowingPlugin extends Plugin {
                 }
                 superglassMakeStage = 2;
             case 2:
-                event.setMenuEntry(depositItems());
+                setMenuEntry(event,depositItems());
                 superglassMakeStage = 3;
                 return;
             case 3:
@@ -186,22 +181,22 @@ public class OneClickGlassblowingPlugin extends Plugin {
                 {
                     if (config.superglassMakeMethod()==Types.SuperGlassMakeMethod.THIRTEEN_THIRTEEN)
                     {
-                        event.setMenuEntry(withdrawXsodaAshOrSeaweed());
+                        setMenuEntry(event,withdrawXsodaAshOrSeaweed());
                         seaweedCount++;
                         return;
                     }
-                    event.setMenuEntry(withdrawOneSeaweed());
+                    setMenuEntry(event,withdrawOneSeaweed());
                     seaweedCount++;
                     return;
                 }
                 superglassMakeStage = 4;
             case 4:
                 if (withdrawXSand()==null) return;
-                event.setMenuEntry(withdrawXSand());
+                setMenuEntry(event,withdrawXSand());
                 superglassMakeStage = 5;
                 return;
             case 5:
-                event.setMenuEntry(castSuperglassMake());
+                setMenuEntry(event,castSuperglassMake());
                 timeout = 4;
                 superglassMakeStage = 1;
         }
@@ -279,8 +274,8 @@ public class OneClickGlassblowingPlugin extends Plugin {
             return createMenuEntry(
                     npc.getIndex(),
                     MenuAction.NPC_THIRD_OPTION,
-                    getNPCLocation(npc).getX(),
-                    getNPCLocation(npc).getY(),
+                    0,
+                    0,
                     false);
         }
         return null;
@@ -388,10 +383,6 @@ public class OneClickGlassblowingPlugin extends Plugin {
                 .nearestTo(client.getLocalPlayer());
     }
 
-    private Point getNPCLocation(NPC npc) {
-        return new Point(npc.getLocalLocation().getSceneX(),npc.getLocalLocation().getSceneY());
-    }
-
     private boolean bankOpen() {
         return client.getItemContainer(InventoryID.BANK) != null;
     }
@@ -399,5 +390,12 @@ public class OneClickGlassblowingPlugin extends Plugin {
     public MenuEntry createMenuEntry(int identifier, MenuAction type, int param0, int param1, boolean forceLeftClick) {
         return client.createMenuEntry(0).setOption("").setTarget("").setIdentifier(identifier).setType(type)
                 .setParam0(param0).setParam1(param1).setForceLeftClick(forceLeftClick);
+    }
+
+    private void setMenuEntry(MenuOptionClicked event, MenuEntry menuEntry){
+        event.setId(menuEntry.getIdentifier());
+        event.setMenuAction(menuEntry.getType());
+        event.setParam0(menuEntry.getParam0());
+        event.setParam1(menuEntry.getParam1());
     }
 }
