@@ -53,7 +53,7 @@ public interface coxraidscouterconfig extends Config {
             description = "Enable Desired Rotations"
     )
     default boolean desiredRotationsToggle() {
-        return true;
+        return false;
     }
 
     @ConfigItem(
