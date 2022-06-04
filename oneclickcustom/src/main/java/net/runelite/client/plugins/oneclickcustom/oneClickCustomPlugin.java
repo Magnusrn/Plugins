@@ -158,8 +158,6 @@ public class oneClickCustomPlugin extends Plugin{
 
         if (objects.getNpc(getConfigIds())==null &!(config.oneClickType()==oneClickCustomTypes.methods.Gather) &! (config.oneClickType() == oneClickCustomTypes.methods.Pick_Up)) return;
 
-        if (inventory.getEmptySlots()==0 && config.InventoryFull() && config.oneClickType()!=oneClickCustomTypes.methods.Attack) return;
-
         if(client.getLocalPlayer() == null || client.getGameState() != GameState.LOGGED_IN) return;
         String text =  "<col=00ff00>One Click Custom";
         client.insertMenuItem(text,"", MenuAction.UNKNOWN.getId(), 0, 0, 0, true);

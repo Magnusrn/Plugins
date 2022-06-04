@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class GetObjects {
@@ -52,10 +53,12 @@ public class GetObjects {
     }
 
     public NPC getNearestAliveNPC(List<Integer> ids) {
-        ArrayList<NPC> npcs = new NPCQuery()
+        List<NPC> npcs = new NPCQuery()
                 .idEquals(ids)
                 .result(client)
-                .list;
+                .stream()
+                .filter(npc-> npc.getHealthRatio() != 0)
+                .collect(Collectors.toList());
         return (NPC) getNearestObject(npcs.stream());
     }
 
