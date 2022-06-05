@@ -36,6 +36,7 @@ dependencies {
 
     compileOnly("com.openosrs:runelite-api:$openosrsVersion+")
     compileOnly("com.openosrs:runelite-client:$openosrsVersion+")
+    compileOnly(group = "com.openosrs.rs", name = "runescape-api", version = ProjectVersions.openosrsVersion)
 
     compileOnly(Libraries.guice)
     compileOnly(Libraries.javax)

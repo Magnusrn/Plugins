@@ -5,12 +5,17 @@ import javax.inject.Inject;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.NPC;
+import net.runelite.api.events.GameTick;
+import net.runelite.api.queries.NPCQuery;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.ktheatreofblood.rooms.Maiden.Maiden;
+import net.runelite.client.plugins.ktheatreofblood.rooms.Maiden.Xarpus;
 import org.pf4j.Extension;
 
 @Extension
@@ -25,6 +30,8 @@ public class KTheatreOfBloodPlugin extends Plugin {
 
     @Inject
     private Maiden maiden;
+    @Inject
+    private Xarpus xarpus;
 
     @Inject
     private KTheatreOfBloodConfig config;
@@ -45,7 +52,8 @@ public class KTheatreOfBloodPlugin extends Plugin {
 
     protected void startUp() {
         if (rooms == null) {
-            rooms = new Room[]{maiden};
+            rooms = new Room[]{maiden, xarpus};
+
 
             for (Room room : rooms) {
                 room.init();

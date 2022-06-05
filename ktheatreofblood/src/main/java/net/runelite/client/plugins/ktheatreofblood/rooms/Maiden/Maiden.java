@@ -110,25 +110,23 @@ public class Maiden extends Room {
             position = "S4";
         }
         //assuming this is entry mode
-        if (npcSpawned.getNpc().getId() == NpcID.NYLOCAS_MATOMENOS_10820)
+        if (npcSpawned.getNpc().getId() == NpcID.NYLOCAS_MATOMENOS)
         {
             crabs.put(npc,position);
         }
     }
 
     @Subscribe
-    public void onNpcDespawned(NpcDespawned npcDespawned)
-    {
+    public void onNpcDespawned(NpcDespawned npcDespawned) {
         //assuming this is entry mode
-        if (npcDespawned.getNpc().getId() == NpcID.NYLOCAS_MATOMENOS_10820)
+        if (npcDespawned.getNpc().getId() == NpcID.NYLOCAS_MATOMENOS)
         {
             crabs.remove(npcDespawned.getNpc());
         }
     }
 
     @Subscribe
-    public void onMenuOptionClicked(MenuOptionClicked event)
-    {
+    public void onMenuOptionClicked(MenuOptionClicked event) {
         if (event.getMenuTarget().contains("Maiden") && crabs.size()!=0 && hotkeyHeld)
         {
             NPC npc = getOptimalCrab();
@@ -157,8 +155,7 @@ public class Maiden extends Room {
         return  crabs.keySet().stream().filter(crab-> crabs.get(crab).equals(finalNpcLocation)).findAny().orElse(null);
     }
 
-    private Point getLocation(NPC npc)
-    {
+    private Point getLocation(NPC npc) {
         return new Point(npc.getLocalLocation().getSceneX(),npc.getLocalLocation().getSceneY());
     }
 }
