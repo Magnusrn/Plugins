@@ -37,13 +37,38 @@ public class Xarpus extends Room {
         super(plugin, config);
     }
 
+    @Override
+    protected void startUp() throws Exception {
+        System.out.println("starting plugin xarpus");
+    }
+
     @Subscribe
     public void onAnimationChanged(AnimationChanged event) {
         if (event.getActor()==client.getLocalPlayer())
         {
-            if (client.getLocalPlayer().getAnimation()==8056)
+            switch (client.getLocalPlayer().getAnimation())
             {
-                weaponCooldown = 5;
+                case 8056: //scythe animation
+                case 435: //scythe defensive (wyd)
+                    weaponCooldown = 5;
+                    break;
+                case 1658: //abyssal whip/Tentacle slash
+                case 1659: //abyssal whip/Tentacle defensive
+                case 4503: //Inquisitor's mace crush
+                case 390: //Dragon Scimitar /Blade of Saeldor
+                case 393: // claw scratch
+                case 8145: // rapier stab
+                case 1062: // dds spec
+                case 422: // punch //REMOVE THESE AFTER TESTING
+                case 423: // kick
+                case 386: // lunge
+                    weaponCooldown = 4;
+                    break;
+                case 428: // chally swipe
+                case 440: // chally jab
+                case 1203: // chally spec
+                    weaponCooldown = 7;
+                    break;
             }
         }
     }
@@ -51,7 +76,6 @@ public class Xarpus extends Room {
     @Subscribe
     public void onGameTick(GameTick gameTick) {
         if (weaponCooldown>0) weaponCooldown --;
-        System.out.println(weaponCooldown);
     }
 
     @Subscribe
@@ -62,11 +86,7 @@ public class Xarpus extends Room {
             if (isInDanger() && event.getMenuTarget().contains("Xarpus"))
             {
                 event.consume();
-                if (config.xarpusWheelchairClickFloor())
-                {
-                    walkTile(client.getLocalPlayer().getWorldLocation());
-                }
-                client.addChatMessage(ChatMessageType.BROADCAST,"DANGER","Rip HC","DANGER");
+                walkTile(client.getLocalPlayer().getWorldLocation());
             }
         }
     }

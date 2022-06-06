@@ -1,9 +1,7 @@
 package net.runelite.client.plugins.ktheatreofblood.rooms.Maiden;
 import com.google.inject.Provides;
 import net.runelite.api.*;
-import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.events.NpcDespawned;
-import net.runelite.api.events.NpcSpawned;
+import net.runelite.api.events.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
@@ -16,9 +14,13 @@ import net.runelite.client.plugins.ktheatreofblood.KTheatreOfBloodPlugin;
 import net.runelite.client.util.HotkeyListener;
 
 import javax.inject.Inject;
+import java.awt.event.KeyEvent;
 import java.util.HashMap;
 
 public class Maiden extends Room {
+    HashMap<NPC,String> crabs = new HashMap<>();
+    private boolean hotkeyHeld = false;
+
     @Inject
     private Client client;
 
@@ -41,23 +43,25 @@ public class Maiden extends Room {
         super(plugin, config);
     }
 
-    HashMap<NPC,String> crabs = new HashMap<>();
-    private boolean hotkeyHeld = false;
-
-    private final HotkeyListener hotkeyListener = new HotkeyListener(() -> config.maidenKeybind()) {
+    private final HotkeyListener maidenKeyListener = new HotkeyListener(() -> config.maidenKeybind()) {
         @Override
-        public void hotkeyPressed() {
-            hotkeyHeld = true;
+        public void keyPressed(KeyEvent e) {
+            if (config.maidenKeybind().matches(e)) {
+                hotkeyHeld = true;
+            }
         }
-
         @Override
-        public void hotkeyReleased() {
-            hotkeyHeld = false;
+        public void keyReleased(KeyEvent e) {
+            if (config.maidenKeybind().matches(e)) {
+                hotkeyHeld = false;
+            }
         }
     };
 
+    @Override
     protected void startUp() throws Exception {
-        keyManager.registerKeyListener(hotkeyListener);
+        System.out.println("starting plugin");
+        keyManager.registerKeyListener(maidenKeyListener);
     }
 
     @Subscribe
@@ -110,7 +114,8 @@ public class Maiden extends Room {
             position = "S4";
         }
         //assuming this is entry mode
-        if (npcSpawned.getNpc().getId() == NpcID.NYLOCAS_MATOMENOS)
+        if (npcSpawned.getNpc().getId() == NpcID.NYLOCAS_MATOMENOS //reg tob
+            ||npcSpawned.getNpc().getId() == NpcID.NYLOCAS_MATOMENOS_10820) //entry mode
         {
             crabs.put(npc,position);
         }
@@ -127,20 +132,21 @@ public class Maiden extends Room {
 
     @Subscribe
     public void onMenuOptionClicked(MenuOptionClicked event) {
-        if (event.getMenuTarget().contains("Maiden") && crabs.size()!=0 && hotkeyHeld)
-        {
-            NPC npc = getOptimalCrab();
-            if (npc==null) return;
-            System.out.println("Freezing crab");
-            Widget widget = client.getWidget(WidgetInfo.SPELL_ICE_BARRAGE);
-            client.setSelectedSpellName("<col=00ff00>" + "Ice Barrage" + "</col>");
-            client.setSelectedSpellWidget(widget.getId());
-            client.setSelectedSpellChildIndex(-1);
-            event.setMenuAction(MenuAction.WIDGET_TARGET_ON_NPC);
-            event.setParam0(getLocation(npc).getX()); //do i even need location? idfk
-            event.setParam1(getLocation(npc).getY());
-            event.setId(npc.getIndex());
-            crabs.remove(npc);
+        if (event.getMenuTarget().contains("Maiden") && hotkeyHeld) {
+            if (crabs.size() != 0 && getOptimalCrab()!=null) {
+                NPC npc = getOptimalCrab();
+                Widget widget = client.getWidget(WidgetInfo.SPELL_ICE_BARRAGE);
+                client.setSelectedSpellName("<col=00ff00>" + "Ice Barrage" + "</col>");
+                client.setSelectedSpellWidget(widget.getId());
+                client.setSelectedSpellChildIndex(-1);
+                event.setMenuAction(MenuAction.WIDGET_TARGET_ON_NPC);
+                event.setParam0(getLocation(npc).getX()); //do i even need location? idfk
+                event.setParam1(getLocation(npc).getY());
+                event.setId(npc.getIndex());
+                crabs.remove(npc); //prevent double freezing same crab, though this should really only be used once!
+                return;
+            }
+            event.consume();
         }
     }
 

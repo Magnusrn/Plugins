@@ -22,4 +22,7 @@ public abstract class Room {
 
     public void unload() {
     }
+
+    protected void startUp() throws Exception {
+    }
 }

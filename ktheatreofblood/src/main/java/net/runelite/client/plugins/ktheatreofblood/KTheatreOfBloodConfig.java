@@ -22,7 +22,7 @@ public interface KTheatreOfBloodConfig extends Config {
     @ConfigItem(
             keyName = "Maiden Freezer",
             name = "Maiden Freezer",
-            description = "Automatically cast ice barrage on the optimal crab if holding keybind and clicking maiden",
+            description = "Automatically cast ice barrage on the initial optimal crab(S1>N1>N2>S2) if holding keybind and clicking maiden",
             section = Maiden,
             position = 0
     )
@@ -44,7 +44,7 @@ public interface KTheatreOfBloodConfig extends Config {
     @ConfigItem(
             keyName = "Xarpus Wheelchair",
             name = "Xarpus Wheelchair",
-            description = "Stops you from attacking xarpus if try to while he's looking",
+            description = "Stops you from attacking xarpus if you try to while he's looking at you",
             section = Xarpus,
             position = 0
     )
@@ -55,24 +55,11 @@ public interface KTheatreOfBloodConfig extends Config {
     @ConfigItem(
             keyName = "Xarpus Wheelchair Weapon Cooldown",
             name = "Xarpus Wheelchair Weapon Cooldown",
-            description = "Only prevent attacking if Xarpus is looking at you while weapon is off cooldown(Scythe supported)",
+            description = "Only prevent attacking if Xarpus is looking at you while weapon is off cooldown(Doesn't support every weapon)",
             section = Xarpus,
             position = 1
     )
     default boolean xarpusWheelchairWeaponCooldown() {
         return false;
     }
-
-    @ConfigItem(
-            keyName = "Xarpus Wheelchair Click Floor",
-            name = "Xarpus Wheelchair Click Floor",
-            description = "If enabled will click the floor to stop any future attacks while using xarpus wheelchair, else click is consumed.",
-            section = Xarpus,
-            position = 2
-    )
-    default boolean xarpusWheelchairClickFloor() {
-        return false;
-    }
-
-
 }

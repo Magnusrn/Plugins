@@ -30,6 +30,7 @@ public class KTheatreOfBloodPlugin extends Plugin {
 
     @Inject
     private Maiden maiden;
+
     @Inject
     private Xarpus xarpus;
 
@@ -50,7 +51,7 @@ public class KTheatreOfBloodPlugin extends Plugin {
         return configManager.getConfig(KTheatreOfBloodConfig.class);
     }
 
-    protected void startUp() {
+    protected void startUp() throws Exception {
         if (rooms == null) {
             rooms = new Room[]{maiden, xarpus};
 
@@ -62,6 +63,7 @@ public class KTheatreOfBloodPlugin extends Plugin {
         for (Room room : rooms) {
             room.load();
             eventBus.register(room);
+            room.startUp();
         }
     }
 
