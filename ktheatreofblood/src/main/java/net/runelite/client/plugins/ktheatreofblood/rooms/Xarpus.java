@@ -8,7 +8,6 @@ import net.runelite.api.events.AnimationChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.NpcSpawned;
-import net.runelite.api.queries.NPCQuery;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.ktheatreofblood.KTheatreOfBloodConfig;
@@ -25,6 +24,7 @@ public class Xarpus extends Room {
     private int weaponCooldown;
     private int ticksSinceTurn = 0;
     private int lastDirection = 0;
+    private NPC xarpus = null;
 
     @Inject
     Client client;
@@ -82,21 +82,31 @@ public class Xarpus extends Room {
     @Subscribe
     public void onNpcSpawned(NpcSpawned event) {
         if (event.getNpc()==null || event.getNpc().getName() == null) return;
-        if (event.getNpc().getName().contains("Xarpus"))
+        switch (event.getNpc().getId())
         {
-            reset();
+            case NpcID.XARPUS:
+            case NpcID.XARPUS_8339:
+            case NpcID.XARPUS_8340:
+            case NpcID.XARPUS_8341:
+            case NpcID.XARPUS_10766: //*Story mode
+            case NpcID.XARPUS_10767:
+            case NpcID.XARPUS_10768:
+            case NpcID.XARPUS_10769: //*
+                reset();
+                xarpus = event.getNpc();
+                break;
         }
     }
 
     private void reset() {
         ticksSinceTurn = 0;
         lastDirection = 0;
+        xarpus = null;
     }
 
     @Subscribe
     public void onGameTick(GameTick gameTick) {
         if (weaponCooldown>0) weaponCooldown --;
-        NPC xarpus = getXarpus();
         List<Integer> directions = Arrays.asList(255,735,1281,1825);
         if (xarpus!=null)
         {
@@ -114,10 +124,11 @@ public class Xarpus extends Room {
 
     @Subscribe
     private void onMenuOptionClicked(MenuOptionClicked event) {
+        if ((ticksSinceTurn+weaponCooldown>7)) return;
+        if (ticksSinceTurn>7) return;
+        if (xarpus == null) return;
         if (config.xarpusWheelchair())
         {
-            if (ticksSinceTurn+weaponCooldown>7) return;
-            if (ticksSinceTurn>7) return;
             if (isInDanger() && event.getMenuTarget().contains("Xarpus"))
             {
                 event.consume();
@@ -127,10 +138,9 @@ public class Xarpus extends Room {
     }
 
     private boolean isInDanger() {
-        NPC npc = getXarpus();
-        if (npc == null) return false;
-        int x = npc.getWorldLocation().getX();
-        int y = npc.getWorldLocation().getY();
+        if (xarpus == null) return false;
+        int x = xarpus.getWorldLocation().getX();
+        int y = xarpus.getWorldLocation().getY();
         //this requires a little overlap so people don't fuck themselves up in the middle. uses xarpus as a reference point to get worldpoints due to it constantly changing with new instances
         WorldArea swArea = new WorldArea(new WorldPoint(x-5,y-5,1),new WorldPoint(x+3,y+3,1));
         WorldArea seArea = new WorldArea(new WorldPoint(x+2,y-5,1),new WorldPoint(x+9,y+3,1));
@@ -155,14 +165,7 @@ public class Xarpus extends Room {
          * </ul>
          */
         //fix npe on entering, is orientation nulling sometimes?
-        return client.getLocalPlayer().getWorldLocation().isInArea(areas.get(npc.getOrientation()));
-    }
-
-    private NPC getXarpus() {
-        return new NPCQuery()
-                .nameEquals("Xarpus")
-                .result(client)
-                .nearestTo(client.getLocalPlayer());
+        return client.getLocalPlayer().getWorldLocation().isInArea(areas.get(xarpus.getOrientation()));
     }
 
     private void walkTile(WorldPoint worldpoint) {
