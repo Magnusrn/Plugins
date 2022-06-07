@@ -5,23 +5,19 @@ import javax.inject.Inject;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.NPC;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.queries.NPCQuery;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.ktheatreofblood.rooms.Maiden.Maiden;
-import net.runelite.client.plugins.ktheatreofblood.rooms.Maiden.Xarpus;
+import net.runelite.client.plugins.ktheatreofblood.rooms.Maiden;
+import net.runelite.client.plugins.ktheatreofblood.rooms.Xarpus;
 import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
         name = "K Theatre Of Blood",
-        description = "Various OP features for Theatre of Blood",
+        description = "Various features for Theatre of Blood",
         enabledByDefault = false
 )
 @Slf4j

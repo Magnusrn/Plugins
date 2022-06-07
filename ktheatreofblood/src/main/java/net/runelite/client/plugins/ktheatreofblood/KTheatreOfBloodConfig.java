@@ -51,15 +51,4 @@ public interface KTheatreOfBloodConfig extends Config {
     default boolean xarpusWheelchair() {
         return false;
     }
-
-    @ConfigItem(
-            keyName = "Xarpus Wheelchair Weapon Cooldown",
-            name = "Xarpus Wheelchair Weapon Cooldown",
-            description = "Only prevent attacking if Xarpus is looking at you while weapon is off cooldown(Doesn't support every weapon)",
-            section = Xarpus,
-            position = 1
-    )
-    default boolean xarpusWheelchairWeaponCooldown() {
-        return false;
-    }
 }

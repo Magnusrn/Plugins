@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.ktheatreofblood.rooms.Maiden;
+package net.runelite.client.plugins.ktheatreofblood.rooms;
 
 import com.google.inject.Provides;
 import net.runelite.api.*;
@@ -7,6 +7,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.AnimationChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.queries.NPCQuery;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -16,10 +17,14 @@ import net.runelite.client.plugins.ktheatreofblood.Room;
 import net.runelite.rs.api.RSClient;
 
 import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class Xarpus extends Room {
     private int weaponCooldown;
+    private int ticksSinceTurn = 0;
+    private int lastDirection = 0;
 
     @Inject
     Client client;
@@ -40,6 +45,7 @@ public class Xarpus extends Room {
     @Override
     protected void startUp() throws Exception {
         System.out.println("starting plugin xarpus");
+        reset();
     }
 
     @Subscribe
@@ -59,7 +65,7 @@ public class Xarpus extends Room {
                 case 393: // claw scratch
                 case 8145: // rapier stab
                 case 1062: // dds spec
-                case 422: // punch //REMOVE THESE AFTER TESTING
+                case 422: // punch
                 case 423: // kick
                 case 386: // lunge
                     weaponCooldown = 4;
@@ -74,15 +80,44 @@ public class Xarpus extends Room {
     }
 
     @Subscribe
+    public void onNpcSpawned(NpcSpawned event) {
+        if (event.getNpc()==null || event.getNpc().getName() == null) return;
+        if (event.getNpc().getName().contains("Xarpus"))
+        {
+            reset();
+        }
+    }
+
+    private void reset() {
+        ticksSinceTurn = 0;
+        lastDirection = 0;
+    }
+
+    @Subscribe
     public void onGameTick(GameTick gameTick) {
         if (weaponCooldown>0) weaponCooldown --;
+        NPC xarpus = getXarpus();
+        List<Integer> directions = Arrays.asList(255,735,1281,1825);
+        if (xarpus!=null)
+        {
+            if (lastDirection!= xarpus.getOrientation())
+            {
+                ticksSinceTurn = 0;
+            }
+            if (directions.contains(xarpus.getOrientation()))
+            {
+                ticksSinceTurn++;
+                lastDirection = xarpus.getOrientation();
+            }
+        }
     }
 
     @Subscribe
     private void onMenuOptionClicked(MenuOptionClicked event) {
         if (config.xarpusWheelchair())
         {
-            if (config.xarpusWheelchairWeaponCooldown() && weaponCooldown>0) return;
+            if (ticksSinceTurn+weaponCooldown>7) return;
+            if (ticksSinceTurn>7) return;
             if (isInDanger() && event.getMenuTarget().contains("Xarpus"))
             {
                 event.consume();
@@ -92,10 +127,7 @@ public class Xarpus extends Room {
     }
 
     private boolean isInDanger() {
-        NPC npc = new NPCQuery()
-                .nameEquals("Xarpus")
-                .result(client)
-                .nearestTo(client.getLocalPlayer());
+        NPC npc = getXarpus();
         if (npc == null) return false;
         int x = npc.getWorldLocation().getX();
         int y = npc.getWorldLocation().getY();
@@ -122,8 +154,15 @@ public class Xarpus extends Room {
          *     <li>1825 is South East</li>
          * </ul>
          */
-
+        //fix npe on entering, is orientation nulling sometimes?
         return client.getLocalPlayer().getWorldLocation().isInArea(areas.get(npc.getOrientation()));
+    }
+
+    private NPC getXarpus() {
+        return new NPCQuery()
+                .nameEquals("Xarpus")
+                .result(client)
+                .nearestTo(client.getLocalPlayer());
     }
 
     private void walkTile(WorldPoint worldpoint) {
