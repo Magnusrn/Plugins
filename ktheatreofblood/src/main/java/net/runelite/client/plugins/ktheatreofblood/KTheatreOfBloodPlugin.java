@@ -10,6 +10,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.ktheatreofblood.rooms.Bloat;
 import net.runelite.client.plugins.ktheatreofblood.rooms.Maiden;
 import net.runelite.client.plugins.ktheatreofblood.rooms.Xarpus;
 import org.pf4j.Extension;
@@ -26,6 +27,9 @@ public class KTheatreOfBloodPlugin extends Plugin {
 
     @Inject
     private Maiden maiden;
+
+    @Inject
+    private Bloat bloat;
 
     @Inject
     private Xarpus xarpus;
@@ -49,7 +53,7 @@ public class KTheatreOfBloodPlugin extends Plugin {
 
     protected void startUp() throws Exception {
         if (rooms == null) {
-            rooms = new Room[]{maiden, xarpus};
+            rooms = new Room[]{maiden, xarpus, bloat};
 
 
             for (Room room : rooms) {

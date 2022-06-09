@@ -21,6 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Xarpus extends Room {
+    //TODO - ensure only runs if xarpus has screeched
+    // prevent clicking on final tick if in safezone maybe.
+
     private int weaponCooldown;
     private int ticksSinceTurn = 0;
     private int lastDirection = 0;

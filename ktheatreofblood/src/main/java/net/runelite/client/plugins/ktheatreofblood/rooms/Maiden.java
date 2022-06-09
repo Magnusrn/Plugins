@@ -25,9 +25,6 @@ public class Maiden extends Room {
     private Client client;
 
     @Inject
-    private ClientThread clientThread;
-
-    @Inject
     private KTheatreOfBloodConfig config;
 
     @Inject

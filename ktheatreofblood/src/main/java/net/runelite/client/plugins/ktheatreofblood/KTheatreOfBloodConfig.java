@@ -12,9 +12,16 @@ public interface KTheatreOfBloodConfig extends Config {
     )
     String Maiden = "Maiden";
     @ConfigSection(
+            name = "Bloat",
+            description = "Bloat options",
+            position = 1,
+            closedByDefault = true
+    )
+    String Bloat = "Bloat";
+    @ConfigSection(
             name = "Xarpus",
             description = "Xarpus options",
-            position = 0,
+            position = 3,
             closedByDefault = true
     )
     String Xarpus = "Xarpus";
@@ -50,5 +57,29 @@ public interface KTheatreOfBloodConfig extends Config {
     )
     default boolean xarpusWheelchair() {
         return false;
+    }
+
+
+    @ConfigItem(
+            keyName = "Phoenix Necklace Helper",
+            name = "Phoenix Necklace Helper",
+            description = "Equips Phoenix Necklace if one exists in your inventory while attacking bloat below certain threshold, while bloat is up",
+            section = Bloat,
+            position = 0
+    )
+    default boolean PneckHelper() {
+        return false;
+    }
+
+    @Range(max = 100)
+    @ConfigItem(
+            keyName = "Phoenix Necklace Helper Threshold",
+            name = "Phoenix Necklace Helper Threshold",
+            description = "Hp to start equipping necks below",
+            section = Bloat,
+            position = 1
+    )
+    default int PneckHelperThreshold() {
+        return 30;
     }
 }
