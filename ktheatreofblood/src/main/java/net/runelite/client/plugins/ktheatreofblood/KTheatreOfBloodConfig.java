@@ -80,6 +80,6 @@ public interface KTheatreOfBloodConfig extends Config {
             position = 1
     )
     default int PneckHelperThreshold() {
-        return 30;
+        return 50;
     }
 }

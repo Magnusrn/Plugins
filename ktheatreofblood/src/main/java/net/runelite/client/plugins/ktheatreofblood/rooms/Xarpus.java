@@ -4,10 +4,7 @@ import com.google.inject.Provides;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.AnimationChanged;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.events.NpcSpawned;
+import net.runelite.api.events.*;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.ktheatreofblood.KTheatreOfBloodConfig;
@@ -21,12 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Xarpus extends Room {
-    //TODO - ensure only runs if xarpus has screeched
-    // prevent clicking on final tick if in safezone maybe.
+    //TODO - prevent clicking on final tick if in safezone maybe.
 
     private int weaponCooldown;
     private int ticksSinceTurn = 0;
     private int lastDirection = 0;
+    private boolean screeched = false;
     private NPC xarpus = null;
 
     @Inject
@@ -101,10 +98,19 @@ public class Xarpus extends Room {
         }
     }
 
+    @Subscribe
+    public void onOverheadTextChanged(OverheadTextChanged event) {
+        if(event.getActor() instanceof NPC && xarpus!=null)
+        {
+            screeched = true;
+        }
+    }
+
     private void reset() {
         ticksSinceTurn = 0;
         lastDirection = 0;
         xarpus = null;
+        screeched = false;
     }
 
     @Subscribe
@@ -130,6 +136,7 @@ public class Xarpus extends Room {
         if ((ticksSinceTurn+weaponCooldown>7)) return;
         if (ticksSinceTurn>7) return;
         if (xarpus == null) return;
+        if (!screeched) return;
         if (config.xarpusWheelchair())
         {
             if (isInDanger() && event.getMenuTarget().contains("Xarpus"))
@@ -144,7 +151,7 @@ public class Xarpus extends Room {
         if (xarpus == null) return false;
         int x = xarpus.getWorldLocation().getX();
         int y = xarpus.getWorldLocation().getY();
-        //this requires a little overlap so people don't fuck themselves up in the middle. uses xarpus as a reference point to get worldpoints due to it constantly changing with new instances
+        //uses xarpus as a reference point to get worldpoints due to it constantly changing with new instances
         WorldArea swArea = new WorldArea(new WorldPoint(x-5,y-5,1),new WorldPoint(x+3,y+3,1));
         WorldArea seArea = new WorldArea(new WorldPoint(x+2,y-5,1),new WorldPoint(x+9,y+3,1));
         WorldArea nwArea = new WorldArea(new WorldPoint(x-5,y+2,1),new WorldPoint(x+3,y+9,1));
