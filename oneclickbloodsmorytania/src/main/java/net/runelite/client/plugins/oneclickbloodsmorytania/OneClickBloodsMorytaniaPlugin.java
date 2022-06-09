@@ -23,6 +23,7 @@ import org.pf4j.Extension;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @Extension
 @PluginDescriptor(
@@ -66,7 +67,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
 
         //this is a patch i have no clue why the widget is triggering, some logic bug which i need to find but this is temporary solution.
         Widget widget = client.getWidget(229,1);
-        if (config.noEssencePatch() && widget!=null && widget.getText().equals("You do not have any pure essences to bind."))
+        if (widget!=null && widget.getText().equals("You do not have any pure essences to bind."))
         {
             craftedRunes = true;
         }
@@ -92,7 +93,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onChatMessage(ChatMessage event) {
+    public void onChatmessage(ChatMessage event) {
         if (event.getMessage().contains("There are no essences in this pouch."))
         {
             //not perfect but it works, prevents spam crafting if pouch is empty due to broken pouches previously
@@ -137,7 +138,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                 Widget activebloodEss = getInventoryItem(ItemID.BLOOD_ESSENCE_ACTIVE);
                 if (activebloodEss == null)
                 {
-                    setMenuEntry(event, activateBloodEssenceMES(bloodEss.getIndex()));
+                    setMenuEntry(event, activateBloodEssence(bloodEss.getIndex()));
                     return;
                 }
             }
@@ -146,7 +147,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         List<Integer> brokenPouches = Arrays.asList(ItemID.MEDIUM_POUCH_5511,ItemID.LARGE_POUCH_5513,ItemID.GIANT_POUCH_5515,ItemID.COLOSSAL_POUCH_26786);
         if (brokenPouches.stream().anyMatch(pouch -> client.getItemContainer(InventoryID.INVENTORY).contains(pouch)))
         {
-            setMenuEntry(event,repairPouchesSpellMES());
+            setMenuEntry(event,repairPouchesSpell());
             return;
         }
 
@@ -155,8 +156,8 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
             switch (runecraftingState)
             {
                 case 0:
-                    setMenuEntry(event,craftRunesMES());
-                    setMenuEntry(event,craftRunesMES());
+                    setMenuEntry(event,craftRunes());
+                    setMenuEntry(event,craftRunes());
                     if (!craftedRunes)
                     {
                         return;
@@ -166,25 +167,25 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                 case 1:
                     if (colossalPouch!=null)
                     {
-                        setMenuEntry(event,emptyPouchMES(colossalPouch));
+                        setMenuEntry(event,emptyPouch(colossalPouch));
                         runecraftingState = 3;
                         return;
                     }
                     if (giantPouch!=null)
                     {
-                        setMenuEntry(event,emptyPouchMES(giantPouch));
+                        setMenuEntry(event,emptyPouch(giantPouch));
                         runecraftingState = 2;
                         return;
                     }
                 case 2:
                     if (largePouch!=null)
                     {
-                        setMenuEntry(event,emptyPouchMES(largePouch));
+                        setMenuEntry(event,emptyPouch(largePouch));
                         runecraftingState = 3;
                         return;
                     }
                 case 3:
-                    setMenuEntry(event,craftRunesMES());
+                    setMenuEntry(event,craftRunes());
                     if (!craftedRunes)
                     {
                         return;
@@ -194,25 +195,25 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                 case 4:
                     if (colossalPouch!=null)
                     {
-                        setMenuEntry(event,emptyPouchMES(colossalPouch));
+                        setMenuEntry(event,emptyPouch(colossalPouch));
                         runecraftingState = 6;
                         return;
                     }
                     if (mediumPouch!=null)
                     {
-                        setMenuEntry(event,emptyPouchMES(mediumPouch));
+                        setMenuEntry(event,emptyPouch(mediumPouch));
                         runecraftingState = 5;
                         return;
                     }
                 case 5:
                     if (smallPouch!=null)
                     {
-                        setMenuEntry(event,emptyPouchMES(smallPouch));
+                        setMenuEntry(event,emptyPouch(smallPouch));
                         runecraftingState = 6;
                         return;
                     }
                 case 6:
-                    setMenuEntry(event,craftRunesMES());
+                    setMenuEntry(event,craftRunes());
                     if (!craftedRunes)
                     {
                         return;
@@ -220,9 +221,9 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                     craftedRunes = false;
                     runecraftingState = 7;
                 case 7:
-                    if (teleToBankMES() != null)
+                    if (teleToBank() != null)
                     {
-                        setMenuEntry(event,teleToBankMES());
+                        setMenuEntry(event,teleToBank());
                         bankTeleportTimeout = 4;
                     }
                     return;
@@ -252,20 +253,20 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                 case 1:
                     if (colossalPouch!=null)
                     {
-                        setMenuEntry(event,fillPouchMES(colossalPouch));
+                        setMenuEntry(event,fillPouch(colossalPouch));
                         bankingState = 3;
                         return;
                     }
                     if (giantPouch!=null)
                     {
-                        setMenuEntry(event,fillPouchMES(giantPouch));
+                        setMenuEntry(event,fillPouch(giantPouch));
                         bankingState = 2;
                         return;
                     }
                 case 2:
                     if (largePouch!=null)
                     {
-                        setMenuEntry(event,fillPouchMES(largePouch));
+                        setMenuEntry(event,fillPouch(largePouch));
                         bankingState = 3;
                         return;
                     }
@@ -276,20 +277,20 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                 case 4:
                     if (colossalPouch!=null)
                     {
-                        setMenuEntry(event,fillPouchMES(colossalPouch));
+                        setMenuEntry(event,fillPouch(colossalPouch));
                         bankingState = 6;
                         return;
                     }
                     if (mediumPouch!=null)
                     {
-                        setMenuEntry(event,fillPouchMES(mediumPouch));
+                        setMenuEntry(event,fillPouch(mediumPouch));
                         bankingState = 5;
                         return;
                     }
                 case 5:
                     if (smallPouch!=null)
                     {
-                        setMenuEntry(event,fillPouchMES(smallPouch));
+                        setMenuEntry(event,fillPouch(smallPouch));
                         bankingState = 6;
                         return;
                     }
@@ -298,9 +299,9 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
                     bankingState = 7;
                     return;
                 case 7:
-                    if (teleToPOHMES()!=null)
+                    if (teleToPOH()!=null)
                     {
-                        setMenuEntry(event,teleToPOHMES());
+                        setMenuEntry(event,teleToPOH());
                         POHTeleportTimeout = 4;
                     }
                     return;
@@ -309,7 +310,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
 
         if (isInBloodAltarArea())
         {
-            setMenuEntry(event,enterAltarMES());
+            setMenuEntry(event,enterAltar());
             return;
         }
 
@@ -317,65 +318,65 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         {
             if (client.getEnergy()<config.runEnergy())
             {
-                setMenuEntry(event,drinkFromPoolMES());
+                setMenuEntry(event,drinkFromPool());
                 return;
             }
-            setMenuEntry(event,useFairyRingMES());
+            setMenuEntry(event,useFairyRing());
             return;
         }
         if (isInMorytaniaHideout1())
         {
-            setMenuEntry(event,leaveMorytaniaHideout1MES());
+            setMenuEntry(event,leaveMorytaniaHideout1());
             return;
         }
         if (isInMorytaniaHideout2())
         {
-            setMenuEntry(event,leaveMorytaniaHideout2MES());
+            setMenuEntry(event,leaveMorytaniaHideout2());
             return;
         }
         if (isInMorytaniaHideout3())
         {
-            setMenuEntry(event,leaveMorytaniaHideout3MES());
+            setMenuEntry(event,leaveMorytaniaHideout3());
             return;
         }
         if (isinMorytaniaHideout4LowAgility())
         {
-            setMenuEntry(event,leaveMorytaniaHideout4LowAgilityMES());
+            setMenuEntry(event,leaveMorytaniaHideout4LowAgility());
             return;
         }
         if (isinMorytaniaHideout5LowAgility())
         {
-            setMenuEntry(event,useLowAgilityShortcut1MES());
+            setMenuEntry(event,useLowAgilityShortcut1());
             return;
         }
         if (isinMorytaniaHideout5LowAgilityShortcut())
         {
-            setMenuEntry(event,useLowAgilityShortcut2MES());
+            setMenuEntry(event,useLowAgilityShortcut2());
             return;
         }
 
         if (isinMorytaniaHideout5HighAgilityShortcut())
         {
-            setMenuEntry(event,useHighAgilityShortcut2MES());
+            setMenuEntry(event,useHighAgilityShortcut2());
             return;
         }
-        if (getEmptySlots()>0 && bankMES()!=null)
+        if (getEmptySlots()>0 && bank()!=null)
         {
-            setMenuEntry(event,bankMES());
+            setMenuEntry(event,bank());
             return;
         }
         if (getEmptySlots()!=0)
         {
-            if (teleToBankMES() != null)
+            if (teleToBank() != null)
             {
-                setMenuEntry(event,teleToBankMES());
+                setMenuEntry(event,teleToBank());
                 bankTeleportTimeout = 4;
             }
             return;
         }
-        if (teleToPOHMES()!=null)
+        if (teleToPOH()!=null)
         {
-            setMenuEntry(event,teleToPOHMES());
+            setMenuEntry(event,teleToPOH());
             POHTeleportTimeout = 4;
         }
     }
@@ -403,12 +404,19 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return null;
     }
 
-    private MenuEntry drinkFromPoolMES() {
-        GameObject pool = getGameObject(29241);
-        return createMenuEntry(pool.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(pool).getX(),getLocation(pool).getY(), false);
+    private MenuEntry drinkFromPool() {
+        List<Integer> pools = Arrays.asList(ObjectID.ORNATE_POOL_OF_REJUVENATION,ObjectID.FANCY_POOL_OF_REJUVENATION,ObjectID.POOL_OF_REJUVENATION,ObjectID.POOL_OF_REVITALISATION);
+        GameObject pool = pools
+                .stream()
+                .map(this::getGameObject)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
+
+        return pool == null ? null : createMenuEntry(pool.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(pool).getX(),getLocation(pool).getY(), false);
     }
 
-    private MenuEntry useFairyRingMES() {
+    private MenuEntry useFairyRing() {
         GameObject fairyRing = getGameObject(29228);
         if (getGameObject(29229)!=null) //if tree fairy ring combo is present
         {
@@ -418,16 +426,16 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return createMenuEntry(fairyRing.getId(), MenuAction.GAME_OBJECT_THIRD_OPTION, getLocation(fairyRing).getX(),getLocation(fairyRing).getY(), false);
     }
 
-    private MenuEntry leaveMorytaniaHideout1MES() {
+    private MenuEntry leaveMorytaniaHideout1() {
         GameObject tunnel = getGameObject(16308);
         return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
     }
-    private MenuEntry leaveMorytaniaHideout2MES() {
+    private MenuEntry leaveMorytaniaHideout2() {
         GameObject tunnel = getGameObject(5046);
         return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
     }
 
-    private MenuEntry leaveMorytaniaHideout3MES() {
+    private MenuEntry leaveMorytaniaHideout3() {
         //if 93 agility & 78 mining use good shortcut else use shit one
         GameObject tunnel = getGameObject(43759); //new tunnel ID
         if ((client.getBoostedSkillLevel(Skill.AGILITY)<93 || client.getBoostedSkillLevel(Skill.MINING)<78) && !config.overrideAgility())
@@ -437,7 +445,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return createMenuEntry( tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
     }
 
-    private MenuEntry leaveMorytaniaHideout4LowAgilityMES() {
+    private MenuEntry leaveMorytaniaHideout4LowAgility() {
         //multiple objects with same ID so need to ensure it's the south tunnel
         WorldArea worldarea = new WorldArea(new WorldPoint(3488,9858,0),new WorldPoint(3495,9865,0));
         GameObject tunnel = new GameObjectQuery()
@@ -450,14 +458,14 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
     }
 
-    private MenuEntry useLowAgilityShortcut1MES() {
+    private MenuEntry useLowAgilityShortcut1() {
         WallObject tunnel = new WallObjectQuery()
                 .idEquals(43755)
                 .result(client)
                 .nearestTo(client.getLocalPlayer());
         return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
     }
-    private MenuEntry useLowAgilityShortcut2MES() {
+    private MenuEntry useLowAgilityShortcut2() {
         WallObject tunnel = new WallObjectQuery()
                 .idEquals(43758)
                 .result(client)
@@ -465,7 +473,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
     }
 
-    private MenuEntry useHighAgilityShortcut2MES() {
+    private MenuEntry useHighAgilityShortcut2() {
         WallObject tunnel = new WallObjectQuery()
                 .idEquals(43762)
                 .result(client)
@@ -473,21 +481,21 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return createMenuEntry(tunnel.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(tunnel).getX(), getLocation(tunnel).getY(), false);
     }
 
-    private MenuEntry enterAltarMES() {
+    private MenuEntry enterAltar() {
         GameObject altar = getGameObject(25380);
         if (getInventoryItem(ItemID.CATALYTIC_TALISMAN)!=null)
         {
-            return useItemOnAltarMES(altar, getInventoryItem(ItemID.CATALYTIC_TALISMAN));
+            return useItemOnAltar(altar, getInventoryItem(ItemID.CATALYTIC_TALISMAN));
         }
         if (getInventoryItem(ItemID.BLOOD_TALISMAN)!=null)
         {
-            return useItemOnAltarMES(altar, getInventoryItem(ItemID.BLOOD_TALISMAN));
+            return useItemOnAltar(altar, getInventoryItem(ItemID.BLOOD_TALISMAN));
         }
         //else assume something is worn giving access to altar
         return createMenuEntry(altar.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(altar).getX(), getLocation(altar).getY(), false);
     }
 
-    private MenuEntry useItemOnAltarMES(GameObject altar,Widget item) {
+    private MenuEntry useItemOnAltar(GameObject altar,Widget item) {
         setSelectedInventoryItem(item);
         return createMenuEntry(altar.getId(), MenuAction.ITEM_USE_ON_GAME_OBJECT, getLocation(altar).getX(), getLocation(altar).getY(), false);
     }
@@ -498,16 +506,16 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         client.setSelectedSpellItemId(item.getId());
     }
 
-    private MenuEntry craftRunesMES() {
+    private MenuEntry craftRunes() {
         GameObject altar = getGameObject(43479);
         return createMenuEntry(altar.getId(), MenuAction.GAME_OBJECT_FIRST_OPTION, getLocation(altar).getX(), getLocation(altar).getY(), true);
     }
 
-    private MenuEntry emptyPouchMES(Widget pouch) {
+    private MenuEntry emptyPouch(Widget pouch) {
         return createMenuEntry(3, MenuAction.CC_OP, pouch.getIndex(), WidgetInfo.INVENTORY.getId(), false);
     }
 
-    private MenuEntry teleToBankMES() {
+    private MenuEntry teleToBank() {
         if (bankTeleportTimeout>0) return null;
         if (client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE) || client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.MAX_CAPE_13342))
         {
@@ -535,7 +543,7 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return createMenuEntry(1, MenuAction.CC_OP, -1, WidgetInfo.SPELL_MOONCLAN_TELEPORT.getId(), false);
     }
 
-    private MenuEntry bankMES() {
+    private MenuEntry bank() {
         GameObject craftingBank = getGameObject(14886);
         if (craftingBank!=null)
         {
@@ -563,11 +571,11 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return createMenuEntry(7, MenuAction.CC_OP_LOW_PRIORITY, getBankIndex(essence), WidgetInfo.BANK_ITEM_CONTAINER.getId(), false);
     }
 
-    private MenuEntry fillPouchMES(Widget pouch) {
+    private MenuEntry fillPouch(Widget pouch) {
         return createMenuEntry(9, MenuAction.CC_OP_LOW_PRIORITY, pouch.getIndex(), WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId(), false);
     }
 
-    private MenuEntry teleToPOHMES() {
+    private MenuEntry teleToPOH() {
         if (POHTeleportTimeout>0) return null;
         Widget tab = getInventoryItem(ItemID.TELEPORT_TO_HOUSE);
         Widget conCape = getInventoryItem(ItemID.CONSTRUCT_CAPE);
@@ -599,11 +607,11 @@ public class OneClickBloodsMorytaniaPlugin extends Plugin {
         return createMenuEntry(1, MenuAction.CC_OP, -1, WidgetInfo.SPELL_TELEPORT_TO_HOUSE.getId(), false);
     }
 
-    private MenuEntry repairPouchesSpellMES() {
+    private MenuEntry repairPouchesSpell() {
         return createMenuEntry(2, MenuAction.CC_OP, -1, WidgetInfo.SPELL_NPC_CONTACT.getId(), false);
     }
 
-    private MenuEntry activateBloodEssenceMES(int slot){
+    private MenuEntry activateBloodEssence(int slot){
         return createMenuEntry(
                 2,
                 MenuAction.CC_OP,
