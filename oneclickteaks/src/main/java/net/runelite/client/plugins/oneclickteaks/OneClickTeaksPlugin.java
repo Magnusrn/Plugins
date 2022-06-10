@@ -55,6 +55,8 @@ public class OneClickTeaksPlugin extends Plugin {
         String text = "<col=00ff00>One Click Teaks/Mahoganys";
         this.client.insertMenuItem(text, "", MenuAction.UNKNOWN
                 .getId(), 0, 0, 0, true);
+        //Ethan Vann the goat. Allows for left clicking anywhere when bank open instead of withdraw/deposit taking priority
+        this.client.setTempMenuEntry(Arrays.stream(client.getMenuEntries()).filter(x->x.getOption().equals(text)).findFirst().orElse(null));
     }
 
 
