@@ -20,7 +20,7 @@ import java.util.List;
 public class Xarpus extends Room {
     //TODO - prevent clicking on final tick if in safezone maybe.
 
-    private int weaponCooldown;
+    private int weaponCooldown = 0;
     private int ticksSinceTurn = 0;
     private int lastDirection = 0;
     private boolean screeched = false;
@@ -133,13 +133,15 @@ public class Xarpus extends Room {
 
     @Subscribe
     private void onMenuOptionClicked(MenuOptionClicked event) {
-        if ((ticksSinceTurn+weaponCooldown>7)) return;
-        if (ticksSinceTurn>7) return;
         if (xarpus == null) return;
         if (!screeched) return;
-        if (config.xarpusWheelchair())
+        //if on tick 8? and not in danger then eat click
+        if (ticksSinceTurn+weaponCooldown>7 && InDanger()) return;
+        if (config.xarpusWheelchair() && event.getMenuTarget().contains("Xarpus"))
         {
-            if (isInDanger() && event.getMenuTarget().contains("Xarpus"))
+            //if in danger or attacking on a tick that will cause you to attack as he turns
+            if (InDanger()
+                || (!InDanger() && ticksSinceTurn+weaponCooldown>7))
             {
                 event.consume();
                 walkTile(client.getLocalPlayer().getWorldLocation());
@@ -147,7 +149,7 @@ public class Xarpus extends Room {
         }
     }
 
-    private boolean isInDanger() {
+    private boolean InDanger() {
         if (xarpus == null) return false;
         int x = xarpus.getWorldLocation().getX();
         int y = xarpus.getWorldLocation().getY();
