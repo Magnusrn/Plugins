@@ -5,6 +5,7 @@ import net.runelite.api.*;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
+import net.runelite.api.util.Text;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.ktheatreofblood.KTheatreOfBloodConfig;
@@ -18,10 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Xarpus extends Room {
-    //TODO - prevent clicking on final tick if in safezone maybe.
 
     private int weaponCooldown = 0;
     private int ticksSinceTurn = 0;
+    private int ticksSinceScreech = 0;
     private int lastDirection = 0;
     private boolean screeched = false;
     private NPC xarpus = null;
@@ -44,7 +45,7 @@ public class Xarpus extends Room {
 
     @Override
     protected void startUp() throws Exception {
-        System.out.println("starting plugin xarpus");
+        System.out.println("Starting Xarpus Plugin KTOB");
         reset();
     }
 
@@ -108,6 +109,7 @@ public class Xarpus extends Room {
 
     private void reset() {
         ticksSinceTurn = 0;
+        ticksSinceScreech = 0;
         lastDirection = 0;
         xarpus = null;
         screeched = false;
@@ -116,34 +118,33 @@ public class Xarpus extends Room {
     @Subscribe
     public void onGameTick(GameTick gameTick) {
         if (weaponCooldown>0) weaponCooldown --;
-        List<Integer> directions = Arrays.asList(255,735,1281,1825);
-        if (xarpus!=null)
+        if (xarpus!=null && screeched)
         {
             if (lastDirection!= xarpus.getOrientation())
             {
                 ticksSinceTurn = 0;
             }
-            if (directions.contains(xarpus.getOrientation()))
-            {
-                ticksSinceTurn++;
-                lastDirection = xarpus.getOrientation();
-            }
+            ticksSinceTurn++;
+            ticksSinceScreech++;
+            lastDirection = xarpus.getOrientation();
+            System.out.println("ticks since screech: " + ticksSinceScreech);
         }
     }
-
+    //test feet on 5, scy on 6
     @Subscribe
     private void onMenuOptionClicked(MenuOptionClicked event) {
         if (xarpus == null) return;
         if (!screeched) return;
-        //if on tick 8? and not in danger then eat click
-        if (ticksSinceTurn+weaponCooldown>7 && InDanger()) return;
+        if (ticksSinceTurn+weaponCooldown >=8 && InDanger()) return;
         if (config.xarpusWheelchair() && event.getMenuTarget().contains("Xarpus"))
         {
-            //if in danger or attacking on a tick that will cause you to attack as he turns
-            if (InDanger()
-                || (!InDanger() && ticksSinceTurn+weaponCooldown>7))
+            System.out.println(ticksSinceScreech);
+            //tickssincescreech is required as xarpus's first turn is the only time it can turn to the same direction, so shouldn't attack on dangerous tick ever before first turn.
+            if ((ticksSinceScreech == 8 || InDanger())
+                || (ticksSinceTurn + weaponCooldown == 8 && !InDanger()))
             {
                 event.consume();
+                //maybe add option to move to safe tile, check for non dangerous tile within 2 tiles and ensure no acid?
                 walkTile(client.getLocalPlayer().getWorldLocation());
             }
         }
@@ -176,7 +177,11 @@ public class Xarpus extends Room {
          *     <li>1825 is South East</li>
          * </ul>
          */
-        //fix npe on entering, is orientation nulling sometimes?
+        //after screech everywhere is safe unless tick 8
+        if (areas.get(xarpus.getOrientation())==null)
+        {
+            return false;
+        }
         return client.getLocalPlayer().getWorldLocation().isInArea(areas.get(xarpus.getOrientation()));
     }
 

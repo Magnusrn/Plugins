@@ -2,10 +2,7 @@ package net.runelite.client.plugins.ktheatreofblood.rooms;
 
 import com.google.inject.Provides;
 import net.runelite.api.*;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.events.NpcDespawned;
-import net.runelite.api.events.NpcSpawned;
+import net.runelite.api.events.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.config.ConfigManager;
@@ -39,6 +36,20 @@ public class Bloat extends Room {
     @Override
     protected void startUp() throws Exception {
         System.out.println("starting plugin bloat");
+    }
+
+    @Subscribe
+    public void onGameTick(GameTick event) {
+        checkForNecklace();
+    }
+
+    private void checkForNecklace() {
+        if (client.getItemContainer(InventoryID.EQUIPMENT)!=null && client.getItemContainer(InventoryID.EQUIPMENT).contains(ItemID.PHOENIX_NECKLACE))
+        {
+            equippedNeck = true;
+            return;
+        }
+        equippedNeck = false;
     }
 
     @Subscribe
@@ -76,14 +87,9 @@ public class Bloat extends Room {
     private Widget getInventoryItem(int id) {
         client.runScript(6009, 9764864, 28, 1, -1);
         Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-        Widget bankInventoryWidget = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
-        if (inventoryWidget!=null && !inventoryWidget.isHidden())
+        if (inventoryWidget!=null)
         {
             return getWidgetItem(inventoryWidget,id);
-        }
-        if (bankInventoryWidget!=null && !bankInventoryWidget.isHidden())
-        {
-            return getWidgetItem(bankInventoryWidget,id);
         }
         return null;
     }
