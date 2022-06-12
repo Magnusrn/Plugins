@@ -88,9 +88,9 @@ public class oneClickZMIPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onChatMessage(ChatMessage event)
-	{
-		if (event.getMessage().contains("There are no essences in this pouch."))
+	public void onChatMessage(ChatMessage event) {
+		if (event.getMessage().contains("There are no essences in this pouch.")
+			|| event.getMessage().contains("You do not have any pure or daeyalt essences to bind."))
 		{
 			//not perfect but it works, prevents spam crafting if pouch is empty due to broken pouches previously
 			craftedRunes = true ;
